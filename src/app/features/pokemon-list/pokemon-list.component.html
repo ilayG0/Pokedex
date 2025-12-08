@@ -1,0 +1,16 @@
+@if(isLoading()){
+<div>Loading...</div>
+} @else {
+
+<div class="pokemon-grid">
+@for(pokemon of this.pokemons; track pokemon.id){
+  <app-pokemon-preview-card [pokemon]="pokemon"/>
+}
+</div>
+
+<div class="pagination">
+  <button (click)="prevPage()" [disabled]="currentPage === 1">Prev</button>
+  <span>Page {{ currentPage }}</span>
+  <button (click)="nextPage()">Next</button>
+</div>
+}

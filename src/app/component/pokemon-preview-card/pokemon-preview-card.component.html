@@ -1,0 +1,13 @@
+<div class="card">
+  <p class="card-id-title">{{ pokemon.id | pokemonId}}</p>
+  <!-- add a pipe to format 1 to #001 -->
+  <img
+    [src]="
+      'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' +
+      pokemon.id +
+      '.png'
+    "
+    alt="{{ pokemon.name }}"
+  />
+  <p class="crad-pokemon-name">{{pokemon.name}}</p>
+</div>
