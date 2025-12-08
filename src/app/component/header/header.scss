@@ -46,18 +46,18 @@ nav a {
   background-color: $color-primary-green;
 }
 .nav-home:hover {
-  color: $color-text-light;
+  color: $color-light;
 }
 
 .nav-favorites {
-  color: $color-text-light;
+  color: $color-light;
 }
 .nav-favorites:hover {
   color: $color-primary-green;
 }
 
 /* Mobile: smaller padding */
-@media (max-width: 600px) {
+/* @media (max-width: 600px) {
   .header {
     padding: 0 1rem;
     height: 64px;
@@ -71,4 +71,4 @@ nav a {
     padding: 0.35rem 1rem;
     font-size: 0.85rem;
   }
-}
+} */
