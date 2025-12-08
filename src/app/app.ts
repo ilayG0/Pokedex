@@ -6,7 +6,7 @@ import { PokemonListComponent } from "./features/pokemon-list/pokemon-list.compo
 
 @Component({
   selector: 'app-root',
-  imports: [Header, SearchBar, PokemonListComponent],
+  imports: [Header, SearchBar, PokemonListComponent, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

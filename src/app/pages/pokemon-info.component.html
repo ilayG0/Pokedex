@@ -1,0 +1,15 @@
+<div *ngIf="isLoading">Loading...</div>
+
+<div *ngIf="!isLoading">
+  <h1>{{ pokemon.name | titlecase }}</h1>
+  <img [src]="pokemon.sprites.front_default" />
+
+  <h3>Types:</h3>
+  <ul>
+    <li *ngFor="let t of pokemon.types">
+      {{ t.type.name }}
+    </li>
+  </ul>
+
+  <button routerLink="/">Back</button>
+</div>

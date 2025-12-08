@@ -1,9 +1,9 @@
-
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PokemonService } from '../../services/pokemon.service';
 import { Pokemon } from '../../models/pokemon.model';
-import { PokemonPreviewCard } from "../../component/pokemon-preview-card/pokemon-preview-card.component";
+import { PokemonPreviewCard } from '../../component/pokemon-preview-card/pokemon-preview-card.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-pokemon-list',
@@ -13,13 +13,14 @@ import { PokemonPreviewCard } from "../../component/pokemon-preview-card/pokemon
   styleUrls: ['./pokemon-list.component.scss'],
 })
 export class PokemonListComponent implements OnInit {
-  pokemons: Pokemon[] = [];          // what we show on this page
+  pokemons: Pokemon[] = []; // what we show on this page
   isLoading = signal(false);
 
   currentPage = 1;
   readonly pageSize = 12;
 
   private readonly pokemonService = inject(PokemonService);
+  private router = inject(Router);
 
   ngOnInit(): void {
     this.loadPage(1);
@@ -75,4 +76,9 @@ export class PokemonListComponent implements OnInit {
   getIdFromUrl(url: string): number {
     return this.pokemonService.extractIdFromUrl(url);
   }
+
+  // go to the chosen pokemon info page
+  goToPokemon(id: number) {
+  this.router.navigate(['/pokemon-info', id]);
+}
 }

@@ -4,7 +4,7 @@
 
 <div class="pokemon-grid">
 @for(pokemon of this.pokemons; track pokemon.id){
-  <app-pokemon-preview-card [pokemon]="pokemon"/>
+  <app-pokemon-preview-card [pokemon]="pokemon"  (click)="goToPokemon(pokemon.id)"/>
 }
 </div>
 

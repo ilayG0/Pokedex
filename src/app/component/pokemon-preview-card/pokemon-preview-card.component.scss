@@ -7,32 +7,38 @@
   text-align: center;
   box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, 0.15);
   cursor: pointer;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.card:hover{
-  box-shadow: 0 0 8px 2px rgba(148, 217, 126, 0.6);  // on hover show green shadow
+.card:hover {
+  box-shadow: 0 0 8px 2px rgba(148, 217, 126, 0.6);
 }
 
 .card img {
   width: 100%;
-  height: 100%;
+  flex: 1 1 auto;
+  object-fit: contain;
   image-rendering: pixelated;
+
 }
 
 p {
-    margin: 0;
-    color: $color-text;
-    font-family: 'Roboto';
-    font-size: 22px;
-    font-weight: 400;
-    line-height: 100%;
-    letter-spacing: 0pc;
+  margin: 0;
+  color: $color-text;
+  font-family: 'Roboto';
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 100%;
+  letter-spacing: 0pc;
 }
 
-.card-id-title{
-    text-align: left;
+.card-id-title {
+  text-align: left;
 }
 
-.crad-pokemon-name{
-    padding-bottom: 5%;
+.crad-pokemon-name {
+  padding-bottom: 5%;
 }
