@@ -1,0 +1,24 @@
+@if(isLoading()){
+<div>Loading...</div>
+} @else {
+
+<div class="pokemon-grid">
+  <div class="card" *ngFor="let p of pokemon">
+    <h3>{{ p.name | titlecase }}</h3>
+    <img
+      [src]="
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' +
+        getIdFromUrl(p.url) +
+        '.png'
+      "
+      alt="{{ p.name }}"
+    />
+  </div>
+</div>
+
+<div class="pagination">
+  <button (click)="prevPage()" [disabled]="currentPage === 1">Prev</button>
+  <span>Page {{ currentPage }}</span>
+  <button (click)="nextPage()">Next</button>
+</div>
+}

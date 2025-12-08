@@ -28,11 +28,31 @@ input {
   height: 36px;
   border-radius: $search-bar-border-radius ;
   border: 0;
-  margin: 0 3px;
+  margin-left: 6px;
   padding: 0 1rem;
   font-family: 'Roboto';
   font-size: 18px;
-  font-weight: 400;
+  font-weight: 300;
   line-height: 100%;
   letter-spacing: 0;
+}
+
+/* filter button svg */
+.filter-btn {
+  width: 40px;
+  height: 37px;
+  border-radius: 12px;
+  background-color: $color-primary-green;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px ;
+  margin-left: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter-btn img {
+  width: 24px;
+  height: 23px;
 }
