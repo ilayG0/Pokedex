@@ -1,0 +1,58 @@
+@import '../../../styles/src-colors';
+
+$card-radius: 9px;
+
+.pokemon-card {
+  margin-top: 24px;
+  margin-left: 15%;
+  margin-right: 30%;
+  padding: 13px 14px;
+  background: #ffffff;
+  border-radius: $card-radius;
+  background-color: $color-light;
+  box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Header: #001 + heart */
+.pokemon-card__header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.pokemon-card__id {
+  font-size: 22px;
+  color: $color-text;
+}
+
+.pokemon-card__favorite-btn {
+  border: none;
+  outline: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  color: $color-text;
+  padding: 2px;
+}
+
+/* Body: two columns (children live inside this grid) */
+.pokemon-card__body {
+  display: grid;
+  grid-template-columns: 35% 2% 60%;
+  column-gap: 10px;
+  align-items: flex-start;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    row-gap: 16px;
+  }
+}
+
+
+.vertical-line {
+  width: 2px;          /* thickness */
+  height: 70%;         /* the line length (not 100%) */
+  background-color: #adadad;
+  //margin: 0 auto;      /* center horizontally if needed */
+}

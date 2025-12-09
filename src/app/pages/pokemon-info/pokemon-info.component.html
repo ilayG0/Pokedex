@@ -1,17 +1,36 @@
-<button type="button" routerLink="/">Back</button>
+<!-- טוען פוקימון -->
+<app-loading-poke-ball *ngIf="isLoading()"></app-loading-poke-ball>
 
-@if(isLoading()){
-  <app-loading-poke-ball/>
- } @else {
-<div>
-  <h1>{{ pokemon.name | titlecase }}</h1>
-  <img [src]="pokemon.sprites.front_default" />
+<button type="button" routerLink="/">Home Page</button>
 
-  <h3>Types:</h3>
-  <ul>
-    <li *ngFor="let t of pokemon.types">
-      {{ t.type.name }}
-    </li>
-  </ul>
+<!-- כרטיס מידע -->
+<div *ngIf="!isLoading() && pokemon" class="pokemon-card">
+  <!-- Header row -->
+  <div class="pokemon-card__header">
+    <span class="pokemon-card__id">
+      {{ pokemon.id | pokemonId  }}
+    </span>
+
+    <button
+      class="pokemon-card__favorite-btn"
+      type="button"
+      aria-label="Add to favorites"
+    >
+      ♡
+    </button>
+  </div>
+
+  <!-- Body: two columns -->
+  <div class="pokemon-card__body">
+    <!-- LEFT: image + name + types -->
+    <app-pokemon-main-info
+      [pokemon]="pokemon"
+    ></app-pokemon-main-info>
+<div class="vertical-line"></div>
+    <!-- RIGHT: description + stats -->
+    <app-pokemon-stats-details
+      [pokemon]="pokemon"
+      [description]="description"
+    ></app-pokemon-stats-details>
+  </div>
 </div>
-}

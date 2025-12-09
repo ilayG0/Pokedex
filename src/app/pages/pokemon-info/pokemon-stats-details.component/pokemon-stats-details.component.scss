@@ -1,0 +1,67 @@
+@import '../../../../styles/src-colors';
+
+
+// Right side: description + stats
+.pokemon-card__right {
+  display: flex;
+  flex-direction: column;
+  gap: 46px;
+}
+
+.pokemon-card__section {
+  margin-bottom: 4px;
+}
+
+.pokemon-card__section-title {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 400;
+  font-family: 'Roboto';
+  color: $color-text;
+}
+
+.pokemon-card__description {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.4;
+  color: $color-primary-blue;
+}
+
+/* Stats grid */
+.pokemon-card__stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 24px;
+  row-gap: 4px;
+  align-items: flex-start;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.pokemon-card__stats-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-row {
+  display: flex;
+  font-size: 18px;
+}
+
+.stat-label, .stat-value  {
+  color: $color-primary-blue;
+}
+
+/* Total */
+.pokemon-card__stats-total {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: $color-text;
+}

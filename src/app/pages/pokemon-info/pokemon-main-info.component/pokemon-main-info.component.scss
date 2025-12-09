@@ -1,0 +1,73 @@
+@import '../../../../styles/src-colors';
+
+// Left side: image + name + types
+.pokemon-card__left {
+  text-align: center;
+}
+
+.pokemon-image-container {
+  width: 100%;           // החדר תופס את כל העמודה
+  height: 150px;         // גובה "קבוע" כמו בדוגמה
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;      // כדי שהתמונה לא תחרוג מהחדר
+
+}
+
+.pokemon-card__image {
+  width: auto;
+  height: 100%;         // הגודל של הפוקימון – תשנה לפי הצורך
+  image-rendering: pixelated;
+  object-fit: contain;   // יושב יפה באמצע ולא נמתח
+}
+
+.pokemon-card__name {
+  margin: 4px 0 8px;
+  font-size: 32px;
+  font-weight: 300;
+  font-family: 'Roboto';
+  color: $color-text;
+}
+
+/* Types row */
+.pokemon-card__types {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 15px 0 ;
+}
+
+.type-chip {
+  padding: 4px 22px;
+  border-radius: 7px;
+  font-size: 22px;
+  font-weight: 300;
+  font-family: 'Roboto';
+  color: #ffffff;
+}
+
+/* Type colors */
+.type-grass {
+  background-color: #7ac74c;
+}
+
+.type-poison {
+  background-color: #a33ea1;
+}
+
+.type-fire {
+  background-color: #ff7043;
+}
+
+.type-water {
+  background-color: #42a5f5;
+}
+
+.type-electric {
+  background-color: #ffca28;
+  color: #3e2723;
+}
+
+/* add more types as needed */
