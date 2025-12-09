@@ -1,0 +1,81 @@
+<div class="filter-card" [formGroup]="filterForm">
+  <!-- first row: name + height -->
+  <div class="all-filters">
+    <div class="filter-card__header">
+      <span class="filter-card__title">פילטור</span>
+    </div>
+    <div class="filter-card__row filter-card__row--two-cols">
+      <div class="field">
+        <label for="name">שם</label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          placeholder="בחירה"
+          [class.field__control--invalid]="f['name'].invalid && (f['name'].touched || submitted)"
+        />
+        @if(f['name'].invalid && (f['name'].touched || submitted)){
+        <div class="field__error">שדה חובה</div>
+        }
+      </div>
+
+      <div class="field">
+        <label for="height">גובה</label>
+        <input id="height" type="number" formControlName="height" placeholder="בחירה" />
+        @if (f['height'].invalid &&  (f['height'].touched || submitted)) {
+        <div class="field__error">יש להזין מספר תקין בלבד</div>
+        }
+      </div>
+    </div>
+
+    <!-- second row: type select -->
+    <div class="filter-card__row">
+      <div class="field">
+        <label for="type">סוג</label>
+        <select
+          id="type"
+          formControlName="type"
+          [class.field__control--invalid]="f['type'].invalid && (f['type'].touched || submitted)"
+        >
+          <option value="" disabled selected>בחירה</option>
+          @for(opt of typeOptions; track opt.name){
+          <option [value]="opt.value">
+            {{ opt.name }}
+          </option>
+          }
+        </select>
+        @if(f['type'].invalid && (f['type'].touched || submitted)){
+        <div class="field__error">יש לבחור סוג</div>
+        }
+      </div>
+    </div>
+
+    <!-- third row: group select -->
+    <div class="filter-card__row">
+      <div class="field">
+        <label for="group">קבוצה</label>
+        <select
+          id="group"
+          formControlName="group"
+          [class.field__control--invalid]="f['group'].invalid && (f['group'].touched || submitted)"
+        >
+          <option value="" disabled selected>בחירה</option>
+          @for(opt of groupOptions; track opt.name){
+          <option [value]="opt.value">
+            {{ opt.name }}
+          </option>
+          }
+        </select>
+        @if(f['group'].invalid && (f['group'].touched || submitted)){
+        <div class="field__error">יש לבחור קבוצה</div>
+        }
+      </div>
+    </div>
+  </div>
+  <hr class="line" />
+  <!-- actions -->
+  <div class="filter-card__actions">
+    <button type="button" class="btn btn--primary" (click)="onSubmit()">חיפוש</button>
+    <button type="button" class="btn btn--ghost" (click)="onCancel()">ביטול</button>
+  </div>
+</div>

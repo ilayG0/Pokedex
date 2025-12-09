@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Pokemon } from '../../models/pokemon.model';
 import { PokemonIdPipe } from '../../pipes/pokemon-id.pipe';
+import { CapitalizeFirstLetterPipe } from "../../pipes/capitalize-first-letter.pipe";
 
 @Component({
   selector: 'app-pokemon-preview-card',
   standalone: true,
-  imports: [PokemonIdPipe],
+  imports: [PokemonIdPipe, CapitalizeFirstLetterPipe],
   templateUrl: './pokemon-preview-card.component.html',
   styleUrl: './pokemon-preview-card.component.scss',
 })

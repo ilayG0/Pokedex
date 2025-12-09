@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-search-bar',
@@ -7,4 +7,10 @@ import { Component } from '@angular/core';
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.scss',
 })
-export class SearchBar {}
+export class SearchBar {
+  @Output() openFilters = new EventEmitter();
+
+  onOpenForm(){
+    this.openFilters.emit();
+  }
+}

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, afterNextRender } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PokemonService } from '../../services/pokemon.service';
 import { Pokemon } from '../../models/pokemon.model';
@@ -33,10 +33,14 @@ export class PokemonListComponent implements OnInit {
     return all.slice(start, end);
   });
 
-  ngOnInit(): void {
-    this.loadPage(1);
+  constructor() {
+    // run AFTER the initial change detection has finished
+    afterNextRender(() => {
+      this.loadPage(1);
+    });
   }
-
+  ngOnInit(): void { }
+  
   /**
    * Loads a specific page (1-based), using pokemons from the service.
    * If not enough pokemons are loaded, calls loadMorePokemons().

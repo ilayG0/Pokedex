@@ -4,13 +4,15 @@ import { Header } from "./component/header/header.component";
 import { SearchBar } from "./component/search-bar/search-bar.component";
 import { PokemonListComponent } from "./features/pokemon-list/pokemon-list.component";
 import { PokemonsHome } from "./pages/home-page/pokemons-home.component";
+import { FilterPanelComponent } from "./component/filter-panel.component/filter-panel.component";
 
 @Component({
   selector: 'app-root',
-  imports: [Header, SearchBar, PokemonListComponent, RouterOutlet, PokemonsHome],
+  imports: [Header, SearchBar, PokemonListComponent, RouterOutlet, PokemonsHome, FilterPanelComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App {
   protected readonly title = signal('pokedex-project');
+
 }
