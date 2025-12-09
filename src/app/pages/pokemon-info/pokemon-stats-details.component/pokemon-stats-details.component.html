@@ -8,49 +8,35 @@
   </section>
 
   <!-- Stats -->
-  <section class="pokemon-card__section">
-    <h3 class="pokemon-card__section-title">Stats</h3>
+<section class="pokemon-card__section">
+  <h3 class="pokemon-card__section-title">Stats</h3>
 
-    <div class="pokemon-card__stats-grid">
-      <div class="pokemon-card__stats-col">
-        <div class="stat-row">
-          <span class="stat-label">HP:</span>
-          <span class="stat-value">{{ getStat('hp') }}</span>
-        </div>
+  <div class="pokemon-card__stats-grid">
 
-        <div class="stat-row">
-          <span class="stat-label">Attack:</span>
-          <span class="stat-value">{{ getStat('attack') }}</span>
-        </div>
-
-        <div class="stat-row">
-          <span class="stat-label">Defense:</span>
-          <span class="stat-value">{{ getStat('defense') }}</span>
-        </div>
-      </div>
-
-      <div class="pokemon-card__stats-col">
-        <div class="stat-row">
-          <span class="stat-label">Special Atk:</span>
-          <span class="stat-value">{{ getStat('special-attack') }}</span>
-        </div>
-
-        <div class="stat-row">
-          <span class="stat-label">Special Def:</span>
-          <span class="stat-value">{{ getStat('special-defense') }}</span>
-        </div>
-
-        <div class="stat-row">
-          <span class="stat-label">Speed:</span>
-          <span class="stat-value">{{ getStat('speed') }}</span>
-        </div>
-      </div>
-      <div class="pokemon-card__stats-col">
-        <div class="stat-row">
-          <span class="stat-label">Total:</span>
-          <span class="stat-value">{{ totalStats }}</span>
-        </div>
+    <!-- LEFT COLUMN -->
+    <div class="pokemon-card__stats-col">
+      <div class="stat-row" *ngFor="let stat of this.statsLeft">
+        <span class="stat-label">{{ stat.label }}:</span>
+        <span class="stat-value">{{ getStat(stat.key) }}</span>
       </div>
     </div>
-  </section>
+
+    <!-- RIGHT COLUMN -->
+    <div class="pokemon-card__stats-col">
+      <div class="stat-row" *ngFor="let stat of this.statsRight">
+        <span class="stat-label">{{ stat.label }}:</span>
+        <span class="stat-value">{{ getStat(stat.key) }}</span>
+      </div>
+    </div>
+
+    <!-- TOTAL -->
+    <div class="pokemon-card__stats-col">
+      <div class="stat-row">
+        <span class="stat-label">Total:</span>
+        <span class="stat-value">{{ totalStats }}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
 </div>

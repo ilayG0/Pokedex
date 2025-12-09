@@ -55,6 +55,10 @@
   color: $color-primary-blue;
 }
 
+.stat-value{
+    margin-left: 5px;
+}
+
 /* Total */
 .pokemon-card__stats-total {
   grid-column: 1 / -1;

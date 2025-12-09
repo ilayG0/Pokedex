@@ -13,6 +13,18 @@ export class PokemonStatsDetailsComponent {
   @Input() pokemon!: Pokemon | null;
   @Input() description = '';
 
+  statsLeft = [
+  { label: 'HP', key: 'hp' },
+  { label: 'Attack', key: 'attack' },
+  { label: 'Defense', key: 'defense' },
+];
+
+statsRight = [
+  { label: 'Special Atk', key: 'special-attack' },
+  { label: 'Special Def', key: 'special-defense' },
+  { label: 'Speed', key: 'speed' },
+];
+
   // Get single stat by name
   getStat(statName: string): number | string {
     if (!this.pokemon?.stats) return '-';
