@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -8,4 +8,15 @@ import { RouterLink } from '@angular/router';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
-export class Header {}
+export class Header {
+
+  isHome= signal(true);
+
+  onHome(){
+    this.isHome.set(true);
+  }
+
+  onFavorite(){
+    this.isHome.set(false);
+  }
+}

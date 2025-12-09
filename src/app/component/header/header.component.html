@@ -4,8 +4,8 @@
   </div>
 
   <nav>
-    <a class="nav-home" routerLink="/"> Home </a>
+    <a class="nav-home" routerLink="/" (click)="onHome()" [class.marker]="isHome()"> Home </a>
 
-    <a class="nav-favorites" routerLink="/favorite-pokemons"> Favorites </a>
+    <a class="nav-favorites" routerLink="/favorite-pokemons" (click)="onFavorite()" [class.marker]="!isHome()"> Favorites </a>
   </nav>
 </header>
