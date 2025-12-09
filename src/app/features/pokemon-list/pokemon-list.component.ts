@@ -1,10 +1,10 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PokemonService } from '../../services/pokemon.service';
 import { Pokemon } from '../../models/pokemon.model';
 import { PokemonPreviewCard } from '../../component/pokemon-preview-card/pokemon-preview-card.component';
 import { Router } from '@angular/router';
-import { LoadingPokeBall } from "../../shared/loading-poke-ball/loading-poke-ball.component";
+import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
 
 @Component({
   selector: 'app-pokemon-list',
@@ -14,40 +14,48 @@ import { LoadingPokeBall } from "../../shared/loading-poke-ball/loading-poke-bal
   styleUrls: ['./pokemon-list.component.scss'],
 })
 export class PokemonListComponent implements OnInit {
-  pokemons: Pokemon[] = []; // what we show on this page
+  // loading state
   isLoading = signal(false);
 
-  currentPage = 1;
+  // pagination
   readonly pageSize = 12;
+  currentPage = signal(1);
 
   private readonly pokemonService = inject(PokemonService);
-  private router = inject(Router);
+  private readonly router = inject(Router);
+
+  // computed list for current page (taken from service's pokemons signal)
+  paginatedPokemons = computed<Pokemon[]>(() => {
+    const all = this.pokemonService.pokemons();
+    const page = this.currentPage();
+    const start = (page - 1) * this.pageSize;
+    const end = page * this.pageSize;
+    return all.slice(start, end);
+  });
 
   ngOnInit(): void {
     this.loadPage(1);
   }
 
   /**
-   * Loads a specific page (1-based), using the cached array from the service.
-   * If the data for that page doesn't exist yet, it calls loadMorePokemons().
+   * Loads a specific page (1-based), using pokemons from the service.
+   * If not enough pokemons are loaded, calls loadMorePokemons().
    */
   loadPage(page: number): void {
     const neededCount = page * this.pageSize;
-    const alreadyLoaded = this.pokemonService.cachedPokemons.length;
+    const alreadyLoaded = this.pokemonService.pokemons().length;
 
-    // if we already have enough Pokémon in cache – just slice
+    // if we already have enough Pokémon in cache – just change page
     if (alreadyLoaded >= neededCount) {
-      this.currentPage = page;
-      this.updateCurrentPageSlice();
+      this.currentPage.set(page);
       return;
     }
 
-    // otherwise, load 12 more from API
+    // otherwise, load more from API
     this.isLoading.set(true);
     this.pokemonService.loadMorePokemons().subscribe({
       next: () => {
-        this.currentPage = page;
-        this.updateCurrentPageSlice();
+        this.currentPage.set(page);
         this.isLoading.set(false);
       },
       error: () => {
@@ -56,30 +64,18 @@ export class PokemonListComponent implements OnInit {
     });
   }
 
-  private updateCurrentPageSlice(): void {
-    const all = this.pokemonService.cachedPokemons;
-    const start = (this.currentPage - 1) * this.pageSize;
-    const end = this.currentPage * this.pageSize;
-    this.pokemons = all.slice(start, end);
-  }
-
   nextPage(): void {
-    this.loadPage(this.currentPage + 1);
+    this.loadPage(this.currentPage() + 1);
   }
 
   prevPage(): void {
-    if (this.currentPage > 1) {
-      this.loadPage(this.currentPage - 1);
+    if (this.currentPage() > 1) {
+      this.loadPage(this.currentPage() - 1);
     }
   }
 
-  // optional helper if you still want it somewhere:
-  getIdFromUrl(url: string): number {
-    return this.pokemonService.extractIdFromUrl(url);
+  // navigate to pokemon info page
+  goToPokemon(id: number): void {
+    this.router.navigate(['/pokemon-info', id]);
   }
-
-  // go to the chosen pokemon info page
-  goToPokemon(id: number) {
-  this.router.navigate(['/pokemon-info', id]);
-}
 }

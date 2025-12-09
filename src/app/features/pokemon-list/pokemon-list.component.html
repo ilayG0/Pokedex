@@ -1,16 +1,28 @@
-@if(isLoading()){
-<app-loading-poke-ball/>
+@if (isLoading()) {
+  <app-loading-poke-ball />
 } @else {
 
-<div class="pokemon-grid">
-@for(pokemon of this.pokemons; track pokemon.id){
-  <app-pokemon-preview-card [pokemon]="pokemon"  (click)="goToPokemon(pokemon.id)"/>
-}
-</div>
+  <div class="pokemon-grid">
+    @for (pokemon of paginatedPokemons(); track pokemon.id) {
+      <app-pokemon-preview-card
+        [pokemon]="pokemon"
+        (click)="goToPokemon(pokemon.id)"
+      />
+    }
+  </div>
 
-<div class="pagination">
-  <button (click)="prevPage()" [disabled]="currentPage === 1">Prev</button>
-  <span>Page {{ currentPage }}</span>
-  <button (click)="nextPage()">Next</button>
-</div>
+  <div class="pagination">
+    <button
+      (click)="prevPage()"
+      [disabled]="currentPage() === 1"
+    >
+      Prev
+    </button>
+
+    <span>Page {{ currentPage() }}</span>
+
+    <button (click)="nextPage()">
+      Next
+    </button>
+  </div>
 }

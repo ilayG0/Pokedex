@@ -1,4 +1,4 @@
-@for (pokemon of favoritePokemons; track pokemon.id) {
+@for (pokemon of this.favorites(); track pokemon.id) {
   <app-pokemon-preview-card
     [pokemon]="pokemon"
     [addCencleBtn]="true"

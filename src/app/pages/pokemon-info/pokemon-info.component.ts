@@ -53,7 +53,6 @@ export class PokemonInfoComponent {
         this.description =
           'A strange seed was planted on its back at birth. The plant sprouts and grows with this POKÉMON.'; // תיאור לדוגמה; אפשר להחליף ב־species API
         this.isLoading.set(false);
-        console.log(p)
       },
       error: (err) => {
         console.error('Error loading pokemon', err);
