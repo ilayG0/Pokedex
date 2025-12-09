@@ -30,15 +30,64 @@ $card-radius: 9px;
   outline: none;
   background: transparent;
   cursor: pointer;
-  font-size: 1rem;
-  color: $color-text;
   padding: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #283593; // default color (outline color)
+}
+
+.favorite-icon {
+  width: 20px;
+  height: 20px;
+  fill: none;              // ⬅️ no fill at start
+  stroke: currentColor;    // ⬅️ outline uses button color
+  stroke-width: 2;
+  transition: fill 0.2s ease, stroke 0.2s ease, transform 0.15s ease;
+}
+
+/* When pokemon.isFavorit = true */
+.pokemon-card__favorite-btn.active {
+  color: red; // ⬅️ this will be used by currentColor
+}
+
+.pokemon-card__favorite-btn.active .favorite-icon {
+  fill: currentColor;      // ⬅️ now it fills red
+  stroke: currentColor;    // ⬅️ outline also red
+  transform: scale(1.1);   // small "pop" effect (optional)
+}
+
+
+.back-button {
+  margin: 40px 15%;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: $color-text;
+  cursor: pointer;
+  padding: 4px 0;
+  font-family: 'Roboto';
+  font-weight: 400;
+  transition: opacity 0.2s ease;
+}
+
+.back-button .arrow {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.back-button:hover {
+  opacity: 0.7;
 }
 
 /* Body: two columns (children live inside this grid) */
 .pokemon-card__body {
   display: grid;
-  grid-template-columns: 35% 3% 60%;
+  grid-template-columns: 35% 3% 63%;
   column-gap: 10px;
   align-items: flex-start;
 
@@ -48,9 +97,8 @@ $card-radius: 9px;
   }
 }
 
-
 .vertical-line {
-  width: 1px;     
-  height: 90%;        
-  background-color: #D7D7D7;
+  width: 1px;
+  height: 90%;
+  background-color: #d7d7d7;
 }

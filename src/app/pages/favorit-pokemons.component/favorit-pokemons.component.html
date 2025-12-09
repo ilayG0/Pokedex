@@ -1,0 +1,7 @@
+@for (pokemon of favoritePokemons; track pokemon.id) {
+  <app-pokemon-preview-card
+    [pokemon]="pokemon"
+    [addCencleBtn]="true"
+    (pokemontoRemove)="onRemoveFavorite($event)"
+  />
+}

@@ -1,6 +1,7 @@
 @import '../../../styles/src-colors';
 
 .card {
+  position: relative;
   background: $color-light;
   border-radius: 12px;
   padding: 0.75rem;
@@ -11,6 +12,21 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.card-remove-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  color: #c62828;
+  padding: 0;
 }
 
 .card:hover {

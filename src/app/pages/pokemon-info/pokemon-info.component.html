@@ -1,32 +1,49 @@
 <!-- טוען פוקימון -->
 <app-loading-poke-ball *ngIf="isLoading()"></app-loading-poke-ball>
 
-<button type="button" routerLink="/">Home Page</button>
+<button class="back-button" routerLink="/">
+  <span class="arrow">
+    <svg width="24" height="12" viewBox="0 0 24 12" xmlns="http://www.w3.org/2000/svg" fill="none">
+      <path d="M7 0L0 6L7 12" stroke="currentColor" stroke-width="2" />
+      <line x1="2" y1="6" x2="24" y2="6" stroke="currentColor" stroke-width="2" />
+    </svg>
+  </span>
+  Home page
+</button>
 
 <!-- כרטיס מידע -->
 <div *ngIf="!isLoading() && pokemon" class="pokemon-card">
   <!-- Header row -->
   <div class="pokemon-card__header">
     <span class="pokemon-card__id">
-      {{ pokemon.id | pokemonId  }}
+      {{ pokemon.id | pokemonId }}
     </span>
 
     <button
       class="pokemon-card__favorite-btn"
       type="button"
       aria-label="Add to favorites"
+      [class.active]="pokemon.isFavorit"
+      (click)="onToggleFavorite(pokemon)"
     >
-      ♡
+      <svg class="favorite-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+         2 6 4 4 6.5 4 8.04 4 9.54 4.81 10.28 6.09
+         11.02 4.81 12.52 4 14.06 4
+         16.56 4 18.56 6 18.56 8.5
+         18.56 12.28 15.16 15.36 13.45 17.03
+         L12 21.35z"
+        />
+      </svg>
     </button>
   </div>
 
   <!-- Body: two columns -->
   <div class="pokemon-card__body">
     <!-- LEFT: image + name + types -->
-    <app-pokemon-main-info
-      [pokemon]="pokemon"
-    ></app-pokemon-main-info>
-<div class="vertical-line"></div>
+    <app-pokemon-main-info [pokemon]="pokemon"></app-pokemon-main-info>
+    <div class="vertical-line"></div>
     <!-- RIGHT: description + stats -->
     <app-pokemon-stats-details
       [pokemon]="pokemon"

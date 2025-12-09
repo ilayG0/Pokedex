@@ -1,6 +1,15 @@
 <div class="card">
-  <p class="card-id-title">{{ pokemon.id | pokemonId}}</p>
-  <!-- add a pipe to format 1 to #001 -->
+  @if (this.addCencleBtn){
+  <button
+    type="button"
+    class="card-remove-btn"
+    (click)="onRemove(pokemon)"
+    aria-label="Remove from favorites"
+  >
+    ✕
+  </button>
+  }
+  <p class="card-id-title">{{ pokemon.id | pokemonId }}</p>
   <img
     [src]="
       'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' +
@@ -9,5 +18,5 @@
     "
     alt="{{ pokemon.name }}"
   />
-  <p class="crad-pokemon-name">{{pokemon.name}}</p>
+  <p class="crad-pokemon-name">{{ pokemon.name }}</p>
 </div>

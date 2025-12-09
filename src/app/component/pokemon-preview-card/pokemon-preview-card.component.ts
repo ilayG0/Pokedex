@@ -1,6 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Pokemon } from '../../models/pokemon.model';
-import { PokemonIdPipe } from "../../pipes/pokemon-id.pipe";
+import { PokemonIdPipe } from '../../pipes/pokemon-id.pipe';
 
 @Component({
   selector: 'app-pokemon-preview-card',
@@ -10,7 +10,11 @@ import { PokemonIdPipe } from "../../pipes/pokemon-id.pipe";
   styleUrl: './pokemon-preview-card.component.scss',
 })
 export class PokemonPreviewCard {
-  @Input({required: true}) pokemon!: Pokemon;
+  @Input({ required: true }) pokemon!: Pokemon;
+  @Input() addCencleBtn?: boolean;
+  @Output() pokemontoRemove = new EventEmitter<Pokemon>();
 
-
+  onRemove(pokemon: Pokemon) {
+    this.pokemontoRemove.emit(pokemon);
+  }
 }

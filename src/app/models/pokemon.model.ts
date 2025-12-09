@@ -5,4 +5,5 @@ export interface Pokemon {
   types: any[];
   abilities: any[];
   stats: any[];
+  isFavorit?: boolean;
 }

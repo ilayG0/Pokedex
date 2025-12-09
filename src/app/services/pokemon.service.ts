@@ -1,4 +1,3 @@
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin, map, switchMap, tap } from 'rxjs';
@@ -22,14 +21,59 @@ export interface PokemonListResponse {
 export class PokemonService {
   private readonly baseUrl = 'https://pokeapi.co/api/v2';
   private readonly pageSize = 12;
+  private readonly FAVORITES_KEY = 'favoritePokemonIds';
 
-  // ⬇️ cache of fully-loaded Pokémon
   private _pokemons: Pokemon[] = [];
+  private _favoriteIds = new Set<number>(); // 🔥 only ids, easy to persist
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.loadFavoritesFromStorage();
+  }
 
-  // Optional: original list endpoint (by name+url only)
-  getPokemonList(page: number = 1, limit: number = this.pageSize): Observable<PokemonListResponse> {
+  // ---------- FAVORITES PERSISTENCE ----------
+
+  private loadFavoritesFromStorage(): void {
+    try {
+      const raw = localStorage.getItem(this.FAVORITES_KEY);
+      if (!raw) return;
+      const ids: number[] = JSON.parse(raw);
+      this._favoriteIds = new Set(ids);
+    } catch {
+      this._favoriteIds = new Set();
+    }
+  }
+
+  private saveFavoritesToStorage(): void {
+    const ids = Array.from(this._favoriteIds.values());
+    localStorage.setItem(this.FAVORITES_KEY, JSON.stringify(ids));
+  }
+
+  // helper: decorate pokemon with isFavorit based on favorite ids
+  private withFavoriteFlag(pokemon: Pokemon): Pokemon {
+    const isFav = this._favoriteIds.has(pokemon.id);
+    return {
+      ...pokemon,
+      isFavorit: isFav,
+    };
+  }
+
+  // ---------- PUBLIC GETTERS ----------
+
+  get cachedPokemons(): Pokemon[] {
+    return this._pokemons;
+  }
+
+  get favoritePokemons(): Pokemon[] {
+    // רק מהקאש שהם פייבוריט
+    return this._pokemons.filter((p) => this._favoriteIds.has(p.id));
+  }
+
+  // ---------- API CALLS ----------
+
+  getPokemonList(
+    page: number = 1,
+    limit: number = this.pageSize
+  ): Observable<PokemonListResponse> {
     const offset = (page - 1) * limit;
     const url = `${this.baseUrl}/pokemon?offset=${offset}&limit=${limit}`;
     return this.http.get<PokemonListResponse>(url);
@@ -38,48 +82,70 @@ export class PokemonService {
   // Get single Pokémon by id or name
   getPokemon(idOrName: number | string): Observable<Pokemon> {
     const url = `${this.baseUrl}/pokemon/${idOrName}`;
-    return this.http.get<Pokemon>(url);
+    return this.http.get<Pokemon>(url).pipe(
+      map((dataFromApi) => this.withFavoriteFlag(dataFromApi)), // 👈 adds isFavorit from stored ids
+      tap((pokemon) => {
+        // keep cache in sync if needed
+        const idx = this._pokemons.findIndex((p) => p.id === pokemon.id);
+        if (idx !== -1) {
+          this._pokemons[idx] = pokemon;
+        }
+      })
+    );
   }
 
-  // Helper to extract ID from resource URL
   extractIdFromUrl(url: string): number {
     const parts = url.split('/').filter(Boolean);
     return Number(parts[parts.length - 1]);
   }
 
-  // 👉 expose cached Pokémon (read-only)
-  get cachedPokemons(): Pokemon[] {
-    return this._pokemons;
-  }
-
   /**
    * 🔥 Load 12 more full Pokémon objects and cache them
-   * - Uses current length as offset
-   * - Does NOT re-fetch existing ones
-   * - Returns the *full* updated cached array
    */
   loadMorePokemons(): Observable<Pokemon[]> {
     const offset = this._pokemons.length;
     const url = `${this.baseUrl}/pokemon?offset=${offset}&limit=${this.pageSize}`;
 
     return this.http.get<PokemonListResponse>(url).pipe(
-      // first get the list of 12 basic resources
       switchMap((res) => {
         if (res.results.length === 0) {
-          // no more Pokémon – just return existing cache
-          return forkJoin([] as Observable<Pokemon>[]).pipe(map(() => [] as Pokemon[]));
+          return forkJoin([] as Observable<Pokemon>[]).pipe(
+            map(() => [] as Pokemon[])
+          );
         }
 
-        // now load full details for each one
-        const detailRequests = res.results.map((r) => this.http.get<Pokemon>(r.url));
+        const detailRequests = res.results.map((r) =>
+          this.http.get<Pokemon>(r.url).pipe(
+            map((dataFromApi) => this.withFavoriteFlag(dataFromApi)) // 👈 decorate with isFavorit
+          )
+        );
+
         return forkJoin(detailRequests);
       }),
       tap((newPokemons: Pokemon[]) => {
-        // append to cache
         this._pokemons = [...this._pokemons, ...newPokemons];
       }),
-      // return the full current cache
       map(() => this._pokemons)
+    );
+  }
+
+  // ---------- FAVORITES LOGIC ----------
+
+  toggleFavorite(pokemon: Pokemon): void {
+    const alreadyFav = this._favoriteIds.has(pokemon.id);
+
+    if (alreadyFav) {
+      this._favoriteIds.delete(pokemon.id);
+    } else {
+      this._favoriteIds.add(pokemon.id);
+    }
+
+    // persist to localStorage
+    this.saveFavoritesToStorage();
+
+    // update cache objects to reflect new state
+    this._pokemons = this._pokemons.map((p) =>
+      p.id === pokemon.id ? this.withFavoriteFlag(p) : p
     );
   }
 }

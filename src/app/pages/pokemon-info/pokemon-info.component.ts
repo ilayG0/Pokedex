@@ -5,15 +5,23 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
 import { Pokemon } from '../../models/pokemon.model';
-import { PokemonPreviewCard } from "../../component/pokemon-preview-card/pokemon-preview-card.component";
-import { PokemonMainInfoComponent } from "./pokemon-main-info.component/pokemon-main-info.component";
-import { PokemonStatsDetailsComponent } from "./pokemon-stats-details.component/pokemon-stats-details.component";
-import { PokemonIdPipe } from "../../pipes/pokemon-id.pipe";
+import { PokemonPreviewCard } from '../../component/pokemon-preview-card/pokemon-preview-card.component';
+import { PokemonMainInfoComponent } from './pokemon-main-info.component/pokemon-main-info.component';
+import { PokemonStatsDetailsComponent } from './pokemon-stats-details.component/pokemon-stats-details.component';
+import { PokemonIdPipe } from '../../pipes/pokemon-id.pipe';
 
 @Component({
   selector: 'app-pokemon-info',
   standalone: true,
-  imports: [CommonModule, RouterLink, LoadingPokeBall, PokemonPreviewCard, PokemonMainInfoComponent, PokemonStatsDetailsComponent, PokemonIdPipe],
+  imports: [
+    CommonModule,
+    RouterLink,
+    LoadingPokeBall,
+    PokemonPreviewCard,
+    PokemonMainInfoComponent,
+    PokemonStatsDetailsComponent,
+    PokemonIdPipe,
+  ],
   templateUrl: './pokemon-info.component.html',
   styleUrl: './pokemon-info.component.scss',
 })
@@ -26,6 +34,11 @@ export class PokemonInfoComponent {
   description = '';
 
   totalStats = 0;
+
+  onToggleFavorite(pokemon: Pokemon) {
+    this.pokemon.isFavorit = true;
+    this.pokemonService.toggleFavorite(pokemon);
+  }
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
@@ -40,6 +53,7 @@ export class PokemonInfoComponent {
         this.description =
           'A strange seed was planted on its back at birth. The plant sprouts and grows with this POKÉMON.'; // תיאור לדוגמה; אפשר להחליף ב־species API
         this.isLoading.set(false);
+        console.log(p)
       },
       error: (err) => {
         console.error('Error loading pokemon', err);
