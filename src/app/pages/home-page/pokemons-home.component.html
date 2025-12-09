@@ -1,6 +1,21 @@
+<app-search-bar
+  (openFilters)="onToggleFiltersForm()"
+  (search)="onFoundPokemon($event)"
+  (reset)="onReset()"
+/>
 
-<app-search-bar (openFilters)="onToggleFiltersForm()" (search)="onFoundPokemon($event)"/>
-<app-pokemon-list [filters]="filters" />
+<ng-container *ngIf="!noResults(); else noResultsTpl">
+  <app-pokemon-list [pokemons]="displayedPokemons()"></app-pokemon-list>
+</ng-container>
 
-@if (showFilter()){
-<app-filter-panel (search)="onSearch($event)" (cancel)="onToggleFiltersForm()"> </app-filter-panel>}
+<ng-template #noResultsTpl>
+  <div class="no-results">No Pokémon found.</div>
+</ng-template>
+
+<div class="home__pagination" *ngIf="filterResults().length === 0 && !searchedPokemon()">
+  <button (click)="prevPage()" [disabled]="currentPage() === 1">Prev</button>
+  <span>Page {{ currentPage() }}</span>
+  <button (click)="nextPage()">Next</button>
+</div>
+
+<app-filter-panel *ngIf="showFilter()" (cancel)="onFiltersCancel()"/> 

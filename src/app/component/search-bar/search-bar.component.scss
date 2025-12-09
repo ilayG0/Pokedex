@@ -55,17 +55,21 @@ $search-bar-border-radius: 9px;
   justify-content: space-between;
   align-items: center;
   padding: 4px 12px 6px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #4a36a8;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 16px;
+  color: $color-text;
+  font-family: 'Roboto';
   text-transform: uppercase;
 }
 
 .recent-clear {
   background: transparent;
   border: none;
-  color: #4a36a8;
-  font-size: 11px;
+  color: $color-text;
+  font-family: 'Roboto';  
+  font-weight: 700;
+  font-size: 14px;
   cursor: pointer;
 }
 
@@ -91,14 +95,18 @@ $search-bar-border-radius: 9px;
 .recent-text {
   flex: 1;
   margin-right: 4px;
+  font-family: 'Roboto';    
+  font-size: 14px;
+  font-weight: 400;
+  color: #5A5A89;
 }
 
 .recent-remove {
   border: none;
   background: transparent;
   cursor: pointer;
-  font-size: 12px;
-  color: #999;
+  font-size: 14px;
+  color: #5A5A8980;
 }
 
 /* הכפתורים שלך נשארים */

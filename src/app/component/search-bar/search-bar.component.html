@@ -12,39 +12,35 @@
     />
 
     @if (showDropdown && recentSearches.length) {
-      <div class="recent-dropdown" (mousedown)="$event.preventDefault()">
-        <div class="recent-header">
-          <span class="recent-title">RECENT SEARCHES</span>
-          <button
-            type="button"
-            class="recent-clear"
-            (click)="onClearRecent($event)"
-          >
-            CLEAR
-          </button>
-        </div>
-
-        <ul class="recent-list">
-          @for (term of recentSearches; track term) {
-            <li class="recent-item" (click)="onSelectRecent(term)">
-              <span class="recent-text">{{ term }}</span>
-              <button
-                type="button"
-                class="recent-remove"
-                (click)="onRemoveRecent(term, $event)"
-              >
-                ✕
-              </button>
-            </li>
-          }
-        </ul>
+    <div class="recent-dropdown" (mousedown)="$event.preventDefault()">
+      <div class="recent-header">
+        <span class="recent-title">RECENT SEARCHES</span>
+        <button type="button" class="recent-clear" (click)="onClearRecent($event)">CLEAR</button>
       </div>
+
+      <ul class="recent-list">
+        @for (term of recentSearches; track term) {
+        <li class="recent-item" (click)="onSelectRecent(term)">
+          <span class="recent-text">{{ term }}</span>
+          <button type="button" class="recent-remove" (click)="onRemoveRecent(term, $event)">
+            ✕
+          </button>
+        </li>
+        }
+      </ul>
+    </div>
     }
   </div>
 
   <button class="search-btn" (click)="onSearchClick()">Search</button>
 
+  @if(didSearch) { <button class="search-btn" type="button" (click)="onResetClick()">Reset</button>}
+
   <button class="filter-btn" (click)="onOpenForm()">
     <img src="filterIcon.svg" class="filter-icon" alt="filter icon" />
   </button>
 </div>
+
+@if (isLoading){
+  <app-loading-poke-ball/>
+}
