@@ -123,15 +123,40 @@ export class PokemonService {
   }
 
   // Get single Pokémon by id or name
+
   getPokemon(idOrName: number | string): Observable<Pokemon> {
     const url = `${this.baseUrl}/pokemon/${idOrName}`;
 
-    return this.http.get<Pokemon>(url).pipe(
-      map((pokemon) => {
-        const isFav = this._favoritePokemons().some((p) => p.id === pokemon.id);
+    return this.http.get<any>(url).pipe(
+      switchMap((pokemonRes) =>
+        this.http.get<any>(`${this.baseUrl}/pokemon-species/${pokemonRes.id}`).pipe(
+          map((speciesRes) => {
+            const flavorEntry = speciesRes.flavor_text_entries.find(
+              (e: any) => e.language.name === 'en'
+            );
 
-        return { ...pokemon, isFavorit: isFav };
-      })
+            const description: string = flavorEntry
+              ? flavorEntry.flavor_text
+                  .replace(/\f/g, ' ')
+                  .replace(/\n/g, ' ')
+                  .replace(/\s+/g, ' ')
+                  .trim()
+              : '';
+
+            const isFav = this._favoritePokemons().some(
+              (p) => p.id === pokemonRes.id
+            );
+
+            const pokemon: Pokemon = {
+              ...pokemonRes,
+              description,
+              isFavorit: isFav,
+            };
+
+            return pokemon;
+          })
+        )
+      )
     );
   }
 

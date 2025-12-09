@@ -36,7 +36,7 @@ export class PokemonInfoComponent {
   totalStats = 0;
 
   onToggleFavorite(pokemon: Pokemon) {
-    this.pokemon.isFavorit = true;
+    this.pokemon.isFavorit = !this.pokemon.isFavorit;
     this.pokemonService.toggleFavorite(pokemon);
   }
 
@@ -50,8 +50,7 @@ export class PokemonInfoComponent {
       next: (p) => {
         this.pokemon = p;
         this.totalStats = this.calculateTotalStats(p);
-        this.description =
-          'A strange seed was planted on its back at birth. The plant sprouts and grows with this POKÉMON.'; // תיאור לדוגמה; אפשר להחליף ב־species API
+        this.description = p.description || '';
         this.isLoading.set(false);
       },
       error: (err) => {
@@ -60,6 +59,7 @@ export class PokemonInfoComponent {
       },
     });
   }
+  
 
   getStat(name: string): number | '-' {
     if (!this.pokemon) return '-';

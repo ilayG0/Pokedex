@@ -1,6 +1,5 @@
 @import '../../../../styles/src-colors';
 
-
 // Right side: description + stats
 .pokemon-card__right {
   display: flex;
@@ -21,6 +20,7 @@
 }
 
 .pokemon-card__description {
+  width: 70%;
   margin: 0;
   font-size: 18px;
   line-height: 1.4;
@@ -51,12 +51,13 @@
   font-size: 18px;
 }
 
-.stat-label, .stat-value  {
+.stat-label,
+.stat-value {
   color: $color-primary-blue;
 }
 
-.stat-value{
-    margin-left: 5px;
+.stat-value {
+  margin-left: 5px;
 }
 
 /* Total */

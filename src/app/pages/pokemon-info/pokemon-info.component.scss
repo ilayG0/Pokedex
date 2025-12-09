@@ -87,7 +87,7 @@ $card-radius: 9px;
 /* Body: two columns (children live inside this grid) */
 .pokemon-card__body {
   display: grid;
-  grid-template-columns: 35% 3% 63%;
+  grid-template-columns: 35% 3% 60%;
   column-gap: 10px;
   align-items: flex-start;
 
