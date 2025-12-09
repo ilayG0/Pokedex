@@ -1,11 +1,11 @@
 :host {
   position: fixed;
-  inset: 0;                 /* top:0; right:0; bottom:0; left:0 */
+  inset: 0; /* top:0; right:0; bottom:0; left:0 */
   display: flex;
-  align-items: center;      /* vertical centering */
-  justify-content: center;  /* horizontal centering */
+  align-items: center; /* vertical centering */
+  justify-content: center; /* horizontal centering */
   background: rgba(255, 255, 255, 0.4); /* transparent white overlay */
-  z-index: 1000;            /* on top of the app */
+  z-index: 1000; /* on top of the app */
   direction: rtl;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
@@ -22,8 +22,12 @@
 
   box-sizing: border-box;
 }
-.all-filters{
+.all-filters {
   padding: 18px 24px 0;
+}
+
+.all-buttons {
+  padding: 0px 24px 0;
 }
 
 /* rest of your CSS stays the same */
@@ -34,8 +38,10 @@
 }
 
 .filter-card__title {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Roboto';
+  font-style: bold;
   color: #222;
 }
 
@@ -55,9 +61,11 @@
 }
 
 .field label {
-  font-size: 12px;
   color: #555;
   margin-bottom: 4px;
+  font-family: 'Roboto';
+  font-size: 15px;
+  font-weight: 400;
 }
 
 .field input,
@@ -93,23 +101,29 @@
 
 .filter-card__actions {
   width: 100%;
-  margin-top: 24%;
-  padding-top: 10px;
-  border-top: 1px solid #e0e0e0;
+
   display: flex;
   flex-direction: row-reverse;
-  gap: 8px;
+  gap: 10px;
+
 }
 
+.line {
+  margin-top: 24%;
+  color: #e0e0e0;
+  size: 2px;
+}
 
 .btn {
-  min-width: 96px;
+  min-width: 140px;
   height: 38px;
-  border-radius: 4px;
-  font-size: 14px;
+  border-radius: 2px;
+  font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   border: none;
+  font-family: 'Roboto';
+  font-weight: 400;
 }
 
 .btn--primary {

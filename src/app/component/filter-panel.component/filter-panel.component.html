@@ -22,7 +22,7 @@
       <div class="field">
         <label for="height">גובה</label>
         <input id="height" type="number" formControlName="height" placeholder="בחירה" />
-        @if (f['height'].invalid &&  (f['height'].touched || submitted)) {
+        @if (f['height'].invalid && (f['height'].touched || submitted)) {
         <div class="field__error">יש להזין מספר תקין בלבד</div>
         }
       </div>
@@ -72,10 +72,12 @@
       </div>
     </div>
   </div>
-
+<hr class="line"/>
   <!-- actions -->
-  <div class="filter-card__actions">
-    <button type="button" class="btn btn--primary" (click)="onSubmit()">חיפוש</button>
-    <button type="button" class="btn btn--ghost" (click)="onCancel()">ביטול</button>
+  <div class="all-buttons">
+    <div class="filter-card__actions">
+      <button type="button" class="btn btn--primary" (click)="onSubmit()">חיפוש</button>
+      <button type="button" class="btn btn--ghost" (click)="onCancel()">ביטול</button>
+    </div>
   </div>
 </div>
