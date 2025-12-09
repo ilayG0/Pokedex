@@ -2,6 +2,12 @@
   <app-loading-poke-ball />
 } @else {
 
+  @if(searchPokemon){
+    <app-pokemon-preview-card
+        [pokemon]="searchPokemon"
+        (click)="goToPokemon(searchPokemon.id)"
+      />
+  } @else {
   <div class="pokemon-grid">
     @for (pokemon of paginatedPokemons(); track pokemon.id) {
       <app-pokemon-preview-card
@@ -25,4 +31,6 @@
       Next
     </button>
   </div>
+  }
+
 }

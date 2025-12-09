@@ -1,8 +1,50 @@
-<input type="text" />
-<button class="search-btn">Search</button>
-<button class="filter-btn" (click)="onOpenForm()" >
-  <img src="filterIcon.svg" class="filter-icon" alt="filter icon" />
-</button>
+<!-- search-bar.component.html -->
+<div class="search-container">
+  <div class="search-input-wrapper">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (focus)="onInputFocus()"
+      (click)="onInputClick()"
+      (blur)="onInputBlur()"
+      (keydown.enter)="onSearchClick()"
+      placeholder="Search Pokémon"
+    />
 
+    @if (showDropdown && recentSearches.length) {
+      <div class="recent-dropdown" (mousedown)="$event.preventDefault()">
+        <div class="recent-header">
+          <span class="recent-title">RECENT SEARCHES</span>
+          <button
+            type="button"
+            class="recent-clear"
+            (click)="onClearRecent($event)"
+          >
+            CLEAR
+          </button>
+        </div>
 
+        <ul class="recent-list">
+          @for (term of recentSearches; track term) {
+            <li class="recent-item" (click)="onSelectRecent(term)">
+              <span class="recent-text">{{ term }}</span>
+              <button
+                type="button"
+                class="recent-remove"
+                (click)="onRemoveRecent(term, $event)"
+              >
+                ✕
+              </button>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
 
+  <button class="search-btn" (click)="onSearchClick()">Search</button>
+
+  <button class="filter-btn" (click)="onOpenForm()">
+    <img src="filterIcon.svg" class="filter-icon" alt="filter icon" />
+  </button>
+</div>

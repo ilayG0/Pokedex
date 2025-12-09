@@ -1,6 +1,6 @@
 
-<app-search-bar (openFilters)="onToggleFiltersForm()"/>
-<app-pokemon-list/>
+<app-search-bar (openFilters)="onToggleFiltersForm()" (search)="onFoundPokemon($event)"/>
+<app-pokemon-list [filters]="filters" />
 
 @if (showFilter()){
 <app-filter-panel (search)="onSearch($event)" (cancel)="onToggleFiltersForm()"> </app-filter-panel>}

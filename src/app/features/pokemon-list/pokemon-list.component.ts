@@ -1,10 +1,11 @@
-import { Component, OnInit, inject, signal, computed, afterNextRender } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, afterNextRender, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PokemonService } from '../../services/pokemon.service';
 import { Pokemon } from '../../models/pokemon.model';
 import { PokemonPreviewCard } from '../../component/pokemon-preview-card/pokemon-preview-card.component';
 import { Router } from '@angular/router';
 import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
+import { required } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-pokemon-list',
@@ -14,6 +15,9 @@ import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-bal
   styleUrls: ['./pokemon-list.component.scss'],
 })
 export class PokemonListComponent implements OnInit {
+  @Input() filters?: any;
+  @Input() searchPokemon?: Pokemon;
+
   // loading state
   isLoading = signal(false);
 
@@ -39,8 +43,8 @@ export class PokemonListComponent implements OnInit {
       this.loadPage(1);
     });
   }
-  ngOnInit(): void { }
-  
+  ngOnInit(): void {}
+
   /**
    * Loads a specific page (1-based), using pokemons from the service.
    * If not enough pokemons are loaded, calls loadMorePokemons().
@@ -81,5 +85,26 @@ export class PokemonListComponent implements OnInit {
   // navigate to pokemon info page
   goToPokemon(id: number): void {
     this.router.navigate(['/pokemon-info', id]);
+  }
+
+  // search with filters
+  applyFilters(filters: any) {
+    this.isLoading.set(true);
+
+    this.pokemonService.searchPokemonsWithFilters(filters).subscribe({
+      next: (result) => {
+        // כאן יש לך את כל הפוקימונים המסוננים מכל הבסיס
+        console.log('Filtered result:', result);
+
+        // אם אתה רוצה להציג אותם במקום ה-pagination:
+        // אפשר לשמור אותם בסיגנל נפרד, למשל:
+        // this.filteredPokemons.set(result);
+
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.isLoading.set(false);
+      },
+    });
   }
 }
