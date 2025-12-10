@@ -34,7 +34,7 @@
   <button class="search-btn" (click)="onSearchClick()">Search</button>
 
   @if(didSearch) { <button class="search-btn" type="button" (click)="onResetClick()">Reset</button>}
-  @if(!isMobile){
+  @if(!(isMobile())){
   <button class="filter-btn" (click)="onOpenForm()">
     <img src="filterIcon.svg" class="filter-icon" alt="filter icon" />
   </button>

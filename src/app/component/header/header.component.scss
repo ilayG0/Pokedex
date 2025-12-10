@@ -48,26 +48,31 @@ nav a.marker {
   background-color: $color-primary-green;
 }
 
-
 /* Mobile */
 @media (max-width: 760px) {
- .header {
+  .header {
     background-color: white;
-    justify-content: center;   
-    padding-top: 50px; 
-    padding-bottom: 60px;             
+    justify-content: center;
+    padding-top: 50px;
+    padding-bottom: 60px;
   }
 
   .header__logo {
     display: flex;
     justify-content: center;
-    width: 100%;  
+    width: 100%;
 
     img {
-    height: 150px;
-    width: 250px;
-    width: auto;
-    display: block;
+      height: 130px;
+      width: 250px;
+      width: auto;
+      display: block;
+    }
   }
+
+  nav a {
+    display: none;
   }
+
+
 }

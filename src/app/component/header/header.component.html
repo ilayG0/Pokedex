@@ -3,7 +3,7 @@
     <img src="pokedex.png" alt="PokeDex logo" />
   </div>
 
-  @if(!isMobile){
+  @if(!isMobile()){
   <nav>
     <a class="nav-home" routerLink="/" (click)="onHome()" [class.marker]="isHome()"> Home </a>
 

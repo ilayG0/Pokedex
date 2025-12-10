@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PokemonService } from '../../services/pokemon.service';
@@ -21,16 +21,21 @@ export class SearchBar {
   showDropdown = false;
   didSearch = false;
   isLoading = false;
-  isMobile = window.innerWidth < 760;
+  isMobile = signal(window.innerWidth < 670);
 
   
-  constructor(private pokemonService: PokemonService) {}
+  constructor(private pokemonService: PokemonService) {
+     window.addEventListener('resize', () => {
+    this.isMobile.set(window.innerWidth < 670);
+  });
+  }
 
   get recentSearches() {
     return this.pokemonService.recentSearches();
   }
 
   onOpenForm() {
+    console.log(this.isMobile());
     this.openFilters.emit();
   }
 
