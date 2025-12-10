@@ -1,6 +1,8 @@
 <header class="header">
-  <div class="header__logo">
+  <div class="header__logo"  (click)="onHome()" >
+    <a routerLink="/"> 
     <img src="pokedex.png" alt="PokeDex logo" />
+    </a>
   </div>
 
   @if(!isMobile()){
