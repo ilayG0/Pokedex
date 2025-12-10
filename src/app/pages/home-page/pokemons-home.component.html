@@ -7,23 +7,10 @@
 />
 
 <!-- Pokemon list -->
-<ng-container *ngIf="!noResults(); else noResultsTpl">
+<ng-container>
   <app-pokemon-list [pokemons]="displayedPokemons()"></app-pokemon-list>
 </ng-container>
 
-<!-- No pokemon found from search -->
-<ng-template #noResultsTpl>
-  <div class="no-results">No Pokémon found.</div>
-</ng-template>
-
-<!-- Pokemon page controle -->
-<div class="home__pagination" *ngIf="filterResults().length === 0 && !searchedPokemon()">
-  <button (click)="prevPage()" [disabled]="currentPage() === 1">Prev</button>
-  <span>Page {{ currentPage() }}</span>
-  <button (click)="nextPage()">Next</button>
-</div>
-
-<!-- Filter search -->
 <app-filter-panel *ngIf="showFilter()" (cancel)="onFiltersCancel()" (search)="onFilterSubmit($event)"/> 
 
 

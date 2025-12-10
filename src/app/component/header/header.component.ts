@@ -9,21 +9,20 @@ import { RouterLink } from '@angular/router';
   styleUrl: './header.component.scss',
 })
 export class Header {
+  isHome = signal(true);
+  isMobile = signal(window.innerWidth < 670);
 
-  isHome= signal(true);
-isMobile = signal(window.innerWidth < 670);
+  constructor() {
+    window.addEventListener('resize', () => {
+      this.isMobile.set(window.innerWidth < 670);
+    });
+  }
 
-constructor() {
-  window.addEventListener('resize', () => {
-    this.isMobile.set(window.innerWidth < 670);
-  });
-}
-  
-  onHome(){
+  onHome() {
     this.isHome.set(true);
   }
 
-  onFavorite(){
+  onFavorite() {
     this.isHome.set(false);
   }
 }

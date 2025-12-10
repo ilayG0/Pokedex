@@ -3,10 +3,10 @@
     <input
       type="text"
       [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearchChange($event)"
       (focus)="onInputFocus()"
       (click)="onInputClick()"
       (blur)="onInputBlur()"
-      (keydown.enter)="onSearchClick()"
       placeholder=""
     />
 
@@ -31,7 +31,7 @@
     }
   </div>
 
-  <button class="search-btn" (click)="onSearchClick()">Search</button>
+  <button class="search-btn" >Search</button>
 
   @if(didSearch) { <button class="search-btn" type="button" (click)="onResetClick()">Reset</button>}
   @if(!(isMobile())){

@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { SearchBar } from '../../component/search-bar/search-bar.component';
@@ -8,7 +8,7 @@ import { FilterPanelComponent } from '../../component/filter-panel.component/fil
 
 import { Pokemon } from '../../models/pokemon.model';
 import { PokemonService } from '../../services/pokemon.service';
-import { LoadingPokeBall } from "../../shared/loading-poke-ball/loading-poke-ball.component";
+import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
 
 export interface PokemonFilters {
   name?: string;
@@ -16,90 +16,50 @@ export interface PokemonFilters {
   type?: string;
   group?: string;
 }
+
 @Component({
   selector: 'app-pokemons-home',
   standalone: true,
-  imports: [CommonModule, SearchBar, Header, PokemonListComponent, FilterPanelComponent, LoadingPokeBall],
+  imports: [
+    CommonModule,
+    SearchBar,
+    Header,
+    PokemonListComponent,
+    FilterPanelComponent,
+    LoadingPokeBall,
+  ],
   templateUrl: './pokemons-home.component.html',
   styleUrls: ['./pokemons-home.component.scss'],
 })
 export class PokemonsHome implements OnInit {
   private readonly pokemonService = inject(PokemonService);
 
-  readonly pageSize = 12;
-
   isLoading = signal(false);
-  currentPage = signal(1);
-
   showFilter = signal(false);
 
-  filters = signal<{ name?: string; height?: number; type?: string; group?: string } | null>(null);
-  filterResults = signal<Pokemon[]>([]);
-
-  searchedPokemon = signal<Pokemon | null>(null);
+  filters = signal<PokemonFilters | null>(null);
   noResults = signal(false);
 
-  private paginatedPokemons = computed<Pokemon[]>(() => {
-    const all = this.pokemonService.pokemons();
-    const page = this.currentPage();
-    const start = (page - 1) * this.pageSize;
-    const end = page * this.pageSize;
-    return all.slice(start, end);
-  });
-
-  readonly displayedPokemons = computed<Pokemon[]>(() => {
-    const filtered = this.filterResults();
-    const searched = this.searchedPokemon();
-
-    if (filtered.length > 0) {
-      return filtered;
-    }
-
-    if (searched) {
-      return [searched];
-    }
-
-    return this.paginatedPokemons();
-  });
+  allPokemons = signal<Pokemon[]>([]);
+  displayedPokemons = signal<Pokemon[]>([]);
 
   ngOnInit(): void {
-    this.loadPage(1);
-  }
-
-  // ---- pagination ----
-
-  loadPage(page: number): void {
-    const neededCount = page * this.pageSize;
-    const alreadyLoaded = this.pokemonService.pokemons().length;
-
-    if (alreadyLoaded >= neededCount) {
-      this.currentPage.set(page);
-      return;
-    }
-
     this.isLoading.set(true);
-    this.pokemonService.loadMorePokemons().subscribe({
-      next: () => {
-        this.currentPage.set(page);
+    this.pokemonService.getAllPokemons().subscribe({
+      next: (pokemons) => {
+        this.allPokemons.set(pokemons);
+        this.displayedPokemons.set(pokemons);
+        this.noResults.set(pokemons.length === 0);
         this.isLoading.set(false);
       },
       error: () => {
+        this.allPokemons.set([]);
+        this.displayedPokemons.set([]);
+        this.noResults.set(true);
         this.isLoading.set(false);
       },
     });
   }
-
-  nextPage(): void {
-    this.loadPage(this.currentPage() + 1);
-  }
-
-  prevPage(): void {
-    if (this.currentPage() > 1) {
-      this.loadPage(this.currentPage() - 1);
-    }
-  }
-
-  // ---- filters overlay ----
 
   onToggleFiltersForm(): void {
     this.showFilter.update((v) => !v);
@@ -108,22 +68,19 @@ export class PokemonsHome implements OnInit {
   onFilterSubmit(filters: PokemonFilters): void {
     this.isLoading.set(true);
     this.filters.set(filters);
-    this.searchedPokemon.set(null);
-    this.filterResults.set([]);
     this.noResults.set(false);
 
     this.pokemonService.searchPokemonsByFilters(filters).subscribe({
       next: (result) => {
-        console.log(result);
-        this.filterResults.set(result);
+        this.displayedPokemons.set(result);
+        this.noResults.set(result.length === 0);
         this.isLoading.set(false);
         this.showFilter.set(false);
-        this.noResults.set(result.length === 0);
       },
       error: () => {
-        this.filterResults.set([]);
-        this.isLoading.set(false);
+        this.displayedPokemons.set([]);
         this.noResults.set(true);
+        this.isLoading.set(false);
       },
     });
   }
@@ -132,31 +89,39 @@ export class PokemonsHome implements OnInit {
     this.showFilter.set(false);
   }
 
-  // ---- search bar  ----
+  onFoundPokemon(searchString: string): void {
+    const term = searchString.trim();
 
-  onFoundPokemon(pokemon: Pokemon | null): void {
-    if (!pokemon) {
-      this.searchedPokemon.set(null);
-      this.filterResults.set([]);
-      this.noResults.set(true);
+    if (!term) {
+      this.displayedPokemons.set(this.allPokemons());
+      this.noResults.set(this.allPokemons().length === 0);
+      this.filters.set(null);
       return;
     }
 
+    this.isLoading.set(true);
     this.noResults.set(false);
-    this.searchedPokemon.set(pokemon);
-    this.filterResults.set([]);
-    this.currentPage.set(1);
+    this.filters.set(null);
+
+    this.pokemonService
+      .filterPokemonsByNameOrId(term)
+      .subscribe({
+        next: (result) => {
+          this.displayedPokemons.set(result);
+          this.noResults.set(result.length === 0);
+          this.isLoading.set(false);
+        },
+        error: () => {
+          this.displayedPokemons.set([]);
+          this.noResults.set(true);
+          this.isLoading.set(false);
+        },
+      });
   }
 
   onReset(): void {
-    this.noResults.set(false);
-    this.filterResults.set([]);
-    this.searchedPokemon.set(null);
     this.filters.set(null);
-    this.currentPage.set(1);
-
-    if (this.pokemonService.pokemons().length === 0) {
-      this.loadPage(1);
-    }
+    this.noResults.set(this.allPokemons().length === 0);
+    this.displayedPokemons.set(this.allPokemons());
   }
 }

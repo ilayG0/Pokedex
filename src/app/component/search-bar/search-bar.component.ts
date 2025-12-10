@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, signal } from '@angular/core';
+import { Component, EventEmitter, inject, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PokemonService } from '../../services/pokemon.service';
@@ -14,20 +14,25 @@ import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-bal
 })
 export class SearchBar {
   @Output() openFilters = new EventEmitter<void>();
-  @Output() search = new EventEmitter<Pokemon | null>();
+  @Output() search = new EventEmitter<string>();
   @Output() reset = new EventEmitter<void>();
+  pokemonService = inject(PokemonService);
 
   searchTerm = '';
   showDropdown = false;
   didSearch = false;
   isLoading = false;
   isMobile = signal(window.innerWidth < 670);
+  filteredPokemons = signal<Pokemon[]>([]);
 
-  
-  constructor(private pokemonService: PokemonService) {
-     window.addEventListener('resize', () => {
-    this.isMobile.set(window.innerWidth < 670);
-  });
+  constructor() {
+    window.addEventListener('resize', () => {
+      this.isMobile.set(window.innerWidth < 670);
+    });
+  }
+
+  onSearchChange(value: string) {
+    this.search.emit(value);
   }
 
   get recentSearches() {
@@ -51,39 +56,6 @@ export class SearchBar {
     this.showDropdown = false;
   }
 
-  onSearchClick() {
-    this.isLoading = true;
-    const term = this.searchTerm.trim();
-
-    if (term === undefined || !term) {
-      this.isLoading = false;
-      return;
-    }
-
-    this.didSearch = true;
-
-    // save recent search
-    this.pokemonService.addRecentSearch(term);
-
-    // get Pokémon
-    this.pokemonService.getPokemon(term).subscribe({
-      next: (pokemon) => {
-        console.log('FOUND POKEMON:', pokemon);
-
-        // Emit the actual Pokémon to parent component
-        this.search.emit(pokemon);
-
-        this.showDropdown = false;
-        this.isLoading = false;
-      },
-      error: () => {
-        console.log('Pokemon not found!');
-        this.search.emit(null);
-        this.showDropdown = false;
-        this.isLoading = false;
-      },
-    });
-  }
 
   onResetClick() {
     this.didSearch = false;
@@ -94,7 +66,7 @@ export class SearchBar {
 
   onSelectRecent(term: string) {
     this.searchTerm = term;
-    this.onSearchClick();
+    this.onSearchChange(term);
   }
 
   onClearRecent(event: MouseEvent) {
