@@ -11,7 +11,8 @@ import { RouterLink } from '@angular/router';
 export class Header {
 
   isHome= signal(true);
-
+  isMobile = window.innerWidth < 760;
+  
   onHome(){
     this.isHome.set(true);
   }

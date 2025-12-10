@@ -1,6 +1,19 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, forkJoin, map, of, switchMap, tap, throwError } from 'rxjs';
+import {
+  Observable,
+  catchError,
+  forkJoin,
+  from,
+  map,
+  mergeMap,
+  of,
+  shareReplay,
+  switchMap,
+  tap,
+  throwError,
+  toArray,
+} from 'rxjs';
 import { Pokemon } from '../models/pokemon.model';
 
 export interface NamedAPIResource {
@@ -13,6 +26,16 @@ export interface PokemonListResponse {
   next: string | null;
   previous: string | null;
   results: NamedAPIResource[];
+}
+export interface SelectOption {
+  name: string;
+  value: string;
+}
+export interface PokemonFilters {
+  name?: string;
+  height?: number;
+  type?: string;
+  group?: string;
 }
 
 @Injectable({
@@ -37,8 +60,169 @@ export class PokemonService {
   private _recentSearches = signal<string[]>(this.loadRecentSearchesFromStorage());
   recentSearches = this._recentSearches.asReadonly();
 
+  // 🔹 options for filters (loaded once)
+  private _typeOptions = signal<SelectOption[]>([]);
+  typeOptions = this._typeOptions.asReadonly();
+
+  private _groupOptions = signal<SelectOption[]>([]);
+  groupOptions = this._groupOptions.asReadonly();
+
+  // cache for "all pokemons", fetched only once
+  private allPokemons$?: Observable<Pokemon[]>;
+
   constructor(private http: HttpClient) {}
 
+  // ------------------------------------------------
+  // 🔥 Fetch ALL pokemons from PokéAPI ONCE and cache
+  // ------------------------------------------------
+  private fetchAllPokemonsFromApi(): Observable<Pokemon[]> {
+    const url = `${this.baseUrl}/pokemon?limit=2000&offset=0`;
+
+    return this.http.get<PokemonListResponse>(url).pipe(
+      // first step: get all basic resources (name + url)
+      map((res) => res.results),
+
+      // second step: fetch details for EACH pokemon with limited concurrency
+      mergeMap((results) =>
+        from(results).pipe(
+          // concurrency 10 -> 10 parallel HTTP requests at a time
+          mergeMap((r) => this.http.get<Pokemon>(r.url), 10),
+          toArray()
+        )
+      ),
+
+      // optional: sort by id, just to keep it tidy
+      map((allPokemons) => allPokemons.slice().sort((a, b) => a.id - b.id)),
+
+      // cache in memory so we never do this again in this session
+      shareReplay(1)
+    );
+  }
+
+  private getAllPokemons(): Observable<Pokemon[]> {
+    if (!this.allPokemons$) {
+      this.allPokemons$ = this.fetchAllPokemonsFromApi();
+    }
+    return this.allPokemons$;
+  }
+
+  // ------------------------------------------------
+  // ⭐ Search over ALL pokemons using filters
+  // ------------------------------------------------
+  searchPokemonsByFilters(filters: PokemonFilters): Observable<Pokemon[]> {
+    const { name, height, type, group } = filters;
+
+    const normalizedName = name?.trim().toLowerCase() || '';
+    const normalizedType = type?.trim().toLowerCase() || '';
+    const normalizedGroup = group?.trim().toLowerCase() || '';
+
+    return this.getAllPokemons().pipe(
+      map((allPokemons) => {
+        // favorite lookup is O(1) by Set
+        const favoriteIds = new Set(this._favoritePokemons().map((p) => p.id));
+
+        return (
+          allPokemons
+            // attach isFavorit based on favorites array
+            .map((p) => ({
+              ...p,
+              isFavorit: favoriteIds.has(p.id),
+            }))
+            // apply filters
+            .filter((p) => {
+              // name contains
+              console.log(normalizedGroup, normalizedGroup,    normalizedType, height)
+              if (normalizedName && p.name.toLowerCase() !== normalizedName) {
+                return false;
+              }
+
+              // exact height
+              if (height != null && height !== undefined) {
+                if (p.height == null || p.height !== height) {
+                  return false;
+                }
+              }
+
+              // type filter (supports PokeAPI structure: [{ type: { name } }])
+              if (normalizedType) {
+                const hasType = p.types?.some((t: any) => {
+                  const typeName: string =
+                    (t?.type?.name as string) ||
+                    (t?.name as string) ||
+                    (typeof t === 'string' ? t : '');
+                  return typeName.toLowerCase() === normalizedType;
+                });
+
+                if (!hasType) {
+                  return false;
+                }
+              }
+
+              // group (egg-group or any custom "group" you add)
+              if (normalizedGroup) {
+                const pokemonGroup =
+                  ((p as any).group as string | string[] | undefined) ?? undefined;
+
+                let hasGroup = false;
+
+                if (typeof pokemonGroup === 'string') {
+                  hasGroup = pokemonGroup.toLowerCase() === normalizedGroup;
+                } else if (Array.isArray(pokemonGroup)) {
+                  hasGroup = pokemonGroup.some((g) => g.toLowerCase() === normalizedGroup);
+                }
+
+                if (!hasGroup) {
+                  return false;
+                }
+              }
+
+              return true;
+            })
+        );
+      })
+    );
+  }
+
+  // =========================================================
+  // 🔹 Load type & group options once
+  // =========================================================
+  loadTypesAndGroups(): void {
+    // types
+    if (this._typeOptions().length === 0) {
+      this.http.get<any>(`${this.baseUrl}/type`).subscribe({
+        next: (res) => {
+          const options =
+            (res.results || [])
+              .filter((t: any) => !['shadow', 'unknown'].includes(t.name))
+              .map((t: any) => ({
+                name: t.name,
+                value: t.name,
+              })) ?? [];
+          this._typeOptions.set(options);
+        },
+        error: () => {
+          this._typeOptions.set([]);
+        },
+      });
+    }
+
+    // egg groups
+    if (this._groupOptions().length === 0) {
+      this.http.get<any>(`${this.baseUrl}/egg-group`).subscribe({
+        next: (res) => {
+          const options =
+            (res.results || []).map((g: any) => ({
+              name: g.name,
+              value: g.name,
+            })) ?? [];
+          this._groupOptions.set(options);
+        },
+        error: () => {
+          this._groupOptions.set([]);
+        },
+      });
+    }
+  }
 
   // =========================================================
   // ✅ חיפוש לפי שם
@@ -114,7 +298,6 @@ export class PokemonService {
     });
   }
 
-  
   // Optional: original list endpoint (by name+url only)
   getPokemonList(page: number = 1, limit: number = this.pageSize): Observable<PokemonListResponse> {
     const offset = (page - 1) * limit;
@@ -143,9 +326,7 @@ export class PokemonService {
                   .trim()
               : '';
 
-            const isFav = this._favoritePokemons().some(
-              (p) => p.id === pokemonRes.id
-            );
+            const isFav = this._favoritePokemons().some((p) => p.id === pokemonRes.id);
 
             const pokemon: Pokemon = {
               ...pokemonRes,
@@ -232,91 +413,5 @@ export class PokemonService {
 
       this._favoritePokemons.update((list) => [...list, { ...updatedPokemon, isFavorit: true }]);
     }
-  }
-
-  /**
-   * 🎯 Search pokemons from the API based on filters.
-   * Does NOT touch the existing pokemons signal or pagination logic.
-   */
-  searchPokemonsWithFilters(filters: {
-    name?: string;
-    height?: number;
-    type?: string;
-    group?: string;
-  }): Observable<Pokemon[]> {
-    const normalizedName = filters.name?.trim().toLowerCase() || '';
-
-    // נשמור את הפייבוריטים כדי להחזיר isFavorit נכון
-    const favoriteIds = new Set(this._favoritePokemons().map((p) => p.id));
-
-    // 1️⃣ בוחרים מקור בסיס
-    let base$: Observable<string[]>; // רשימת שמות פוקימונים שנביא עליהם פרטים
-
-    if (filters.type) {
-      // בסיס לפי סוג
-      base$ = this.http
-        .get<any>(`${this.baseUrl}/type/${filters.type}`)
-        .pipe(map((res) => res.pokemon.map((p: any) => p.pokemon.name)));
-    } else if (filters.group) {
-      // בסיס לפי egg group (מוחזר species -> name)
-      base$ = this.http
-        .get<any>(`${this.baseUrl}/egg-group/${filters.group}`)
-        .pipe(map((res) => res.pokemon_species.map((s: any) => s.name)));
-    } else if (normalizedName) {
-      // ניסיון להביא פוקימון לפי שם מדויק
-      base$ = this.http.get<Pokemon>(`${this.baseUrl}/pokemon/${normalizedName}`).pipe(
-        map((p) => [p.name]),
-        catchError(() => of([] as string[]))
-      );
-    } else {
-      // ברירת מחדל: נביא batch ראשון גדול
-      base$ = this.http
-        .get<PokemonListResponse>(`${this.baseUrl}/pokemon?limit=200&offset=0`)
-        .pipe(map((res) => res.results.map((r) => r.name)));
-    }
-
-    // 2️⃣ מביאים פרטים מלאים על כל הפוקימונים מהבסיס
-    return base$.pipe(
-      switchMap((names) => {
-        if (!names.length) {
-          return of([] as Pokemon[]);
-        }
-
-        const requests = names.map((name) =>
-          this.http.get<Pokemon>(`${this.baseUrl}/pokemon/${name}`)
-        );
-
-        return forkJoin(requests);
-      }),
-
-      // 3️⃣ מסננים לפי הפילטרים
-      map((pokemons) => {
-        let list = pokemons;
-
-        // שם - מכיל
-        if (normalizedName) {
-          list = list.filter((p) => p.name.toLowerCase().includes(normalizedName));
-        }
-
-        // גובה - התאמה מדויקת
-        if (filters.height !== undefined && filters.height !== null && filters.height !== 0) {
-          list = list.filter((p) => p.height === filters.height);
-        }
-
-        // סוג - לוודא שגם הרשומות עצמן מכילות את הסוג
-        if (filters.type) {
-          list = list.filter((p) => p.types?.some((t: any) => t.type?.name === filters.type));
-        }
-
-        // קבוצה (egg group) — פה זה קצת יותר טריקי כי /pokemon לא מחזיר egg_groups.
-        // אפשר לדלג או להשאיר TODO. כרגע רק נשאיר את הפילטר ברמת המקור.
-        // אם תרצה, אפשר להרחיב עם קריאות /pokemon-species.
-
-        // 4️⃣ מוסיפים isFavorit לפי רשימת הפייבוריטים
-        return list.map((p) =>
-          favoriteIds.has(p.id) ? { ...p, isFavorit: true } : { ...p, isFavorit: false }
-        );
-      })
-    );
   }
 }

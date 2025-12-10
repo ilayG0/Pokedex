@@ -1,15 +1,11 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-
-interface Option {
-  name: string;
-  value: string;
-}
+import { PokemonService, SelectOption } from '../../services/pokemon.service';
 
 @Component({
   selector: 'app-filter-panel',
-  imports: [ReactiveFormsModule, HttpClientModule],
+  standalone: true,
+  imports: [ReactiveFormsModule],
   templateUrl: './filter-panel.component.html',
   styleUrls: ['./filter-panel.component.scss'],
 })
@@ -19,12 +15,12 @@ export class FilterPanelComponent implements OnInit {
 
   filterForm!: FormGroup;
 
-  typeOptions: Option[] = [];
-  groupOptions: Option[] = [];
-
   submitted = false;
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {}
+  private readonly fb = inject(FormBuilder);
+  private readonly pokemonService = inject(PokemonService);
+
+  constructor() {}
 
   ngOnInit(): void {
     this.filterForm = this.fb.group({
@@ -37,37 +33,24 @@ export class FilterPanelComponent implements OnInit {
       group: ['', [Validators.required]],
     });
 
-    this.loadTypes();
-    this.loadGroups();
+    // trigger initial load – will only actually call API once
+    this.pokemonService.loadTypesAndGroups();
   }
 
-  // ---- PokéAPI calls ----
-  private loadTypes(): void {
-    this.http.get<any>('https://pokeapi.co/api/v2/type').subscribe((res) => {
-      this.typeOptions = (res.results || [])
-        .filter((t: any) => !['shadow', 'unknown'].includes(t.name))
-        .map((t: any) => ({
-          name: t.name,
-          value: t.name,
-        }));
-    });
+  // 🟢 connect template directly to service signals
+  get typeOptions(): SelectOption[] {
+    return this.pokemonService.typeOptions();
   }
 
-  private loadGroups(): void {
-    this.http.get<any>('https://pokeapi.co/api/v2/egg-group').subscribe((res) => {
-      this.groupOptions = (res.results || []).map((g: any) => ({
-        name: g.name,
-        value: g.name,
-      }));
-    });
+  get groupOptions(): SelectOption[] {
+    return this.pokemonService.groupOptions();
   }
 
-  // ---- Helpers ----
   get f() {
     return this.filterForm.controls;
   }
 
-  onSubmit(): void {
+  onSubmit() {
     this.submitted = true;
     if (this.filterForm.invalid) {
       this.filterForm.markAllAsTouched();
@@ -75,6 +58,7 @@ export class FilterPanelComponent implements OnInit {
     }
     console.log(this.filterForm.value);
     this.search.emit(this.filterForm.value);
+    this.onCancel();
   }
 
   onCancel(): void {

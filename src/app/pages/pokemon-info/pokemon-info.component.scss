@@ -5,7 +5,7 @@ $card-radius: 9px;
 .pokemon-card {
   margin-top: 24px;
   margin-left: 15%;
-  margin-right: 28%;
+  margin-right: 26%;
   padding: 13px 14px;
   background: #ffffff;
   border-radius: $card-radius;
@@ -101,4 +101,13 @@ $card-radius: 9px;
   width: 1px;
   height: 90%;
   background-color: #d7d7d7;
+}
+
+
+/* Mobile */
+@media (max-width: 760px) {
+    .pokemon-card{
+        margin: 0 15%;
+    }
+    
 }

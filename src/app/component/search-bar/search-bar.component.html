@@ -8,7 +8,7 @@
       (click)="onInputClick()"
       (blur)="onInputBlur()"
       (keydown.enter)="onSearchClick()"
-      placeholder="Search Pokémon"
+      placeholder=""
     />
 
     @if (showDropdown && recentSearches.length) {
@@ -35,12 +35,13 @@
   <button class="search-btn" (click)="onSearchClick()">Search</button>
 
   @if(didSearch) { <button class="search-btn" type="button" (click)="onResetClick()">Reset</button>}
-
+  @if(!isMobile){
   <button class="filter-btn" (click)="onOpenForm()">
     <img src="filterIcon.svg" class="filter-icon" alt="filter icon" />
   </button>
+  }
 </div>
 
 @if (isLoading){
-  <app-loading-poke-ball/>
+<app-loading-poke-ball />
 }

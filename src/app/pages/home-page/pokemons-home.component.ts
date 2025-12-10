@@ -8,11 +8,18 @@ import { FilterPanelComponent } from '../../component/filter-panel.component/fil
 
 import { Pokemon } from '../../models/pokemon.model';
 import { PokemonService } from '../../services/pokemon.service';
+import { LoadingPokeBall } from "../../shared/loading-poke-ball/loading-poke-ball.component";
 
+export interface PokemonFilters {
+  name?: string;
+  height?: number;
+  type?: string;
+  group?: string;
+}
 @Component({
   selector: 'app-pokemons-home',
   standalone: true,
-  imports: [CommonModule, SearchBar, Header, PokemonListComponent, FilterPanelComponent],
+  imports: [CommonModule, SearchBar, Header, PokemonListComponent, FilterPanelComponent, LoadingPokeBall],
   templateUrl: './pokemons-home.component.html',
   styleUrls: ['./pokemons-home.component.scss'],
 })
@@ -97,24 +104,18 @@ export class PokemonsHome implements OnInit {
   onToggleFiltersForm(): void {
     this.showFilter.update((v) => !v);
   }
-  
-  onFilterSubmit(form: any): void {
+
+  onFilterSubmit(filters: PokemonFilters): void {
     this.isLoading.set(true);
-
-    const mapped = {
-      name: form.name,
-      height: form.height ? Number(form.height) : undefined,
-      type: form.type,
-      group: form.group,
-    };
-
-    this.filters.set(mapped);
+    this.filters.set(filters);
     this.searchedPokemon.set(null);
     this.filterResults.set([]);
     this.noResults.set(false);
 
-    this.pokemonService.searchPokemonsWithFilters(mapped).subscribe({
+    // 👇 This now calls the smart service function that uses ALL pokemons
+    this.pokemonService.searchPokemonsByFilters(filters).subscribe({
       next: (result) => {
+        console.log(result);
         this.filterResults.set(result);
         this.isLoading.set(false);
         this.showFilter.set(false);
@@ -128,14 +129,13 @@ export class PokemonsHome implements OnInit {
     });
   }
 
-
   onFiltersCancel(): void {
     this.showFilter.set(false);
   }
 
   // ---- search bar (single Pokémon search) ----
 
-   onFoundPokemon(pokemon: Pokemon | null): void {
+  onFoundPokemon(pokemon: Pokemon | null): void {
     if (!pokemon) {
       this.searchedPokemon.set(null);
       this.filterResults.set([]);
@@ -149,7 +149,7 @@ export class PokemonsHome implements OnInit {
     this.currentPage.set(1);
   }
 
-    onReset(): void {
+  onReset(): void {
     this.noResults.set(false);
     this.filterResults.set([]);
     this.searchedPokemon.set(null);
@@ -160,5 +160,4 @@ export class PokemonsHome implements OnInit {
       this.loadPage(1);
     }
   }
-
 }

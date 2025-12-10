@@ -70,3 +70,36 @@
   font-weight: 600;
   color: $color-text;
 }
+
+
+/* --- Mobile --- */
+@media (max-width: 670px) {
+  .pokemon-card__stats-grid {
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .pokemon-card__stats-col {
+    display: contents;
+  }
+
+  .stat-row {
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .pokemon-card__stats-total {
+    align-self: center;
+    margin-top: 8px;
+  }
+  .pokemon-card__section-title {
+    text-align: center;
+    font-size: 22px;
+  }
+  .pokemon-card__description {
+    text-align: center;
+    margin: 0 auto;
+    font-size: 18px;
+  }
+}

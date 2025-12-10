@@ -67,7 +67,7 @@ $search-bar-border-radius: 9px;
   background: transparent;
   border: none;
   color: $color-text;
-  font-family: 'Roboto';  
+  font-family: 'Roboto';
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
@@ -95,10 +95,10 @@ $search-bar-border-radius: 9px;
 .recent-text {
   flex: 1;
   margin-right: 4px;
-  font-family: 'Roboto';    
+  font-family: 'Roboto';
   font-size: 14px;
   font-weight: 400;
-  color: #5A5A89;
+  color: #5a5a89;
 }
 
 .recent-remove {
@@ -106,7 +106,7 @@ $search-bar-border-radius: 9px;
   background: transparent;
   cursor: pointer;
   font-size: 14px;
-  color: #5A5A8980;
+  color: #5a5a8980;
 }
 
 /* הכפתורים שלך נשארים */
@@ -144,4 +144,15 @@ $search-bar-border-radius: 9px;
 .filter-btn img {
   width: 24px;
   height: 23px;
+}
+
+/* Mobile */
+@media (max-width: 760px) {
+  .search-input-wrapper input {
+    width: 90%;
+  }
+  .search-input-wrapper {
+    position: relative;
+    flex: 0 0 60%;
+  }
 }

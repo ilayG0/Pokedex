@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PokemonService } from '../../services/pokemon.service';
 import { Pokemon } from '../../models/pokemon.model';
-import { LoadingPokeBall } from "../../shared/loading-poke-ball/loading-poke-ball.component";
+import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
 
 @Component({
   selector: 'app-search-bar',
@@ -22,7 +22,9 @@ export class SearchBar {
   showDropdown = false;
   didSearch = false;
   isLoading = false;
+  isMobile = window.innerWidth < 760;
 
+  
   constructor(private pokemonService: PokemonService) {}
 
   get recentSearches() {
@@ -42,10 +44,7 @@ export class SearchBar {
   }
 
   onInputBlur() {
-    // דיליי קטן כדי לא לחסום קליק על האייטמים בדרופדאון
-    setTimeout(() => {
-      this.showDropdown = false;
-    }, 200);
+    this.showDropdown = false;
   }
 
   onSearchClick() {
@@ -77,7 +76,7 @@ export class SearchBar {
         console.log('Pokemon not found!');
         this.search.emit(null);
         this.showDropdown = false;
-         this.isLoading = false;
+        this.isLoading = false;
       },
     });
   }
