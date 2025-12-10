@@ -124,4 +124,5 @@ export class PokemonsHome implements OnInit {
     this.noResults.set(this.allPokemons().length === 0);
     this.displayedPokemons.set(this.allPokemons());
   }
+
 }

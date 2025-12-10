@@ -32,6 +32,7 @@ export class PokemonInfoComponent {
   pokemon!: Pokemon;
   isLoading = signal(true);
   description = '';
+  isFromFavorite = false;
 
   totalStats = 0;
 
@@ -41,6 +42,11 @@ export class PokemonInfoComponent {
   }
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe((params) => {
+      this.isFromFavorite = params['isFromFavorite'] === 'true';
+      console.log('isFromFavorite:', this.isFromFavorite);
+    });
+
     const idParam = this.route.snapshot.paramMap.get('id');
     const id = Number(idParam);
 
@@ -59,7 +65,6 @@ export class PokemonInfoComponent {
       },
     });
   }
-  
 
   getStat(name: string): number | '-' {
     if (!this.pokemon) return '-';

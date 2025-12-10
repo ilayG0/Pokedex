@@ -32,7 +32,11 @@ export class SearchBar {
   }
 
   onSearchChange(value: string) {
+    this.searchTerm = value;
     this.search.emit(value);
+  }
+  onSearch() {
+    this.pokemonService.addRecentSearch(this.searchTerm);
   }
 
   get recentSearches() {
@@ -55,7 +59,6 @@ export class SearchBar {
   onInputBlur() {
     this.showDropdown = false;
   }
-
 
   onResetClick() {
     this.didSearch = false;

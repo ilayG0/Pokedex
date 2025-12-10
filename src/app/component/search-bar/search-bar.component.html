@@ -31,11 +31,11 @@
     }
   </div>
 
-  <button class="search-btn" >Search</button>
+  <button class="search-btn" (click)="onSearch()">Search</button>
 
   @if(didSearch) { <button class="search-btn" type="button" (click)="onResetClick()">Reset</button>}
   @if(!(isMobile())){
-  <button class="filter-btn" (click)="onOpenForm()">
+  <button class="filter-btn" (click)="onOpenForm()" >
     <img src="filterIcon.svg" class="filter-icon" alt="filter icon" />
   </button>
   }

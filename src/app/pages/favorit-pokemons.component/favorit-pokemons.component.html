@@ -3,5 +3,22 @@
     [pokemon]="pokemon"
     [addCencleBtn]="true"
     (pokemontoRemove)="onRemoveFavorite($event)"
+    (click)="goToPokemon(pokemon.id)"
   />
+}
+@if (favorites().length === 0) {
+  <section class="empty-favorites">
+    <div class="empty-favorites__card">
+      <div class="empty-favorites__icon">
+        <div class="pokeball-circle">
+          <span class="pokeball-line"></span>
+          <span class="pokeball-button"></span>
+        </div>
+      </div>
+
+      <h2 class="empty-favorites__title">
+        No Favorite Pokémon Yet
+      </h2>
+    </div>
+  </section>
 }

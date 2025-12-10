@@ -129,7 +129,6 @@ export class PokemonService {
             // apply filters
             .filter((p) => {
               // name contains
-              console.log(normalizedGroup, normalizedGroup,    normalizedType, height)
               if (normalizedName && p.name.toLowerCase() !== normalizedName) {
                 return false;
               }
