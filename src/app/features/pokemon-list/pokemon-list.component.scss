@@ -3,7 +3,7 @@
   margin: 3% 15%;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
+  gap: 1.8rem;
 
   @media (max-width: 1200px) {
     grid-template-columns: repeat(3, 1fr);
