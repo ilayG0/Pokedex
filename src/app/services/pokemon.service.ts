@@ -2,12 +2,10 @@ import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {
   Observable,
-  catchError,
   forkJoin,
   from,
   map,
   mergeMap,
-  of,
   shareReplay,
   switchMap,
   tap,
@@ -45,22 +43,22 @@ export class PokemonService {
   private readonly baseUrl = 'https://pokeapi.co/api/v2';
   private readonly pageSize = 12;
 
-  // 🔹 key ל-localStorage
+  // localstorage keu
   private readonly RECENT_SEARCHES_KEY = 'pokemon_recent_searches';
 
-  // 🔹 All pokemons
+  // All pokemons
   private _pokemons = signal<Pokemon[]>([]);
   pokemons = this._pokemons.asReadonly();
 
-  // 🔹 Favorite pokemons
+  // Favorite pokemons
   private _favoritePokemons = signal<Pokemon[]>([]);
   favoritePokemons = this._favoritePokemons.asReadonly();
 
-  // 🔹 Recent searches
+  // Recent searches
   private _recentSearches = signal<string[]>(this.loadRecentSearchesFromStorage());
   recentSearches = this._recentSearches.asReadonly();
 
-  // 🔹 options for filters (loaded once)
+  // options for filters (loaded once)
   private _typeOptions = signal<SelectOption[]>([]);
   typeOptions = this._typeOptions.asReadonly();
 
@@ -73,7 +71,7 @@ export class PokemonService {
   constructor(private http: HttpClient) {}
 
   // ------------------------------------------------
-  // 🔥 Fetch ALL pokemons from PokéAPI ONCE and cache
+  //  Fetch ALL pokemons from PokéAPI ONCE and cache
   // ------------------------------------------------
   private fetchAllPokemonsFromApi(): Observable<Pokemon[]> {
     const url = `${this.baseUrl}/pokemon?limit=2000&offset=0`;
@@ -107,7 +105,7 @@ export class PokemonService {
   }
 
   // ------------------------------------------------
-  // ⭐ Search over ALL pokemons using filters
+  //  Search over ALL pokemons using filters
   // ------------------------------------------------
   searchPokemonsByFilters(filters: PokemonFilters): Observable<Pokemon[]> {
     const { name, height, type, group } = filters;
@@ -184,7 +182,7 @@ export class PokemonService {
   }
 
   // =========================================================
-  // 🔹 Load type & group options once
+  //  Load type & group options once
   // =========================================================
   loadTypesAndGroups(): void {
     // types
@@ -225,7 +223,7 @@ export class PokemonService {
   }
 
   // =========================================================
-  // ✅ חיפוש לפי שם
+  // search by a name
   // =========================================================
   searchPokemonByName(name: string): Observable<Pokemon> {
     const term = name.trim().toLowerCase();
@@ -249,7 +247,7 @@ export class PokemonService {
   }
 
   // =========================================================
-  // ✅ לוגיקה של recent searches
+  //  recent searches
   // =========================================================
 
   private loadRecentSearchesFromStorage(): string[] {
@@ -268,7 +266,7 @@ export class PokemonService {
     try {
       localStorage.setItem(this.RECENT_SEARCHES_KEY, JSON.stringify(list.slice(0, 5)));
     } catch {
-      // נוכל להתעלם משגיאות localStorage
+    
     }
   }
 
@@ -348,7 +346,7 @@ export class PokemonService {
   }
 
   /**
-   * 🔥 Load 12 more full Pokémon objects and update the pokemons signal
+   *  Load 12 more full Pokémon objects and update the pokemons signal
    * - Uses current length as offset
    * - Does NOT re-fetch existing ones
    * - Returns the *full* updated array (from the signal)
@@ -388,23 +386,23 @@ export class PokemonService {
   }
 
   /**
-   * ⭐ Toggle favorite state for a Pokémon
+   *  Toggle favorite state for a Pokémon
    * - Updates isFavorit in the main pokemons array
    * - Adds/removes from favoritePokemons
    */
   toggleFavorite(pokemon: Pokemon): void {
     const isAlreadyFavorite = this._favoritePokemons().some((p) => p.id === pokemon.id);
 
-    // 1️⃣ Update main pokemons list (flip isFavorit)
+    //  Update main pokemons list (flip isFavorit)
     this._pokemons.update((list) =>
       list.map((p) => (p.id === pokemon.id ? { ...p, isFavorit: !isAlreadyFavorite } : p))
     );
 
     if (isAlreadyFavorite) {
-      // 2️⃣ If it was favorite -> remove from favorites
+      //  If it was favorite -> remove from favorites
       this._favoritePokemons.update((list) => list.filter((p) => p.id !== pokemon.id));
     } else {
-      // 2️⃣ If not favorite -> add to favorites with isFavorit = true
+      // If not favorite -> add to favorites with isFavorit = true
       // use the updated version from main list if exists
       const updatedPokemon = this._pokemons().find((p) => p.id === pokemon.id) ?? {
         ...pokemon,

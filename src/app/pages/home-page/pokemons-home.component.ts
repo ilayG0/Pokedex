@@ -112,7 +112,6 @@ export class PokemonsHome implements OnInit {
     this.filterResults.set([]);
     this.noResults.set(false);
 
-    // 👇 This now calls the smart service function that uses ALL pokemons
     this.pokemonService.searchPokemonsByFilters(filters).subscribe({
       next: (result) => {
         console.log(result);
@@ -133,7 +132,7 @@ export class PokemonsHome implements OnInit {
     this.showFilter.set(false);
   }
 
-  // ---- search bar (single Pokémon search) ----
+  // ---- search bar  ----
 
   onFoundPokemon(pokemon: Pokemon | null): void {
     if (!pokemon) {

@@ -37,7 +37,7 @@ export class FilterPanelComponent implements OnInit {
     this.pokemonService.loadTypesAndGroups();
   }
 
-  // 🟢 connect template directly to service signals
+  //  connect template directly to service signals
   get typeOptions(): SelectOption[] {
     return this.pokemonService.typeOptions();
   }
