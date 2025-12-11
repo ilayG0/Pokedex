@@ -44,7 +44,6 @@ export class SearchBar {
   }
 
   onOpenForm() {
-    console.log(this.isMobile());
     this.openFilters.emit();
   }
 

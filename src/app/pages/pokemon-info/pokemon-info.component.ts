@@ -27,7 +27,6 @@ export class PokemonInfoComponent {
   isLoading = signal(true);
   description = '';
   isFromFavorite = false;
-
   totalStats = 0;
 
   ngOnInit(): void {

@@ -41,7 +41,6 @@ export interface PokemonFilters {
 })
 export class PokemonService {
   private readonly baseUrl = 'https://pokeapi.co/api/v2';
-  private readonly pageSize = 12;
 
   private readonly RECENT_SEARCHES_KEY = 'pokemon_recent_searches';
   private readonly FAVORITE_POKEMON_IDS = 'favorite_pokemons';

@@ -48,7 +48,6 @@ export class PokemonCard {
   }
 
   onRemove(): void {
-    console.log("DFdf")
     this.pokemonToRemove.emit(this.pokemon);
   }
   goToPokemonFromHome(id: number): void {

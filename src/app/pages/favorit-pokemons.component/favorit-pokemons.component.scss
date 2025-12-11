@@ -1,7 +1,4 @@
-/* BRAND COLORS */
-$color-primary-blue: #020160;
-$color-primary-green: #94D97E;
-$color-text: #373299;
+@import '../../../styles/src-colors';
 
 :host {
   margin: 3% 15%;

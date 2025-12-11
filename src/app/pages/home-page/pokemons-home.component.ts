@@ -9,6 +9,7 @@ import { FilterPanelComponent } from '../../component/filter-panel.component/fil
 import { Pokemon } from '../../models/pokemon.model';
 import { PokemonService } from '../../services/pokemon.service';
 import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
+import { Router } from '@angular/router';
 
 export interface PokemonFilters {
   name?: string;
@@ -20,19 +21,13 @@ export interface PokemonFilters {
 @Component({
   selector: 'app-pokemons-home',
   standalone: true,
-  imports: [
-    CommonModule,
-    SearchBar,
-    Header,
-    PokemonListComponent,
-    FilterPanelComponent,
-    LoadingPokeBall,
-  ],
+  imports: [CommonModule, SearchBar, PokemonListComponent, FilterPanelComponent, LoadingPokeBall],
   templateUrl: './pokemons-home.component.html',
   styleUrls: ['./pokemons-home.component.scss'],
 })
 export class PokemonsHome implements OnInit {
   private readonly pokemonService = inject(PokemonService);
+  private readonly router = inject(Router);
 
   isLoading = signal(false);
   showFilter = signal(false);
@@ -73,6 +68,14 @@ export class PokemonsHome implements OnInit {
     this.pokemonService.searchPokemonsByFilters(filters).subscribe({
       next: (result) => {
         this.displayedPokemons.set(result);
+        console.log(filters);
+        this.router.navigate(['/search'], {
+          queryParams: {
+            height: filters.height || null,
+            group: filters.group || null,
+            type: filters.type || null,
+          },
+        });
         this.noResults.set(result.length === 0);
         this.isLoading.set(false);
         this.showFilter.set(false);
@@ -103,20 +106,23 @@ export class PokemonsHome implements OnInit {
     this.noResults.set(false);
     this.filters.set(null);
 
-    this.pokemonService
-      .filterPokemonsByNameOrId(term)
-      .subscribe({
-        next: (result) => {
-          this.displayedPokemons.set(result);
-          this.noResults.set(result.length === 0);
-          this.isLoading.set(false);
-        },
-        error: () => {
-          this.displayedPokemons.set([]);
-          this.noResults.set(true);
-          this.isLoading.set(false);
-        },
-      });
+    this.pokemonService.filterPokemonsByNameOrId(term).subscribe({
+      next: (result) => {
+        this.displayedPokemons.set(result);
+        this.noResults.set(result.length === 0);
+         this.router.navigate(['/search'], {
+          queryParams: {
+            nameOrId: term || null,
+          },
+        });
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.displayedPokemons.set([]);
+        this.noResults.set(true);
+        this.isLoading.set(false);
+      },
+    });
   }
 
   onReset(): void {
@@ -124,5 +130,4 @@ export class PokemonsHome implements OnInit {
     this.noResults.set(this.allPokemons().length === 0);
     this.displayedPokemons.set(this.allPokemons());
   }
-
 }
