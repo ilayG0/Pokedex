@@ -24,3 +24,13 @@
 .back-button:hover {
   opacity: 0.7;
 }
+
+@media (max-width: 760px) {
+    .back-button{
+    margin: 15px 11%;
+
+  }
+  .footer{
+    height: 50px;
+  }
+}
