@@ -166,7 +166,6 @@ h2{
 .pokemon-card__types {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
   gap: 10px;
   margin-top: 5px;
 }
@@ -229,7 +228,7 @@ h2{
 
 .pokemon-image-container {
   width: 100%;
-  height: 150px;
+  height: 200px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -250,7 +249,7 @@ h2{
 
 .vertical-divider .line {
   width: 1px;              
-  height: 100%;        
+  height: 95%;        
   background-color: #d7d7d7;   
 }
 
@@ -325,8 +324,45 @@ h2{
   }
 }
 
+
+.pokemon-card__section {
+  margin-bottom: 4px;
+}
+
+.pokemon-card__section-title {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 400;
+  font-family: 'Roboto';
+  color: $color-text;
+}
+
+.pokemon-card__description {
+  width: 80%;
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.4;
+  color: $color-primary-blue;
+}
+
+.stat-label,
+.stat-value {
+  font-size: 18px;
+  font-family: 'Roboto';
+  color: $color-primary-blue;
+}
+
+.stat-value {
+  margin-left: 5px;
+}
+
+.description-section{
+  padding-bottom: 10%;
+}
+
 /* ---------- MOBILE (< 760px) ---------- */
 @media (max-width: 759px) {
+
   .pokemon-details {
     text-align: center;
 
@@ -352,24 +388,4 @@ h2{
       margin-top: 0.5rem;
     }
   }
-}
-
-.pokemon-card__section {
-  margin-bottom: 4px;
-}
-
-.pokemon-card__section-title {
-  margin: 0 0 4px;
-  font-size: 22px;
-  font-weight: 400;
-  font-family: 'Roboto';
-  color: $color-text;
-}
-
-.pokemon-card__description {
-  width: 70%;
-  margin: 0;
-  font-size: 18px;
-  line-height: 1.4;
-  color: $color-primary-blue;
 }

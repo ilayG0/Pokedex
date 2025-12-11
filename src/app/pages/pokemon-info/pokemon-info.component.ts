@@ -5,10 +5,6 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
 import { Pokemon } from '../../models/pokemon.model';
-import { PokemonPreviewCard } from '../../component/pokemon-preview-card/pokemon-preview-card.component';
-import { PokemonMainInfoComponent } from './pokemon-main-info.component/pokemon-main-info.component';
-import { PokemonStatsDetailsComponent } from './pokemon-stats-details.component/pokemon-stats-details.component';
-import { PokemonIdPipe } from '../../pipes/pokemon-id.pipe';
 import { PokemonCard } from "../../component/pokemon-card /pokemon-card.component";
 
 @Component({
@@ -18,10 +14,6 @@ import { PokemonCard } from "../../component/pokemon-card /pokemon-card.componen
     CommonModule,
     RouterLink,
     LoadingPokeBall,
-    PokemonPreviewCard,
-    PokemonMainInfoComponent,
-    PokemonStatsDetailsComponent,
-    PokemonIdPipe,
     PokemonCard
 ],
   templateUrl: './pokemon-info.component.html',

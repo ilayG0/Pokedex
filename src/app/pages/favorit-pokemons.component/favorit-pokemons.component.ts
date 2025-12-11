@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
-import { PokemonPreviewCard } from '../../component/pokemon-preview-card/pokemon-preview-card.component';
+import { PokemonCard } from '../../component/pokemon-card /pokemon-card.component';
 import { PokemonService } from '../../services/pokemon.service';
 import { Pokemon } from '../../models/pokemon.model';
 import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-favorit-pokemons.component',
-  imports: [PokemonPreviewCard, RouterLink],
+  imports: [ PokemonCard, RouterLink],
   templateUrl: './favorit-pokemons.component.html',
   styleUrl: './favorit-pokemons.component.scss',
 })

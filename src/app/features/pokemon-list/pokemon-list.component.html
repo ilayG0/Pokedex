@@ -1,9 +1,6 @@
 <div class="pokemon-grid">
-  @for (pokemon of displayedPokemons; track pokemon.id) { @if(pokemon.id === 1){
-  <app-pokemon-card [pokemon]="pokemon" page="home"></app-pokemon-card>
-
-  }
-  <app-pokemon-preview-card [pokemon]="pokemon" page="home" />
+  @for (pokemon of displayedPokemons; track pokemon.id) {
+  <app-pokemon-card [pokemon]="pokemon" page="home" />
   }
 </div>
 

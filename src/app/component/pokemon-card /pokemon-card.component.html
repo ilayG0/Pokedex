@@ -4,7 +4,7 @@
       {{ pokemon.id | pokemonId }}
     </span>
 
-    @if (this.addCancelBtn){
+    @if (page === 'favorite'){
     <button type="button" class="card-remove-btn" (click)="onRemove(); $event.stopPropagation()">
       ✕
     </button>
@@ -39,7 +39,7 @@
       <a (click)="goToPokemon(pokemon.id)">
         <img
         class="card-home-image"
-          *ngIf="page === 'home'"
+          *ngIf="page === 'home' || page === 'favorite'"
           [src]="
             'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' +
             pokemon.id +
@@ -67,7 +67,7 @@
     </div>
     <div class="col-md-7 pokemon-details" *ngIf="page === 'info'">
       <!-- DESCRIPTION -->
-      <section class="pokemon-card__section ">
+      <section class="pokemon-card__section  description-section">
         <h3 class="pokemon-card__section-title">Description</h3>
         <p class="pokemon-card__description">
           {{ pokemon.description }}
@@ -75,30 +75,30 @@
       </section>
 
       <!-- STATS -->
-      <section class="pokemon-details__section">
-        <h3 class="pokemon-details__title">Stats</h3>
+      <section class="pokemon-card__section ">
+        <h3 class="pokemon-card__section-title">Stats</h3>
 
         <div class="pokemon-details__stats-layout">
           <!-- LEFT COLUMN -->
           <div class="pokemon-details__stats-column">
             <p class="pokemon-details__stat-item" *ngFor="let stat of this.statsLeft">
-              <span class="pokemon-details__stat-label">{{ stat.label }}:</span>
-              <span class="pokemon-details__stat-value">{{ getStat(stat.key) }}</span>
+              <span class="stat-label">{{ stat.label }}:</span>
+              <span class="stat-value">{{ getStat(stat.key) }}</span>
             </p>
           </div>
 
           <!-- RIGHT COLUMN -->
           <div class="pokemon-details__stats-column">
             <p class="pokemon-details__stat-item" *ngFor="let stat of this.statsRight">
-              <span class="pokemon-details__stat-label">{{ stat.label }}:</span>
-              <span class="pokemon-details__stat-value">{{ getStat(stat.key) }}</span>
+              <span class="stat-label">{{ stat.label }}:</span>
+              <span class="stat-value">{{ getStat(stat.key) }}</span>
             </p>
           </div>
 
           <!-- TOTAL -->
           <p class="pokemon-details__stat-item pokemon-details__stat-item--total">
-            <span class="pokemon-details__stat-label">Total:</span>
-            <span class="pokemon-details__stat-value">{{ this.totalStats }}</span>
+            <span class="stat-label">Total:</span>
+            <span class="stat-value">{{ this.totalStats }}</span>
           </p>
         </div>
       </section>
