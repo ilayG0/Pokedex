@@ -27,8 +27,12 @@
   cursor: pointer;
   color: #5A5A89;
   padding: 0;
+  z-index: 999;
 }
 
+.card-remove-btn:hover{
+  color:  rgba(217, 126, 126, 0.9);
+}
 .card:hover {
   box-shadow: 0 0 8px 2px rgba(148, 217, 126, 0.6);
 }

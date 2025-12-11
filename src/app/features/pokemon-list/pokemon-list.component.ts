@@ -1,6 +1,5 @@
 import { Component, Input, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 
 import { Pokemon } from '../../models/pokemon.model';
 import { PokemonPreviewCard } from '../../component/pokemon-preview-card/pokemon-preview-card.component';
@@ -14,7 +13,6 @@ import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-bal
   styleUrls: ['./pokemon-list.component.scss'],
 })
 export class PokemonListComponent {
-  private readonly router = inject(Router);
 
   readonly pageSize = 12;
   currentPage = signal(1);
@@ -45,9 +43,7 @@ export class PokemonListComponent {
     return Math.ceil(this._pokemons.length / this.pageSize);
   }
 
-  goToPokemon(id: number): void {
-    this.router.navigate(['/pokemon-info', id]);
-  }
+
 
   nextPage(): void {
     if (this.currentPage() < this.totalPages) {

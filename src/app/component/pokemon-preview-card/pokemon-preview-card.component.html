@@ -3,20 +3,23 @@
   <button
     type="button"
     class="card-remove-btn"
-    (click)="onRemove(pokemon)"
+    (click)="onRemove(pokemon); $event.stopPropagation()"
     aria-label="Remove from favorites"
   >
     ✕
   </button>
   }
+
   <p class="card-id-title">{{ pokemon.id | pokemonId }}</p>
-  <img
-    [src]="
-      'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' +
-      pokemon.id +
-      '.png'
-    "
-    alt="{{ pokemon.name }}"
-  />
-  <p class="crad-pokemon-name">{{ pokemon.name | capitalizeFirst}}</p>
+  <a (click)="goToPokemon(pokemon.id)">
+    <img
+      [src]="
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' +
+        pokemon.id +
+        '.png'
+      "
+      alt="{{ pokemon.name }}"
+    />
+    <p class="crad-pokemon-name">{{ pokemon.name | capitalizeFirst }}</p>
+  </a>
 </div>

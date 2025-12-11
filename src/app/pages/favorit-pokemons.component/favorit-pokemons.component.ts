@@ -19,10 +19,4 @@ export class FavoritPokemonsComponent {
     this.pokemonService.toggleFavorite(pokemon);
   }
 
-  goToPokemon(id: number): void {
-    let isFromFavorite = true;
-    this.router.navigate(['/pokemon-info', id], {
-      queryParams: { isFromFavorite },
-    });
-  }
 }

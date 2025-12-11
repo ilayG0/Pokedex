@@ -2,7 +2,7 @@
   @for (pokemon of displayedPokemons; track pokemon.id) {
     <app-pokemon-preview-card
       [pokemon]="pokemon"
-      (click)="goToPokemon(pokemon.id)"
+      page="home"
     />
   }
 </div>

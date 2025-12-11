@@ -2,8 +2,8 @@
   <app-pokemon-preview-card
     [pokemon]="pokemon"
     [addCencleBtn]="true"
+    page="favorite"
     (pokemontoRemove)="onRemoveFavorite($event)"
-    (click)="goToPokemon(pokemon.id)"
   />
 }
 @if (favorites().length === 0) {
