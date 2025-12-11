@@ -9,6 +9,7 @@ import { PokemonPreviewCard } from '../../component/pokemon-preview-card/pokemon
 import { PokemonMainInfoComponent } from './pokemon-main-info.component/pokemon-main-info.component';
 import { PokemonStatsDetailsComponent } from './pokemon-stats-details.component/pokemon-stats-details.component';
 import { PokemonIdPipe } from '../../pipes/pokemon-id.pipe';
+import { PokemonCard } from "../../component/pokemon-card /pokemon-card.component";
 
 @Component({
   selector: 'app-pokemon-info',
@@ -21,7 +22,8 @@ import { PokemonIdPipe } from '../../pipes/pokemon-id.pipe';
     PokemonMainInfoComponent,
     PokemonStatsDetailsComponent,
     PokemonIdPipe,
-  ],
+    PokemonCard
+],
   templateUrl: './pokemon-info.component.html',
   styleUrl: './pokemon-info.component.scss',
 })
@@ -55,6 +57,7 @@ export class PokemonInfoComponent {
     this.pokemonService.getPokemon(id).subscribe({
       next: (p) => {
         this.pokemon = p;
+        console.log(p)
         this.totalStats = this.calculateTotalStats(p);
         this.description = p.description || '';
         this.isLoading.set(false);

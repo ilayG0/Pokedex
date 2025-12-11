@@ -1,0 +1,107 @@
+<div [class]="page === 'info' ? 'pokemon-card-info' : 'card'">
+  <div class="pokemon-card__header">
+    <span class="pokemon-card__id">
+      {{ pokemon.id | pokemonId }}
+    </span>
+
+    @if (this.addCancelBtn){
+    <button type="button" class="card-remove-btn" (click)="onRemove(); $event.stopPropagation()">
+      ✕
+    </button>
+    } @else if(page === 'info'){
+    <button
+      class="pokemon-card__favorite-btn"
+      type="button"
+      aria-label="Add to favorites"
+      [class.active]="pokemon.isFavorit"
+      (click)="onToggleFavorite(pokemon)"
+    >
+      <svg
+        class="favorite-heart"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          d="M12 21s-6-4.35-9-8.28C-1.5 8.1 1.5 2 6.3 2c2.55 0 4.2 1.8 5.7 3.45C13.5 3.8 15.15 2 17.7 2 22.5 2 25.5 8.1 21 12.72C18 16.65 12 21 12 21z"
+          [attr.fill]="pokemon.isFavorit ? 'currentColor' : 'none'"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg></button
+    >}
+  </div>
+  <div [class]="page === 'info' ? 'row devider' : ''">
+    <div [class]="page === 'info' ? 'col-md-4' : ''">
+      <a (click)="goToPokemon(pokemon.id)">
+        <img
+        class="card-home-image"
+          *ngIf="page === 'home'"
+          [src]="
+            'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' +
+            pokemon.id +
+            '.png'
+          "
+          alt="{{ pokemon.name }}"
+        />
+        <div class="pokemon-image-container" *ngIf="page === 'info'">
+          <img
+            class="pokemon-card__image"
+            [src]="pokemon.sprites.front_default"
+            [alt]="pokemon.name"
+          />
+        </div>
+        <h2 [class.pokemon-card__name]="page === 'info'">{{ pokemon.name | capitalizeFirst }}</h2>
+      </a>
+      <div class="pokemon-card__types" *ngIf="page === 'info'">
+        <span *ngFor="let t of pokemon.types" class="type-chip" [ngClass]="'type-' + t.type.name">
+          {{ t.type.name | capitalizeFirst }}
+        </span>
+      </div>
+    </div>
+    <div class="col-md-1 vertical-divider" *ngIf="page === 'info'">
+      <div class="line"></div>
+    </div>
+    <div class="col-md-7 pokemon-details" *ngIf="page === 'info'">
+      <!-- DESCRIPTION -->
+      <section class="pokemon-details__section pokemon-details__section--description">
+        <h3 class="pokemon-details__title">Description</h3>
+        <p class="pokemon-details__description">
+          {{ pokemon.description }}
+        </p>
+      </section>
+
+      <!-- STATS -->
+      <section class="pokemon-details__section">
+        <h3 class="pokemon-details__title">Stats</h3>
+
+        <div class="pokemon-details__stats-layout">
+          <!-- LEFT COLUMN -->
+          <div class="pokemon-details__stats-column">
+            <p class="pokemon-details__stat-item" *ngFor="let stat of this.statsLeft">
+              <span class="pokemon-details__stat-label">{{ stat.label }}:</span>
+              <span class="pokemon-details__stat-value">{{ getStat(stat.key) }}</span>
+            </p>
+          </div>
+
+          <!-- RIGHT COLUMN -->
+          <div class="pokemon-details__stats-column">
+            <p class="pokemon-details__stat-item" *ngFor="let stat of this.statsRight">
+              <span class="pokemon-details__stat-label">{{ stat.label }}:</span>
+              <span class="pokemon-details__stat-value">{{ getStat(stat.key) }}</span>
+            </p>
+          </div>
+
+          <!-- TOTAL -->
+          <p class="pokemon-details__stat-item pokemon-details__stat-item--total">
+            <span class="pokemon-details__stat-label">Total:</span>
+            <span class="pokemon-details__stat-value">{{ this.totalStats }}</span>
+          </p>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

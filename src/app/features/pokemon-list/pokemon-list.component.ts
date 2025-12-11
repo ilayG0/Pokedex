@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { Pokemon } from '../../models/pokemon.model';
 import { PokemonPreviewCard } from '../../component/pokemon-preview-card/pokemon-preview-card.component';
 import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
+import { PokemonCard } from "../../component/pokemon-card /pokemon-card.component";
 
 @Component({
   selector: 'app-pokemon-list',
   standalone: true,
-  imports: [CommonModule, PokemonPreviewCard, LoadingPokeBall],
+  imports: [CommonModule, PokemonPreviewCard, LoadingPokeBall, PokemonCard],
   templateUrl: './pokemon-list.component.html',
   styleUrls: ['./pokemon-list.component.scss'],
 })

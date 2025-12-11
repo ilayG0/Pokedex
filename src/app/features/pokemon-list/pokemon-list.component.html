@@ -1,27 +1,22 @@
 <div class="pokemon-grid">
-  @for (pokemon of displayedPokemons; track pokemon.id) {
-    <app-pokemon-preview-card
-      [pokemon]="pokemon"
-      page="home"
-    />
+  @for (pokemon of displayedPokemons; track pokemon.id) { @if(pokemon.id === 1){
+  <app-pokemon-card [pokemon]="pokemon" page="home"></app-pokemon-card>
+
+  }
+  <app-pokemon-preview-card [pokemon]="pokemon" page="home" />
   }
 </div>
 
 @if (pokemons.length === 0) {
-  <div class="no-results">No Pokémon found.</div>
+<div class="no-results">No Pokémon found.</div>
 }
 
 <div class="home__pagination">
-  <button (click)="prevPage()" [disabled]="currentPage() === 1">
-    Prev
-  </button>
+  <button (click)="prevPage()" [disabled]="currentPage() === 1">Prev</button>
 
   <span>Page {{ currentPage() }} / {{ totalPages }}</span>
 
-  <button
-    (click)="nextPage()"
-    [disabled]="currentPage() === totalPages || pokemons.length === 0"
-  >
+  <button (click)="nextPage()" [disabled]="currentPage() === totalPages || pokemons.length === 0">
     Next
   </button>
 </div>
