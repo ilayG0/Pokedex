@@ -76,3 +76,74 @@ nav a.active {
     display: none;
   }
 }
+
+.pokeball-badge {
+  position: relative;
+  width: 35px;
+  height: 35px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+}
+
+.pokeball-count {
+  position: absolute;
+  font-size: 10px;
+  font-weight: 700;
+  color: #222;
+  z-index: 3;
+  transform: translateY(1px);
+}
+.nav-favorites {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pokeball-badge {
+  position: relative;
+  width: 35px;
+  height: 35px;
+  margin-left: 4px;
+  border-radius: 50%;
+  border: 2px solid #111;
+  box-sizing: border-box;
+  background: linear-gradient(to bottom, #ff1c1c 0 50%, #ffffff 50% 100%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* הפס השחור באמצע */
+.pokeball-badge::before {
+  content: '';
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 50%;
+  height: 2px;
+  background: #111;
+  transform: translateY(-50%);
+}
+
+/* הכפתור במרכז */
+.pokeball-badge::after {
+  content: '';
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #111;
+}
+
+/* המספר בתוך הפוקדור */
+.pokeball-badge__count {
+  position: relative;
+  z-index: 1;
+  font-size: 10px;
+  font-weight: 700;
+  color: #111;
+}

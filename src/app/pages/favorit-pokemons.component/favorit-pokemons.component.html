@@ -4,7 +4,7 @@
   page="favorite"
   (pokemonToRemove)="onRemoveFavorite($event)"
 />
-} @if (favorites().length === 0) {
+} @if (favorites().length === 0 && !isLoading()) {
 <section class="empty-favorites">
   <div class="empty-favorites__card">
     <div class="empty-favorites__icon">
@@ -17,4 +17,6 @@
     <h2 class="empty-favorites__title">No Favorite Pokémon Yet</h2>
   </div>
 </section>
+} @else if(isLoading()){
+  <app-loading-poke-ball/>
 }

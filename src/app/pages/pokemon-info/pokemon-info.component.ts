@@ -33,7 +33,6 @@ export class PokemonInfoComponent {
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
       this.isFromFavorite = params['isFromFavorite'] === 'true';
-      console.log('isFromFavorite:', this.isFromFavorite, params['isFromFavorite']);
     });
 
     const idParam = this.route.snapshot.paramMap.get('id');

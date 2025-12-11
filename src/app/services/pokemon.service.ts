@@ -1,14 +1,12 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {
   Observable,
-  forkJoin,
   from,
   map,
   mergeMap,
   shareReplay,
   switchMap,
-  tap,
   throwError,
   toArray,
 } from 'rxjs';
@@ -25,10 +23,12 @@ export interface PokemonListResponse {
   previous: string | null;
   results: NamedAPIResource[];
 }
+
 export interface SelectOption {
   name: string;
   value: string;
 }
+
 export interface PokemonFilters {
   name?: string;
   height?: number;
@@ -43,56 +43,91 @@ export class PokemonService {
   private readonly baseUrl = 'https://pokeapi.co/api/v2';
   private readonly pageSize = 12;
 
-  // localstorage keu
   private readonly RECENT_SEARCHES_KEY = 'pokemon_recent_searches';
+  private readonly FAVORITE_POKEMON_IDS = 'favorite_pokemons';
 
-  // All pokemons
   private _pokemons = signal<Pokemon[]>([]);
   pokemons = this._pokemons.asReadonly();
 
-  // Favorite pokemons
-  private _favoritePokemons = signal<Pokemon[]>([]);
-  favoritePokemons = this._favoritePokemons.asReadonly();
+  favoriteIds = signal<number[]>(this.loadFavoriteIds());
 
-  // Recent searches
+  favoriteCount = computed(() => this.favoriteIds().length);
+
+  favoritePokemons = computed<Pokemon[]>(() => {
+    const favSet = new Set(this.favoriteIds());
+    return this._pokemons().filter((p) => favSet.has(p.id));
+  });
+
   private _recentSearches = signal<string[]>(this.loadRecentSearchesFromStorage());
   recentSearches = this._recentSearches.asReadonly();
 
-  // options for filters (loaded once)
   private _typeOptions = signal<SelectOption[]>([]);
   typeOptions = this._typeOptions.asReadonly();
 
   private _groupOptions = signal<SelectOption[]>([]);
   groupOptions = this._groupOptions.asReadonly();
 
-  // cache for "all pokemons", fetched only once
   private allPokemons$?: Observable<Pokemon[]>;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.getAllPokemons().subscribe();
+  }
 
-  // ------------------------------------------------
-  //  Fetch ALL pokemons from PokéAPI ONCE and cache
-  // ------------------------------------------------
+  private loadFavoriteIds(): number[] {
+    try {
+      return JSON.parse(localStorage.getItem(this.FAVORITE_POKEMON_IDS) || '[]');
+    } catch {
+      return [];
+    }
+  }
+
+  private saveFavoriteIds(): void {
+    try {
+      localStorage.setItem(this.FAVORITE_POKEMON_IDS, JSON.stringify(this.favoriteIds()));
+    } catch {}
+  }
+
+  isFavorite(id: number): boolean {
+    return this.favoriteIds().includes(id);
+  }
+
+  toggleFavorite(pokemon: Pokemon): void {
+    const id = pokemon.id;
+    const exists = this.favoriteIds().includes(id);
+
+    const updatedIds = exists
+      ? this.favoriteIds().filter((x) => x !== id)
+      : [...this.favoriteIds(), id];
+
+    this.favoriteIds.set(updatedIds);
+    this.saveFavoriteIds();
+
+    this._pokemons.update((list) =>
+      list.map((p) => (p.id === id ? { ...p, isFavorit: !exists } : p))
+    );
+  }
+
   private fetchAllPokemonsFromApi(): Observable<Pokemon[]> {
     const url = `${this.baseUrl}/pokemon?limit=2000&offset=0`;
 
     return this.http.get<PokemonListResponse>(url).pipe(
-      // first step: get all basic resources (name + url)
       map((res) => res.results),
-
-      // second step: fetch details for EACH pokemon with limited concurrency
       mergeMap((results) =>
         from(results).pipe(
-          // concurrency 10 -> 10 parallel HTTP requests at a time
           mergeMap((r) => this.http.get<Pokemon>(r.url), 10),
           toArray()
         )
       ),
-
-      // optional: sort by id, just to keep it tidy
       map((allPokemons) => allPokemons.slice().sort((a, b) => a.id - b.id)),
-
-      // cache in memory so we never do this again in this session
+      map((sorted) => {
+        const favSet = new Set(this.favoriteIds());
+        const enriched = sorted.map((p) => ({
+          ...p,
+          isFavorit: favSet.has(p.id),
+        }));
+        this._pokemons.set(enriched);
+        return enriched;
+      }),
       shareReplay(1)
     );
   }
@@ -104,9 +139,6 @@ export class PokemonService {
     return this.allPokemons$;
   }
 
-  // ------------------------------------------------
-  //  Search over ALL pokemons using filters
-  // ------------------------------------------------
   searchPokemonsByFilters(filters: PokemonFilters): Observable<Pokemon[]> {
     const { name, height, type, group } = filters;
 
@@ -116,72 +148,62 @@ export class PokemonService {
 
     return this.getAllPokemons().pipe(
       map((allPokemons) => {
-        // favorite lookup is O(1) by Set
-        const favoriteIds = new Set(this._favoritePokemons().map((p) => p.id));
+        const favoriteIdsSet = new Set(this.favoriteIds());
 
-        return (
-          allPokemons
-            // attach isFavorit based on favorites array
-            .map((p) => ({
-              ...p,
-              isFavorit: favoriteIds.has(p.id),
-            }))
-            // apply filters
-            .filter((p) => {
-              // name contains
-              if (normalizedName && p.name.toLowerCase() !== normalizedName) {
+        return allPokemons
+          .map((p) => ({
+            ...p,
+            isFavorit: favoriteIdsSet.has(p.id),
+          }))
+          .filter((p) => {
+            if (normalizedName && p.name.toLowerCase() !== normalizedName) {
+              return false;
+            }
+
+            if (height != null && height !== undefined) {
+              if (p.height == null || p.height !== height) {
                 return false;
               }
+            }
 
-              // exact height
-              if (height != null && height !== undefined) {
-                if (p.height == null || p.height !== height) {
-                  return false;
-                }
+            if (normalizedType) {
+              const hasType = p.types?.some((t: any) => {
+                const typeName: string =
+                  (t?.type?.name as string) ||
+                  (t?.name as string) ||
+                  (typeof t === 'string' ? t : '');
+                return typeName.toLowerCase() === normalizedType;
+              });
+
+              if (!hasType) {
+                return false;
+              }
+            }
+
+            if (normalizedGroup) {
+              const pokemonGroup =
+                ((p as any).group as string | string[] | undefined) ?? undefined;
+
+              let hasGroup = false;
+
+              if (typeof pokemonGroup === 'string') {
+                hasGroup = pokemonGroup.toLowerCase() === normalizedGroup;
+              } else if (Array.isArray(pokemonGroup)) {
+                hasGroup = pokemonGroup.some((g) => g.toLowerCase() === normalizedGroup);
               }
 
-              // type filter (supports PokeAPI structure: [{ type: { name } }])
-              if (normalizedType) {
-                const hasType = p.types?.some((t: any) => {
-                  const typeName: string =
-                    (t?.type?.name as string) ||
-                    (t?.name as string) ||
-                    (typeof t === 'string' ? t : '');
-                  return typeName.toLowerCase() === normalizedType;
-                });
-
-                if (!hasType) {
-                  return false;
-                }
+              if (!hasGroup) {
+                return false;
               }
+            }
 
-              // group (egg-group or any custom "group" you add)
-              if (normalizedGroup) {
-                const pokemonGroup =
-                  ((p as any).group as string | string[] | undefined) ?? undefined;
-
-                let hasGroup = false;
-
-                if (typeof pokemonGroup === 'string') {
-                  hasGroup = pokemonGroup.toLowerCase() === normalizedGroup;
-                } else if (Array.isArray(pokemonGroup)) {
-                  hasGroup = pokemonGroup.some((g) => g.toLowerCase() === normalizedGroup);
-                }
-
-                if (!hasGroup) {
-                  return false;
-                }
-              }
-
-              return true;
-            })
-        );
+            return true;
+          });
       })
     );
   }
 
   loadTypesAndGroups(): void {
-    // types
     if (this._typeOptions().length === 0) {
       this.http.get<any>(`${this.baseUrl}/type`).subscribe({
         next: (res) => {
@@ -200,7 +222,6 @@ export class PokemonService {
       });
     }
 
-    // egg groups
     if (this._groupOptions().length === 0) {
       this.http.get<any>(`${this.baseUrl}/egg-group`).subscribe({
         next: (res) => {
@@ -227,9 +248,9 @@ export class PokemonService {
     const url = `${this.baseUrl}/pokemon/${term}`;
 
     return this.http.get<Pokemon>(url).pipe(
-      map((pokemon) => {
-        const isFav = this._favoritePokemons().some((p) => p.id === pokemon.id);
-        const withFlag: Pokemon = { ...pokemon, isFavorit: isFav };
+      map((pokemonRes) => {
+        const isFav = this.isFavorite(pokemonRes.id);
+        const withFlag: Pokemon = { ...pokemonRes, isFavorit: isFav };
 
         this.addRecentSearch(term);
 
@@ -253,9 +274,7 @@ export class PokemonService {
   private saveRecentSearchesToStorage(list: string[]): void {
     try {
       localStorage.setItem(this.RECENT_SEARCHES_KEY, JSON.stringify(list.slice(0, 5)));
-    } catch {
-    
-    }
+    } catch {}
   }
 
   addRecentSearch(term: string): void {
@@ -284,7 +303,6 @@ export class PokemonService {
     });
   }
 
-
   getPokemon(idOrName: number | string): Observable<Pokemon> {
     const url = `${this.baseUrl}/pokemon/${idOrName}`;
 
@@ -304,7 +322,7 @@ export class PokemonService {
                   .trim()
               : '';
 
-            const isFav = this._favoritePokemons().some((p) => p.id === pokemonRes.id);
+            const isFav = this.isFavorite(pokemonRes.id);
 
             const pokemon: Pokemon = {
               ...pokemonRes,
@@ -319,40 +337,25 @@ export class PokemonService {
     );
   }
 
-
-  toggleFavorite(pokemon: Pokemon): void {
-    const isAlreadyFavorite = this._favoritePokemons().some((p) => p.id === pokemon.id);
-
-    this._pokemons.update((list) =>
-      list.map((p) => (p.id === pokemon.id ? { ...p, isFavorit: !isAlreadyFavorite } : p))
-    );
-
-    if (isAlreadyFavorite) {
-      this._favoritePokemons.update((list) => list.filter((p) => p.id !== pokemon.id));
-    } else {
-      const updatedPokemon = this._pokemons().find((p) => p.id === pokemon.id) ?? {
-        ...pokemon,
-        isFavorit: true,
-      };
-
-      this._favoritePokemons.update((list) => [...list, { ...updatedPokemon, isFavorit: true }]);
-    }
-  }
-
   filterPokemonsByNameOrId(term: string): Observable<Pokemon[]> {
-  const clean = term.trim().toLowerCase();
+    const clean = term.trim().toLowerCase();
 
-  if (!clean) return this.getAllPokemons(); 
+    if (!clean) return this.getAllPokemons();
 
-  return this.getAllPokemons().pipe(
-    map((all) => {
-      return all.filter((p) => {
-        const nameMatch = p.name.toLowerCase().includes(clean);
-        const idMatch = String(p.id).includes(clean); 
-        return nameMatch || idMatch;
-      });
-    })
-  );
-}
-
+    return this.getAllPokemons().pipe(
+      map((all) => {
+        const favSet = new Set(this.favoriteIds());
+        return all
+          .filter((p) => {
+            const nameMatch = p.name.toLowerCase().includes(clean);
+            const idMatch = String(p.id).includes(clean);
+            return nameMatch || idMatch;
+          })
+          .map((p) => ({
+            ...p,
+            isFavorit: favSet.has(p.id),
+          }));
+      })
+    );
+  }
 }

@@ -22,7 +22,13 @@
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
     >
-      Favorites
+      <span>Favorites</span>
+
+      @if (count > 0) {
+      <span class="pokeball-badge">
+        <span class="pokeball-badge__count">{{ count }}</span>
+      </span>
+      }
     </a>
   </nav>
   }
