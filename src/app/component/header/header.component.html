@@ -1,15 +1,29 @@
 <header class="header">
-  <div class="header__logo"  (click)="onHome()" >
-    <a routerLink="/"> 
-    <img src="pokedex.png" alt="PokeDex logo" />
+  <div class="header__logo">
+    <a routerLink="/">
+      <img src="pokedex.png" alt="PokeDex logo" />
     </a>
   </div>
 
   @if(!isMobile()){
   <nav>
-    <a class="nav-home" routerLink="/" (click)="onHome()" [class.marker]="isHome()"> Home </a>
+    <a
+      class="nav-home"
+      routerLink="/"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Home
+    </a>
 
-    <a class="nav-favorites" routerLink="/favorite-pokemons" (click)="onFavorite()" [class.marker]="!isHome()"> Favorites </a>
+    <a
+      class="nav-favorites"
+      routerLink="/favorite-pokemons"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Favorites
+    </a>
   </nav>
-}
+  }
 </header>

@@ -1,9 +1,9 @@
 import { Component, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink ,RouterLinkActive} from '@angular/router';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink],
+  imports: [RouterLink, RouterLinkActive ],
   standalone: true,
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
@@ -16,13 +16,5 @@ export class Header {
     window.addEventListener('resize', () => {
       this.isMobile.set(window.innerWidth < 670);
     });
-  }
-
-  onHome() {
-    this.isHome.set(true);
-  }
-
-  onFavorite() {
-    this.isHome.set(false);
   }
 }

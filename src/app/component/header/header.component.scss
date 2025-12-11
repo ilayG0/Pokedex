@@ -41,11 +41,13 @@ nav a {
   cursor: pointer;
   color: $color-light;
   text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-nav a.marker {
+nav a.active {
+  background-color: $color-primary-green; // make active bg green
   color: $color-primary-blue;
-  background-color: $color-primary-green;
+  font-weight: 500;
 }
 
 /* Mobile */
@@ -73,6 +75,4 @@ nav a.marker {
   nav a {
     display: none;
   }
-
-
 }
