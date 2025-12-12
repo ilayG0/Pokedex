@@ -70,8 +70,14 @@ export class FilterPanelComponent implements OnInit {
     return map[color] ?? '#000000';
   }
 
-    onColorSelect(color: string | null): void {
-    this.filterForm.get('color')?.setValue(color);
+  onColorSelect(color: string): void {
+    const current = this.filterForm.get('color')?.value;
+
+    if (current === color) {
+      this.filterForm.get('color')?.setValue(null);
+    } else {
+      this.filterForm.get('color')?.setValue(color);
+    }
   }
 
   get typeOptions(): SelectOption[] {
