@@ -266,6 +266,11 @@
   font-size: 0.75rem;
   color: #111827;
   text-align: center;
+  font-family: 'Roboto';
+
+  &.selected{
+    font-weight: bold;
+  }
 }
 
 @media (max-width: 760px) {

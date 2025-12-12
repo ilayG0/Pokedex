@@ -61,7 +61,9 @@
               <div class="pokeball-center-inner"></div>
             </div>
           </div>
-          <span class="pokeball-label">{{ c.label }}</span>
+          <span class="pokeball-label" 
+          [class.selected]="filterForm.get('color')?.value === c.value"
+          >{{ c.label }}</span>
         </button>
       }
     </div>
