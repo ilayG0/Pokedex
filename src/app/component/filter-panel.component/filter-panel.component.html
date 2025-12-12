@@ -18,7 +18,7 @@
         <label for="type">סוג</label>
         <select id="type" formControlName="type">
           <option value="">בחירה</option>
-          @for(opt of typeOptions; track opt.name){
+          @for (opt of typeOptions; track opt.name) {
             <option [value]="opt.value">{{ opt.name }}</option>
           }
         </select>
@@ -31,10 +31,39 @@
         <label for="group">קבוצה</label>
         <select id="group" formControlName="group">
           <option value="">בחירה</option>
-          @for(opt of groupOptions; track opt.name){
+          @for (opt of groupOptions; track opt.name) {
             <option [value]="opt.value">{{ opt.name }}</option>
           }
         </select>
+      </div>
+    </div>
+
+    <!-- color -->
+    <div class="filter-card__row">
+      <div class="field">
+        <label>צבע</label>
+
+        <div class="color-picker">
+          @for (c of pokemonColors; track c.value) {
+            <div
+              class="color-chip"
+              [class.selected]="filterForm.get('color')?.value === c.value"
+              (click)="onColorSelect(c.value)"
+            >
+              <span
+                class="color-dot"
+                [ngStyle]="{ 'background-color': getColorHex(c.value) }"
+              ></span>
+              <span class="label">{{ c.label }}</span>
+            </div>
+          }
+
+          @if (filterForm.get('color')?.value) {
+            <div class="color-chip clear" (click)="onColorSelect(null)">
+              ✕ איפוס צבע
+            </div>
+          }
+        </div>
       </div>
     </div>
   </div>

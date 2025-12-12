@@ -16,6 +16,7 @@ export interface PokemonFilters {
   height?: number;
   type?: string;
   group?: string;
+  color?: string;
 }
 
 @Component({
@@ -74,6 +75,7 @@ export class PokemonsHome implements OnInit {
             height: filters.height || null,
             group: filters.group || null,
             type: filters.type || null,
+            color: filters.color || null,
           },
         });
         this.noResults.set(result.length === 0);

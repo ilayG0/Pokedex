@@ -1,3 +1,5 @@
+@import '../../../styles/src-colors';
+
 :host {
   position: fixed;
   inset: 0;
@@ -137,13 +139,69 @@
 }
 
 .btn--primary {
-  background: #000f6b;
+  background: $color-primary-blue;
   color: #ffffff;
 }
 
 .btn--ghost {
   background: #ffffff;
-  color: #000f6b;
-  border: 1px solid #000f6b;
+  color: $color-primary-blue;
+  border: 1px solid $color-primary-blue;
 }
 
+/* color picker */
+.color-picker {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+}
+
+.color-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  transition: all 0.18s ease;
+  user-select: none;
+  white-space: nowrap;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  &.selected {
+    background: #ffffff;
+    border-color: $color-text;
+    box-shadow: 0 3px 8px #02016055;
+  }
+
+  &.clear {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #b91c1c;
+    font-weight: 500;
+
+    &:hover {
+      background: #fee2e2;
+    }
+  }
+
+  .label {
+    font-family: inherit;
+  }
+}
+
+.color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid #d1d5db;
+  flex-shrink: 0;
+}

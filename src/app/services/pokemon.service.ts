@@ -34,6 +34,7 @@ export interface PokemonFilters {
   height?: number;
   type?: string;
   group?: string;
+  color?: string;
 }
 
 @Injectable({
@@ -138,69 +139,96 @@ export class PokemonService {
     return this.allPokemons$;
   }
 
-  searchPokemonsByFilters(filters: PokemonFilters): Observable<Pokemon[]> {
-    const { name, height, type, group } = filters;
+searchPokemonsByFilters(filters: PokemonFilters): Observable<Pokemon[]> {
+  const { name, height, type, group, color } = filters;
 
-    const normalizedName = name?.trim().toLowerCase() || '';
-    const normalizedType = type?.trim().toLowerCase() || '';
-    const normalizedGroup = group?.trim().toLowerCase() || '';
+  const normalizedName = name?.trim().toLowerCase() || '';
+  const normalizedType = type?.trim().toLowerCase() || '';
+  const normalizedGroup = group?.trim().toLowerCase() || '';
+  const normalizedColor = color?.trim().toLowerCase() || '';
 
-    return this.getAllPokemons().pipe(
-      map((allPokemons) => {
-        const favoriteIdsSet = new Set(this.favoriteIds());
+  const applyFilters = (allPokemons: Pokemon[], allowedIds?: Set<number>): Pokemon[] => {
+    const favoriteIdsSet = new Set(this.favoriteIds());
 
-        return allPokemons
-          .map((p) => ({
-            ...p,
-            isFavorit: favoriteIdsSet.has(p.id),
-          }))
-          .filter((p) => {
-            if (normalizedName && p.name.toLowerCase() !== normalizedName) {
-              return false;
-            }
+    return allPokemons
+      .map((p) => ({
+        ...p,
+        isFavorit: favoriteIdsSet.has(p.id),
+      }))
+      .filter((p) => {
+        if (allowedIds && !allowedIds.has(p.id)) {
+          return false;
+        }
 
-            if (height != null && height !== undefined) {
-              if (p.height == null || p.height !== height) {
-                return false;
-              }
-            }
+        if (normalizedName && p.name.toLowerCase() !== normalizedName) {
+          return false;
+        }
 
-            if (normalizedType) {
-              const hasType = p.types?.some((t: any) => {
-                const typeName: string =
-                  (t?.type?.name as string) ||
-                  (t?.name as string) ||
-                  (typeof t === 'string' ? t : '');
-                return typeName.toLowerCase() === normalizedType;
-              });
+        if (height != null && height !== undefined) {
+          if (p.height == null || p.height !== height) {
+            return false;
+          }
+        }
 
-              if (!hasType) {
-                return false;
-              }
-            }
-
-            if (normalizedGroup) {
-              const pokemonGroup =
-                ((p as any).group as string | string[] | undefined) ?? undefined;
-
-              let hasGroup = false;
-
-              if (typeof pokemonGroup === 'string') {
-                hasGroup = pokemonGroup.toLowerCase() === normalizedGroup;
-              } else if (Array.isArray(pokemonGroup)) {
-                hasGroup = pokemonGroup.some((g) => g.toLowerCase() === normalizedGroup);
-              }
-
-              if (!hasGroup) {
-                return false;
-              }
-            }
-
-            return true;
+        if (normalizedType) {
+          const hasType = p.types?.some((t: any) => {
+            const typeName: string =
+              (t?.type?.name as string) ||
+              (t?.name as string) ||
+              (typeof t === 'string' ? t : '');
+            return typeName.toLowerCase() === normalizedType;
           });
-      })
-    );
+
+          if (!hasType) {
+            return false;
+          }
+        }
+
+        if (normalizedGroup) {
+          const pokemonGroup =
+            ((p as any).group as string | string[] | undefined) ?? undefined;
+
+          let hasGroup = false;
+
+          if (typeof pokemonGroup === 'string') {
+            hasGroup = pokemonGroup.toLowerCase() === normalizedGroup;
+          } else if (Array.isArray(pokemonGroup)) {
+            hasGroup = pokemonGroup.some((g) => g.toLowerCase() === normalizedGroup);
+          }
+
+          if (!hasGroup) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+  };
+
+  if (!normalizedColor) {
+    return this.getAllPokemons().pipe(map((allPokemons) => applyFilters(allPokemons)));
   }
+
+  return this.http
+    .get<{ pokemon_species: { name: string; url: string }[] }>(
+      `${this.baseUrl}/pokemon-color/${normalizedColor}`
+    )
+    .pipe(
+      map((res) => res.pokemon_species || []),
+      map((species) => {
+        const ids = species.map((s) => {
+          const parts = s.url.split('/').filter(Boolean);
+          const idStr = parts[parts.length - 1];
+          return Number(idStr);
+        });
+        return new Set(ids);
+      }),
+      switchMap((allowedIds) =>
+        this.getAllPokemons().pipe(map((allPokemons) => applyFilters(allPokemons, allowedIds)))
+      )
+    );
+}
+
 
   loadTypesAndGroups(): void {
     if (this._typeOptions().length === 0) {
