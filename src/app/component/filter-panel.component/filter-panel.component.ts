@@ -93,7 +93,6 @@ export class FilterPanelComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log('filetr ;', this.filterForm.value);
     this.search.emit(this.filterForm.value);
   }
 

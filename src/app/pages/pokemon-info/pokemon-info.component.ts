@@ -30,18 +30,16 @@ export class PokemonInfoComponent {
   totalStats = 0;
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe((params) => {
-      this.isFromFavorite = params['isFromFavorite'] === 'true';
-    });
-
     const idParam = this.route.snapshot.paramMap.get('id');
     const id = Number(idParam);
+    console.log(id)
 
     this.isLoading.set(true);
 
     this.pokemonService.getPokemon(id).subscribe({
       next: (p) => {
         this.pokemon = p;
+        console.log(this.pokemon)
         this.totalStats = this.calculateTotalStats(p);
         this.description = p.description || '';
         this.isLoading.set(false);

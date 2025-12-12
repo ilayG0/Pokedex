@@ -20,7 +20,6 @@ export class SearchBar {
 
   searchTerm = '';
   showDropdown = false;
-  didSearch = false;
   isLoading = false;
   isMobile = signal(window.innerWidth < 670);
   filteredPokemons = signal<Pokemon[]>([]);
@@ -60,7 +59,6 @@ export class SearchBar {
   }
 
   onResetClick() {
-    this.didSearch = false;
     this.searchTerm = '';
     this.showDropdown = false;
     this.reset.emit();

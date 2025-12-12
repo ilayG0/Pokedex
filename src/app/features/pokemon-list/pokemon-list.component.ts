@@ -22,7 +22,6 @@ export class PokemonListComponent {
   @Input()
   set pokemons(value: Pokemon[]) {
     this._pokemons = value ?? [];
-    // whenever the list changes (filter/search), go back to first page
     this.currentPage.set(1);
   }
 
@@ -30,7 +29,6 @@ export class PokemonListComponent {
     return this._pokemons;
   }
 
-  // Pokémon shown on current page
   get displayedPokemons(): Pokemon[] {
     const page = this.currentPage();
     const start = (page - 1) * this.pageSize;

@@ -33,11 +33,12 @@
 
   <button class="search-btn" (click)="onSearch()">Search</button>
 
-  @if(didSearch) { <button class="search-btn" type="button" (click)="onResetClick()">Reset</button>}
-  <button class="filter-btn" (click)="onOpenForm()" >
+  <button class="search-btn" type="button" (click)="onResetClick()" *ngIf="searchTerm !== ''">
+    Reset
+  </button>
+  <button class="filter-btn" (click)="onOpenForm()">
     <img src="filterIcon.svg" class="filter-icon" alt="filter icon" />
   </button>
-
 </div>
 
 @if (isLoading){

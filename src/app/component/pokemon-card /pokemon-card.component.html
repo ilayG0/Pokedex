@@ -1,20 +1,21 @@
+@if (pokemon && pokemon.id) {
 <div [class]="page === 'info' ? 'pokemon-card-info' : 'card'">
   <div class="pokemon-card__header">
     <span class="pokemon-card__id">
       {{ pokemon.id | pokemonId }}
     </span>
 
-    @if (page === 'favorite'){
+    @if (page === 'favorite') {
     <button type="button" class="card-remove-btn" (click)="onRemove(); $event.stopPropagation()">
       ✕
     </button>
-    } @else if(page === 'info'){
+    } @else if (page === 'info') {
     <button
       class="pokemon-card__favorite-btn"
       type="button"
       aria-label="Add to favorites"
       [class.active]="pokemon.isFavorit"
-      (click)="onToggleFavorite(pokemon)"
+      (click)="onToggleFavorite(pokemon); $event.stopPropagation()"
     >
       <svg
         class="favorite-heart"
@@ -31,14 +32,16 @@
           stroke-linecap="round"
           stroke-linejoin="round"
         />
-      </svg></button
-    >}
+      </svg>
+    </button>
+    }
   </div>
+
   <div [class]="page === 'info' ? 'row devider' : ''">
     <div [class]="page === 'info' ? 'col-md-4' : ''">
       <a (click)="goToPokemon(pokemon.id)">
         <img
-        class="card-home-image"
+          class="card-home-image"
           *ngIf="page === 'home' || page === 'favorite'"
           [src]="
             'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' +
@@ -47,61 +50,64 @@
           "
           alt="{{ pokemon.name }}"
         />
+
         <div class="pokemon-image-container" *ngIf="page === 'info'">
           <img
             class="pokemon-card__image"
-            [src]="pokemon.sprites.front_default"
+            [src]="pokemon.sprites?.front_default"
             [alt]="pokemon.name"
           />
         </div>
+
         <h2 [class.pokemon-card__name]="page === 'info'">{{ pokemon.name | capitalizeFirst }}</h2>
       </a>
+
       <div class="pokemon-card__types" *ngIf="page === 'info'">
         <span *ngFor="let t of pokemon.types" class="type-chip" [ngClass]="'type-' + t.type.name">
           {{ t.type.name | capitalizeFirst }}
         </span>
       </div>
     </div>
+
     <div class="col-md-1 vertical-divider" *ngIf="page === 'info'">
       <div class="line"></div>
     </div>
+
     <div class="col-md-7 pokemon-details" *ngIf="page === 'info'">
-      <!-- DESCRIPTION -->
-      <section class="pokemon-card__section  description-section">
+      <section class="pokemon-card__section description-section">
         <h3 class="pokemon-card__section-title">Description</h3>
         <p class="pokemon-card__description">
           {{ pokemon.description }}
         </p>
       </section>
 
-      <!-- STATS -->
-      <section class="pokemon-card__section ">
+      <section class="pokemon-card__section">
         <h3 class="pokemon-card__section-title">Stats</h3>
 
         <div class="pokemon-details__stats-layout">
-          <!-- LEFT COLUMN -->
           <div class="pokemon-details__stats-column">
-            <p class="pokemon-details__stat-item" *ngFor="let stat of this.statsLeft">
+            <p class="pokemon-details__stat-item" *ngFor="let stat of statsLeft">
               <span class="stat-label">{{ stat.label }}:</span>
               <span class="stat-value">{{ getStat(stat.key) }}</span>
             </p>
           </div>
 
-          <!-- RIGHT COLUMN -->
           <div class="pokemon-details__stats-column">
-            <p class="pokemon-details__stat-item" *ngFor="let stat of this.statsRight">
+            <p class="pokemon-details__stat-item" *ngFor="let stat of statsRight">
               <span class="stat-label">{{ stat.label }}:</span>
               <span class="stat-value">{{ getStat(stat.key) }}</span>
             </p>
           </div>
 
-          <!-- TOTAL -->
           <p class="pokemon-details__stat-item pokemon-details__stat-item--total">
             <span class="stat-label">Total:</span>
-            <span class="stat-value">{{ this.totalStats }}</span>
+            <span class="stat-value">{{ totalStats }}</span>
           </p>
         </div>
       </section>
     </div>
   </div>
 </div>
+} @else {
+<app-loading-poke-ball />
+}

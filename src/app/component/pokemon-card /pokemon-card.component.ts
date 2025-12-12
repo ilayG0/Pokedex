@@ -5,11 +5,12 @@ import { PokemonIdPipe } from '../../pipes/pokemon-id.pipe';
 import { CommonModule } from '@angular/common';
 import { CapitalizeFirstLetterPipe } from '../../pipes/capitalize-first-letter.pipe';
 import { PokemonService } from '../../services/pokemon.service';
+import { LoadingPokeBall } from "../../shared/loading-poke-ball/loading-poke-ball.component";
 
 @Component({
   selector: 'app-pokemon-card',
   standalone: true,
-  imports: [CommonModule, PokemonIdPipe, CapitalizeFirstLetterPipe],
+  imports: [CommonModule, PokemonIdPipe, CapitalizeFirstLetterPipe, LoadingPokeBall],
   templateUrl: './pokemon-card.component.html',
   styleUrl: './pokemon-card.component.scss',
 })

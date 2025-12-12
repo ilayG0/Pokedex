@@ -5,6 +5,7 @@ import {
   from,
   map,
   mergeMap,
+  of,
   shareReplay,
   switchMap,
   throwError,
@@ -142,34 +143,34 @@ export class PokemonService {
 searchPokemonsByFilters(filters: PokemonFilters): Observable<Pokemon[]> {
   const { name, height, type, group, color } = filters;
 
-  const normalizedName = name?.trim().toLowerCase() || '';
-  const normalizedType = type?.trim().toLowerCase() || '';
-  const normalizedGroup = group?.trim().toLowerCase() || '';
-  const normalizedColor = color?.trim().toLowerCase() || '';
+  const normalizedName = (name ?? '').trim().toLowerCase();
+  const normalizedType = (type ?? '').trim().toLowerCase();
+  const normalizedGroup = (group ?? '').trim().toLowerCase();
+
+  const normalizedColor = (color ?? '').toString().trim().toLowerCase();
+  const hasColor =
+    normalizedColor.length > 0 &&
+    normalizedColor !== 'null' &&
+    normalizedColor !== 'undefined';
 
   const applyFilters = (allPokemons: Pokemon[], allowedIds?: Set<number>): Pokemon[] => {
     const favoriteIdsSet = new Set(this.favoriteIds());
 
     return allPokemons
-      .map((p) => ({
-        ...p,
-        isFavorit: favoriteIdsSet.has(p.id),
-      }))
+      .map((p) => ({ ...p, isFavorit: favoriteIdsSet.has(p.id) }))
       .filter((p) => {
-        if (allowedIds && !allowedIds.has(p.id)) {
-          return false;
+        // color gate
+        if (allowedIds && !allowedIds.has(p.id)) return false;
+
+        // name (partial match)
+        if (normalizedName && !p.name?.toLowerCase().includes(normalizedName)) return false;
+
+        // height
+        if (height != null) {
+          if (p.height == null || p.height !== height) return false;
         }
 
-        if (normalizedName && p.name.toLowerCase() !== normalizedName) {
-          return false;
-        }
-
-        if (height != null && height !== undefined) {
-          if (p.height == null || p.height !== height) {
-            return false;
-          }
-        }
-
+        // type
         if (normalizedType) {
           const hasType = p.types?.some((t: any) => {
             const typeName: string =
@@ -178,54 +179,54 @@ searchPokemonsByFilters(filters: PokemonFilters): Observable<Pokemon[]> {
               (typeof t === 'string' ? t : '');
             return typeName.toLowerCase() === normalizedType;
           });
-
-          if (!hasType) {
-            return false;
-          }
+          if (!hasType) return false;
         }
 
+        // group
         if (normalizedGroup) {
-          const pokemonGroup =
-            ((p as any).group as string | string[] | undefined) ?? undefined;
+          const pokemonGroup = ((p as any).group as string | string[] | undefined) ?? undefined;
 
-          let hasGroup = false;
+          const hasGroup =
+            typeof pokemonGroup === 'string'
+              ? pokemonGroup.toLowerCase() === normalizedGroup
+              : Array.isArray(pokemonGroup)
+              ? pokemonGroup.some((g) => g.toLowerCase() === normalizedGroup)
+              : false;
 
-          if (typeof pokemonGroup === 'string') {
-            hasGroup = pokemonGroup.toLowerCase() === normalizedGroup;
-          } else if (Array.isArray(pokemonGroup)) {
-            hasGroup = pokemonGroup.some((g) => g.toLowerCase() === normalizedGroup);
-          }
-
-          if (!hasGroup) {
-            return false;
-          }
+          if (!hasGroup) return false;
         }
 
         return true;
       });
   };
 
-  if (!normalizedColor) {
-    return this.getAllPokemons().pipe(map((allPokemons) => applyFilters(allPokemons)));
+  // no color selected -> just apply local filters
+  if (!hasColor) {
+    return this.getAllPokemons().pipe(map((all) => applyFilters(all)));
   }
 
+  // color selected -> get allowed IDs first, then filter
   return this.http
     .get<{ pokemon_species: { name: string; url: string }[] }>(
       `${this.baseUrl}/pokemon-color/${normalizedColor}`
     )
     .pipe(
-      map((res) => res.pokemon_species || []),
+      map((res) => res.pokemon_species ?? []),
       map((species) => {
-        const ids = species.map((s) => {
-          const parts = s.url.split('/').filter(Boolean);
-          const idStr = parts[parts.length - 1];
-          return Number(idStr);
-        });
+        const ids = species
+          .map((s) => {
+            const parts = s.url.split('/').filter(Boolean);
+            const idStr = parts[parts.length - 1];
+            return Number(idStr);
+          })
+          .filter((n) => Number.isFinite(n));
+
         return new Set(ids);
       }),
-      switchMap((allowedIds) =>
-        this.getAllPokemons().pipe(map((allPokemons) => applyFilters(allPokemons, allowedIds)))
-      )
+      switchMap((allowedIds) => {
+        if (!allowedIds.size) return of([] as Pokemon[]);
+        return this.getAllPokemons().pipe(map((all) => applyFilters(all, allowedIds)));
+      })
     );
 }
 
