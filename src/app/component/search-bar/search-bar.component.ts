@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { PokemonService } from '../../services/pokemon.service';
 import { Pokemon } from '../../models/pokemon.model';
 import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
+import { ActivatedRoute } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-search-bar',
@@ -16,7 +18,10 @@ export class SearchBar {
   @Output() openFilters = new EventEmitter<void>();
   @Output() search = new EventEmitter<string>();
   @Output() reset = new EventEmitter<void>();
+
+  private readonly route = inject(ActivatedRoute);
   pokemonService = inject(PokemonService);
+  private destroy$ = new Subject<void>();
 
   searchTerm = '';
   showDropdown = false;
@@ -28,6 +33,17 @@ export class SearchBar {
     window.addEventListener('resize', () => {
       this.isMobile.set(window.innerWidth < 670);
     });
+  }
+
+  ngOnInit(): void {
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((qp) => {
+      this.searchTerm = qp['nameOrId'];
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   onSearchChange(value: string) {

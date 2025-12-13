@@ -126,7 +126,6 @@ export class PokemonsHome implements OnInit {
 
     this.pokemonService.searchPokemonsByFilters(filters).subscribe({
       next: (result) => {
-        console.log('res:   ', result);
         this.displayedPokemons.set(result);
         this.router.navigate(['/search'], {
           queryParams: {
