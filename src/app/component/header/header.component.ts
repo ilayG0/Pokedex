@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import {  RouterLink, RouterLinkActive } from '@angular/router';
 import { PokemonService } from '../../services/pokemon.service';
 
 @Component({

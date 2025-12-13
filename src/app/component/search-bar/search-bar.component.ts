@@ -37,7 +37,11 @@ export class SearchBar {
 
   ngOnInit(): void {
     this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((qp) => {
-      this.searchTerm = qp['nameOrId'];
+      if (qp['nameOrId']) {
+        this.searchTerm = qp['nameOrId'];
+      } else {
+        this.searchTerm = '';
+      }
     });
   }
 

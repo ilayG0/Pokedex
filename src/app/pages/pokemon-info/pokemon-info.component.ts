@@ -37,14 +37,12 @@ export class PokemonInfoComponent {
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
     const id = Number(idParam);
-    console.log(id)
 
     this.isLoading.set(true);
 
     this.pokemonService.getPokemon(id).subscribe({
       next: (p) => {
         this.pokemon = p;
-        console.log(this.pokemon)
         this.totalStats = this.calculateTotalStats(p);
         this.description = p.description || '';
         this.isLoading.set(false);

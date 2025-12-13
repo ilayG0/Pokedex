@@ -1,5 +1,5 @@
-import { Component, Input, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, Input, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -17,29 +17,17 @@ import { PokemonCard } from '../../component/pokemon-card /pokemon-card.componen
 export class PokemonListComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-
   private readonly destroy$ = new Subject<void>();
 
   readonly pageSize = 12;
   currentPage = signal(1);
 
   private _pokemons: Pokemon[] = [];
+  private requestedPage = 1;
 
   @Input()
   set pokemons(value: Pokemon[]) {
     this._pokemons = value ?? [];
-
-    // Keep current page from URL; only clamp if the list got smaller
-    const clamped = this.clampPage(this.currentPage());
-    if (clamped !== this.currentPage()) {
-      this.currentPage.set(clamped);
-      this.router.navigate([], {
-        relativeTo: this.route,
-        queryParams: { page: clamped },
-        queryParamsHandling: 'merge',
-        replaceUrl: true,
-      });
-    }
   }
 
   get pokemons(): Pokemon[] {
@@ -47,20 +35,12 @@ export class PokemonListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // React to URL changes (Back/Forward + manual URL edits)
-    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((qp) => {
-      const page = Number(qp['page']) || 1;
-      this.currentPage.set(this.clampPage(page));
+    this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe((m) => {
+      const urlPage = m.get('page');
+      const page = urlPage ? Number(urlPage) : 1;
 
-      // Ensure page exists in URL
-      if (!('page' in qp)) {
-        this.router.navigate([], {
-          relativeTo: this.route,
-          queryParams: { page: 1 },
-          queryParamsHandling: 'merge',
-          replaceUrl: true,
-        });
-      }
+      this.requestedPage = Number.isFinite(page) ? Math.floor(page) : 1;
+      this.currentPage.set(this.requestedPage);
     });
   }
 
@@ -80,14 +60,16 @@ export class PokemonListComponent implements OnInit, OnDestroy {
   }
 
   nextPage(): void {
-    if (this.currentPage() < this.totalPages) {
-      this.setPage(this.currentPage() + 1);
+    const next = this.currentPage() + 1;
+    if (next <= this.totalPages) {
+      this.setPage(next);
     }
   }
 
   prevPage(): void {
-    if (this.currentPage() > 1) {
-      this.setPage(this.currentPage() - 1);
+    const prev = this.currentPage() - 1;
+    if (prev >= 1) {
+      this.setPage(prev);
     }
   }
 
@@ -96,17 +78,21 @@ export class PokemonListComponent implements OnInit, OnDestroy {
     if (next === this.currentPage()) return;
 
     this.currentPage.set(next);
-
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { page: next },
-      queryParamsHandling: 'merge',
-      // replaceUrl: true, // optional: if you don't want browser history per page click
-    });
+    this.requestedPage = next;
+    this.navigateToPage(next, false);
   }
 
   private clampPage(page: number): number {
-    if (!page || page < 1) return 1;
+    if (!Number.isFinite(page) || page < 1) return 1;
     return Math.min(page, this.totalPages);
+  }
+
+  private navigateToPage(page: number, replaceUrl: boolean): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { page },
+      queryParamsHandling: 'merge',
+      replaceUrl,
+    });
   }
 }
