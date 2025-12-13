@@ -44,7 +44,6 @@ export class PokemonsHome implements OnInit, OnDestroy {
   displayedPokemons = signal<Pokemon[]>([]);
 
   ngOnInit(): void {
-    // Ensure /search always has page=1 (only when missing)
     const initialQp = this.route.snapshot.queryParams;
     if (this.route.snapshot.routeConfig?.path === 'search' && !('page' in initialQp)) {
       this.router.navigate([], {
@@ -55,7 +54,6 @@ export class PokemonsHome implements OnInit, OnDestroy {
       });
     }
 
-    // Load base list ONCE, then start URL-reactive logic
     this.isLoading.set(true);
 
     this.pokemonService
@@ -83,7 +81,6 @@ export class PokemonsHome implements OnInit, OnDestroy {
           const keys = Object.keys(qp ?? {});
           const onlyPage = keys.length === 1 && keys[0] === 'page';
 
-          // No query params OR only paging -> show base list
           if (!qp || keys.length === 0 || onlyPage) {
             this.filters.set(null);
             const all = this.allPokemons();
@@ -91,7 +88,6 @@ export class PokemonsHome implements OnInit, OnDestroy {
             return of(all);
           }
 
-          // nameOrId search
           if (qp['nameOrId']) {
             this.filters.set(null);
             this.noResults.set(false);
@@ -102,7 +98,6 @@ export class PokemonsHome implements OnInit, OnDestroy {
               .pipe(finalize(() => this.isLoading.set(false)));
           }
 
-          // filters search
           const filters: PokemonFilters = {
             height: qp['height'] ? Number(qp['height']) : undefined,
             group: qp['group'] ?? undefined,
@@ -146,9 +141,9 @@ export class PokemonsHome implements OnInit, OnDestroy {
         this.isLoading.set(false);
         this.showFilter.set(false);
 
-        // Always reset paging on a NEW filter search
-        this.router.navigate(['/search'], {
+        this.router.navigate(['/home'], {
           queryParams: {
+            search : true,
             page: 1,
             ...(filters.height != null ? { height: filters.height } : {}),
             ...(filters.group ? { group: filters.group } : {}),
@@ -173,7 +168,6 @@ export class PokemonsHome implements OnInit, OnDestroy {
     const term = searchString.trim();
 
     if (!term) {
-      // Reset to home page 1
       this.filters.set(null);
       this.displayedPokemons.set(this.allPokemons());
       this.noResults.set(this.allPokemons().length === 0);
@@ -192,8 +186,7 @@ export class PokemonsHome implements OnInit, OnDestroy {
         this.noResults.set(result.length === 0);
         this.isLoading.set(false);
 
-        // Always reset paging on a NEW search
-        this.router.navigate(['/search'], { queryParams: { nameOrId: term, page: 1 } });
+        this.router.navigate(['/home'], { queryParams: { search : true,nameOrId: term, page: 1 } });
       },
       error: () => {
         this.displayedPokemons.set([]);

@@ -5,7 +5,6 @@ import { FavoritPokemonsComponent } from './pages/favorit-pokemons.component/fav
 
 export const routes: Routes = [
 { path: 'home', component: PokemonsHome }, 
-{ path: 'search', component: PokemonsHome }, 
 { path: 'pokemon-info/:id', component: PokemonInfoComponent },
 { path: 'favorite-pokemons', component: FavoritPokemonsComponent }
 ];
