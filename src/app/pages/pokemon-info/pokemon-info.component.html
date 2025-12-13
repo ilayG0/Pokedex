@@ -1,6 +1,6 @@
 <app-loading-poke-ball *ngIf="isLoading()"></app-loading-poke-ball>
 
-<button class="back-button" [routerLink]="isFromFavorite ? '/favorite-pokemons' : '/'">
+<button class="back-button" (click)="onGoBack()">
   <span class="arrow">
     <svg width="24" height="12" viewBox="0 0 24 12" xmlns="http://www.w3.org/2000/svg" fill="none">
       <path d="M7 0L0 6L7 12" stroke="currentColor" stroke-width="2" />

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { SearchBar } from '../../component/search-bar/search-bar.component';
@@ -9,7 +9,8 @@ import { Pokemon } from '../../models/pokemon.model';
 import { PokemonService } from '../../services/pokemon.service';
 import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize, of, Subject, switchMap, takeUntil } from 'rxjs';
+
+import { finalize, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
 export interface PokemonFilters {
   name?: string;
@@ -26,7 +27,7 @@ export interface PokemonFilters {
   templateUrl: './pokemons-home.component.html',
   styleUrls: ['./pokemons-home.component.scss'],
 })
-export class PokemonsHome implements OnInit {
+export class PokemonsHome implements OnInit, OnDestroy {
   private readonly pokemonService = inject(PokemonService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -43,46 +44,59 @@ export class PokemonsHome implements OnInit {
   displayedPokemons = signal<Pokemon[]>([]);
 
   ngOnInit(): void {
-    // 1) Load base list once
+    // Ensure /search always has page=1 (only when missing)
+    const initialQp = this.route.snapshot.queryParams;
+    if (this.route.snapshot.routeConfig?.path === 'search' && !('page' in initialQp)) {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { page: 1 },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
+    }
+
+    // Load base list ONCE, then start URL-reactive logic
     this.isLoading.set(true);
+
     this.pokemonService
       .getAllPokemons()
       .pipe(
+        takeUntil(this.destroy$),
         finalize(() => this.isLoading.set(false)),
-        takeUntil(this.destroy$)
+        tap((pokemons) => this.allPokemons.set(pokemons))
       )
       .subscribe({
-        next: (pokemons) => {
-          this.allPokemons.set(pokemons);
-
-          // if no query params -> show all
-          if (Object.keys(this.route.snapshot.queryParams).length === 0) {
-            this.displayedPokemons.set(pokemons);
-            this.noResults.set(pokemons.length === 0);
-          }
-        },
+        next: () => this.listenToQueryParams(),
         error: () => {
           this.allPokemons.set([]);
           this.displayedPokemons.set([]);
           this.noResults.set(true);
         },
       });
+  }
 
-    // 2) React to query params changes (this is the missing piece)
+  private listenToQueryParams(): void {
     this.route.queryParams
       .pipe(
         takeUntil(this.destroy$),
         switchMap((qp) => {
-          // nothing in URL -> show all
-          if (!qp || Object.keys(qp).length === 0) {
+          const keys = Object.keys(qp ?? {});
+          const onlyPage = keys.length === 1 && keys[0] === 'page';
+
+          // No query params OR only paging -> show base list
+          if (!qp || keys.length === 0 || onlyPage) {
             this.filters.set(null);
-            this.noResults.set(this.allPokemons().length === 0);
-            return of(this.allPokemons());
+            const all = this.allPokemons();
+            this.noResults.set(all.length === 0);
+            return of(all);
           }
 
           // nameOrId search
           if (qp['nameOrId']) {
+            this.filters.set(null);
+            this.noResults.set(false);
             this.isLoading.set(true);
+
             return this.pokemonService
               .filterPokemonsByNameOrId(qp['nameOrId'])
               .pipe(finalize(() => this.isLoading.set(false)));
@@ -97,6 +111,7 @@ export class PokemonsHome implements OnInit {
           };
 
           this.filters.set(filters);
+          this.noResults.set(false);
           this.isLoading.set(true);
 
           return this.pokemonService
@@ -127,17 +142,20 @@ export class PokemonsHome implements OnInit {
     this.pokemonService.searchPokemonsByFilters(filters).subscribe({
       next: (result) => {
         this.displayedPokemons.set(result);
+        this.noResults.set(result.length === 0);
+        this.isLoading.set(false);
+        this.showFilter.set(false);
+
+        // Always reset paging on a NEW filter search
         this.router.navigate(['/search'], {
           queryParams: {
+            page: 1,
             ...(filters.height != null ? { height: filters.height } : {}),
             ...(filters.group ? { group: filters.group } : {}),
             ...(filters.type ? { type: filters.type } : {}),
             ...(filters.color ? { color: filters.color } : {}),
           },
         });
-        this.noResults.set(result.length === 0);
-        this.isLoading.set(false);
-        this.showFilter.set(false);
       },
       error: () => {
         this.displayedPokemons.set([]);
@@ -155,10 +173,12 @@ export class PokemonsHome implements OnInit {
     const term = searchString.trim();
 
     if (!term) {
-      this.displayedPokemons.set(this.allPokemons());
-      this.router.navigate(['/']);
-      this.noResults.set(this.allPokemons().length === 0);
+      // Reset to home page 1
       this.filters.set(null);
+      this.displayedPokemons.set(this.allPokemons());
+      this.noResults.set(this.allPokemons().length === 0);
+
+      this.router.navigate(['/home'], { queryParams: { page: 1 } });
       return;
     }
 
@@ -170,8 +190,10 @@ export class PokemonsHome implements OnInit {
       next: (result) => {
         this.displayedPokemons.set(result);
         this.noResults.set(result.length === 0);
-        this.router.navigate(['/search'], { queryParams: { nameOrId: term } });
         this.isLoading.set(false);
+
+        // Always reset paging on a NEW search
+        this.router.navigate(['/search'], { queryParams: { nameOrId: term, page: 1 } });
       },
       error: () => {
         this.displayedPokemons.set([]);
@@ -182,9 +204,11 @@ export class PokemonsHome implements OnInit {
   }
 
   onReset(): void {
-    this.router.navigate(['/']);
+    this.router.navigate(['/home'], { queryParams: { page: 1 } });
     this.filters.set(null);
-    this.noResults.set(this.allPokemons().length === 0);
-    this.displayedPokemons.set(this.allPokemons());
+
+    const all = this.allPokemons();
+    this.noResults.set(all.length === 0);
+    this.displayedPokemons.set(all);
   }
 }

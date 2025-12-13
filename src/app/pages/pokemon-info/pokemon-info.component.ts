@@ -7,6 +7,7 @@ import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-bal
 import { Pokemon } from '../../models/pokemon.model';
 import { PokemonCard } from "../../component/pokemon-card /pokemon-card.component";
 import { PokemonErrorNotificationComponent } from "../../shared/pokemon-error-notification.component/pokemon-error-notification.component";
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-pokemon-info',
@@ -24,6 +25,7 @@ import { PokemonErrorNotificationComponent } from "../../shared/pokemon-error-no
 export class PokemonInfoComponent {
   private route = inject(ActivatedRoute);
   private pokemonService = inject(PokemonService);
+  private readonly location = inject(Location);
 
   pokemon!: Pokemon;
   isLoading = signal(true);
@@ -57,5 +59,8 @@ export class PokemonInfoComponent {
 
   private calculateTotalStats(pokemon: Pokemon): number {
     return pokemon.stats.reduce((sum, s) => sum + s.base_stat, 0);
+  }
+  onGoBack(){
+     this.location.back(); 
   }
 }
