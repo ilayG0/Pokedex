@@ -33,7 +33,7 @@
 
   <button class="search-btn" (click)="onSearch()">Search</button>
 
-  <button class="search-btn" type="button" (click)="onResetClick()" *ngIf="searchTerm !== ''">
+  <button class="search-btn" type="button" (click)="onResetClick()" *ngIf="searchTerm !== '' && !isMobile()">
     Reset
   </button>
   <button class="filter-btn" (click)="onOpenForm()">

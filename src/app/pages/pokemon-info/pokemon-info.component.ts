@@ -5,9 +5,10 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
 import { Pokemon } from '../../models/pokemon.model';
-import { PokemonCard } from "../../component/pokemon-card /pokemon-card.component";
-import { PokemonErrorNotificationComponent } from "../../shared/pokemon-error-notification.component/pokemon-error-notification.component";
+import { PokemonCard } from '../../component/pokemon-card /pokemon-card.component';
+import { PokemonErrorNotificationComponent } from '../../shared/pokemon-error-notification.component/pokemon-error-notification.component';
 import { Location } from '@angular/common';
+import { combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-pokemon-info',
@@ -17,8 +18,8 @@ import { Location } from '@angular/common';
     RouterLink,
     LoadingPokeBall,
     PokemonCard,
-    PokemonErrorNotificationComponent
-],
+    PokemonErrorNotificationComponent,
+  ],
   templateUrl: './pokemon-info.component.html',
   styleUrl: './pokemon-info.component.scss',
 })
@@ -34,12 +35,14 @@ export class PokemonInfoComponent {
   errorLoadingPokemon = false;
   totalStats = 0;
 
-  ngOnInit(): void {
-    const idParam = this.route.snapshot.paramMap.get('id');
-    const id = Number(idParam);
+ngOnInit(): void {
+  this.isLoading.set(true);
 
-    this.isLoading.set(true);
-
+  combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(([params, query]) => {
+    const id = Number(params.get('id'));
+    const isFromFavorite = query.get('isFromFavorite') === 'true';
+    this.isFromFavorite = isFromFavorite;
+    
     this.pokemonService.getPokemon(id).subscribe({
       next: (p) => {
         this.pokemon = p;
@@ -53,12 +56,14 @@ export class PokemonInfoComponent {
         this.errorLoadingPokemon = true;
       },
     });
-  }
+  });
+}
+
 
   private calculateTotalStats(pokemon: Pokemon): number {
     return pokemon.stats.reduce((sum, s) => sum + s.base_stat, 0);
   }
-  onGoBack(){
-     this.location.back(); 
+  onGoBack() {
+    this.location.back();
   }
 }
