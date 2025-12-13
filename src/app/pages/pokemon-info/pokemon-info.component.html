@@ -12,4 +12,6 @@
 
 <app-pokemon-card *ngIf="pokemon" [pokemon]="pokemon" page="info"> </app-pokemon-card>
 
+<app-pokemon-error-notification *ngIf="errorLoadingPokemon" errorTitle="404" errorMessage="Pokémon not found" errorAction="Try searching again or check your connection" />
+
 <div class="footer"></div>

@@ -4,12 +4,15 @@ import { PokemonService } from '../../services/pokemon.service';
 import { Pokemon } from '../../models/pokemon.model';
 import { Router } from '@angular/router';
 import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
-
+import { PokemonErrorNotificationComponent } from '../../shared/pokemon-error-notification.component/pokemon-error-notification.component';
 @Component({
   selector: 'app-favorit-pokemons.component',
-  imports: [PokemonCard, LoadingPokeBall],
+  imports: [PokemonCard, LoadingPokeBall, PokemonErrorNotificationComponent],
   templateUrl: './favorit-pokemons.component.html',
   styleUrl: './favorit-pokemons.component.scss',
+    host: {
+    '[class.has-items]': 'hasItems()'
+  }
 })
 export class FavoritPokemonsComponent {
   pokemonService = inject(PokemonService);
@@ -20,6 +23,7 @@ export class FavoritPokemonsComponent {
   pokemons = this.pokemonService.pokemons;
 
   isLoading = computed(() => this.favoriteIds().length > 0 && this.pokemons().length === 0);
+  hasItems = computed(() => this.favorites().length > 0);
 
   ngOnInit(): void {
     this.pokemonService.getAllPokemons().subscribe();

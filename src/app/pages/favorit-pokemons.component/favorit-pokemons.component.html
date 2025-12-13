@@ -5,18 +5,7 @@
   (pokemonToRemove)="onRemoveFavorite($event)"
 />
 } @if (favorites().length === 0 && !isLoading()) {
-<section class="empty-favorites">
-  <div class="empty-favorites__card">
-    <div class="empty-favorites__icon">
-      <div class="pokeball-circle">
-        <span class="pokeball-line"></span>
-        <span class="pokeball-button"></span>
-      </div>
-    </div>
-
-    <h2 class="empty-favorites__title">No Favorite Pokémon Yet</h2>
-  </div>
-</section>
+<app-pokemon-error-notification errorMessage="No Favorite Pokémon Yet" errorAction="Start exploring and add Pokémon you love"/>
 } @else if(isLoading()){
-  <app-loading-poke-ball/>
+<app-loading-poke-ball />
 }

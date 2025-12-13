@@ -6,6 +6,7 @@ import { RouterLink } from '@angular/router';
 import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
 import { Pokemon } from '../../models/pokemon.model';
 import { PokemonCard } from "../../component/pokemon-card /pokemon-card.component";
+import { PokemonErrorNotificationComponent } from "../../shared/pokemon-error-notification.component/pokemon-error-notification.component";
 
 @Component({
   selector: 'app-pokemon-info',
@@ -14,7 +15,8 @@ import { PokemonCard } from "../../component/pokemon-card /pokemon-card.componen
     CommonModule,
     RouterLink,
     LoadingPokeBall,
-    PokemonCard
+    PokemonCard,
+    PokemonErrorNotificationComponent
 ],
   templateUrl: './pokemon-info.component.html',
   styleUrl: './pokemon-info.component.scss',
@@ -27,6 +29,7 @@ export class PokemonInfoComponent {
   isLoading = signal(true);
   description = '';
   isFromFavorite = false;
+  errorLoadingPokemon = false;
   totalStats = 0;
 
   ngOnInit(): void {
@@ -47,6 +50,7 @@ export class PokemonInfoComponent {
       error: (err) => {
         console.error('Error loading pokemon', err);
         this.isLoading.set(false);
+        this.errorLoadingPokemon = true;
       },
     });
   }

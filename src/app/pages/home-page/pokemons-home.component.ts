@@ -2,7 +2,6 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { SearchBar } from '../../component/search-bar/search-bar.component';
-import { Header } from '../../component/header/header.component';
 import { PokemonListComponent } from '../../features/pokemon-list/pokemon-list.component';
 import { FilterPanelComponent } from '../../component/filter-panel.component/filter-panel.component';
 
@@ -158,6 +157,7 @@ export class PokemonsHome implements OnInit {
 
     if (!term) {
       this.displayedPokemons.set(this.allPokemons());
+      this.router.navigate(['/']);
       this.noResults.set(this.allPokemons().length === 0);
       this.filters.set(null);
       return;
@@ -171,7 +171,7 @@ export class PokemonsHome implements OnInit {
       next: (result) => {
         this.displayedPokemons.set(result);
         this.noResults.set(result.length === 0);
-       this.router.navigate(['/search'], { queryParams: { nameOrId: term } });
+        this.router.navigate(['/search'], { queryParams: { nameOrId: term } });
         this.isLoading.set(false);
       },
       error: () => {
@@ -183,6 +183,7 @@ export class PokemonsHome implements OnInit {
   }
 
   onReset(): void {
+    this.router.navigate(['/']);
     this.filters.set(null);
     this.noResults.set(this.allPokemons().length === 0);
     this.displayedPokemons.set(this.allPokemons());
