@@ -8,7 +8,6 @@ import {
   of,
   shareReplay,
   switchMap,
-  throwError,
   toArray,
 } from 'rxjs';
 import { Pokemon } from '../models/pokemon.model';
@@ -230,25 +229,6 @@ export class PokemonService {
     }
   }
 
-  searchPokemonByName(name: string): Observable<Pokemon> {
-    const term = name.trim().toLowerCase();
-    if (!term) {
-      return throwError(() => new Error('Empty search term'));
-    }
-
-    const url = `${environment.POKEDEX_API_URL}/pokemon/${term}`;
-
-    return this.http.get<Pokemon>(url).pipe(
-      map((pokemonRes) => {
-        const isFav = this.isFavorite(pokemonRes.id);
-        const withFlag: Pokemon = { ...pokemonRes, isFavorit: isFav };
-
-        this.addRecentSearch(term);
-
-        return withFlag;
-      })
-    );
-  }
 
   private loadRecentSearchesFromStorage(): string[] {
     try {
