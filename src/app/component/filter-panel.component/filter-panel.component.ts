@@ -1,8 +1,8 @@
 import { Component, EventEmitter, OnInit, Output, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { NgStyle } from '@angular/common';
 import { PokemonService } from '../../services/pokemon.service';
 import { SelectOption } from '../../models/pokemon-filter-selected-option.model';
-import { NgStyle } from '@angular/common';
 import { POKEMON_COLORS } from '../../models/pokemon-color-option.model';
 
 @Component({
@@ -52,12 +52,7 @@ export class FilterPanelComponent implements OnInit {
 
   onColorSelect(color: string): void {
     const current = this.filterForm.get('color')?.value;
-
-    if (current === color) {
-      this.filterForm.get('color')?.setValue(null);
-    } else {
-      this.filterForm.get('color')?.setValue(color);
-    }
+    this.filterForm.get('color')?.setValue(current === color ? null : color);
   }
 
   get typeOptions(): SelectOption[] {
@@ -68,11 +63,8 @@ export class FilterPanelComponent implements OnInit {
     return this.pokemonService.groupOptions();
   }
 
-  get f() {
-    return this.filterForm.controls;
-  }
-
   onSubmit(): void {
+    this.filterForm.markAllAsTouched();
     this.search.emit(this.filterForm.value);
   }
 
@@ -83,6 +75,7 @@ export class FilterPanelComponent implements OnInit {
       group: '',
       color: null,
     });
+
     this.cancel.emit();
   }
 }

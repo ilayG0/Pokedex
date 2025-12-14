@@ -12,7 +12,6 @@ $card-radius: 9px;
   box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, 0.15);
   cursor: pointer;
   aspect-ratio: 1 / 1;
-  //width: 100%;
   display: flex;
   flex-direction: column;
   font-family: 'Roboto';
@@ -51,21 +50,11 @@ $card-radius: 9px;
   align-items: center;
   justify-content: center;
 
-  color: #283593; 
+  color: #283593;
 }
 
-.favorite-icon {
-  width: 20px;
-  height: 20px;
-  fill: none;             
-  stroke: currentColor;   
-  stroke-width: 2;
-  transition: fill 0.2s ease, stroke 0.2s ease, transform 0.15s ease;
-}
-
-/* When pokemon.isFavorit = true */
 .pokemon-card__favorite-btn.active {
-  color: #F55555; 
+  color: #f55555;
 }
 
 .card-remove-btn {
@@ -108,12 +97,8 @@ p {
   letter-spacing: 0pc;
 }
 
-.card-id-title {
-  text-align: left;
-}
-
-h2{
-  font-family: 'Roboto';  
+h2 {
+  font-family: 'Roboto';
   font-weight: 400;
   color: $color-text;
   font-size: 22px;
@@ -127,21 +112,6 @@ h2{
   font-size: 32px;
 }
 
-/* favorite button */
-
-.pokemon-card__favorite-btn {
-  border: none;
-  outline: none;
-  background: transparent;
-  cursor: pointer;
-  padding: 2px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  color: #283593;
-}
-
 .favorite-icon {
   width: 20px;
   height: 20px;
@@ -151,18 +121,6 @@ h2{
   transition: fill 0.2s ease, stroke 0.2s ease, transform 0.15s ease;
 }
 
-/* When pokemon.isFavorit = true */
-.pokemon-card__favorite-btn.active {
-  color: #f55555;
-}
-
-.pokemon-card__favorite-btn.active .favorite-icon {
-  fill: currentColor;
-  stroke: currentColor;
-  transform: scale(1.1);
-}
-
-/* Types row */
 .pokemon-card__types {
   display: flex;
   justify-content: center;
@@ -192,8 +150,6 @@ h2{
   box-sizing: border-box;
 }
 
-
-/* mobile: stack everything */
 @media (max-width: 759px) {
   .col-md-1,
   .col-md-3,
@@ -207,24 +163,24 @@ h2{
 @media (min-width: 768px) {
   .col-md-1 {
     flex: 0 0 8.3333%;
-    max-width: 8.3333%;  
+    max-width: 8.3333%;
   }
 
   .col-md-4 {
     flex: 0 0 33.3333%;
-    max-width: 33.3333%;  
+    max-width: 33.3333%;
   }
 
   .col-md-7 {
     flex: 0 0 58.3333%;
-    max-width: 58.3333%;  
+    max-width: 58.3333%;
   }
 }
 
-.devider{
+.devider {
   padding: 10px 10px;
   padding-right: 5%;
-} 
+}
 
 .pokemon-image-container {
   width: 100%;
@@ -244,57 +200,38 @@ h2{
 
 .vertical-divider {
   display: flex;
-  justify-content: center;  
+  justify-content: center;
 }
 
 .vertical-divider .line {
-  width: 1px;              
-  height: 95%;        
-  background-color: #d7d7d7;   
+  width: 1px;
+  height: 95%;
+  background-color: #d7d7d7;
 }
 
 @media (max-width: 767px) {
   .vertical-divider {
-    width: 90%;       // full width row
+    width: 90%;
     padding: 10px 0;
     display: flex;
     justify-content: center;
   }
 
   .vertical-divider .line {
-    width: 85%;       // horizontal
+    width: 85%;
     height: 1px;
     background-color: #d7d7d7;
   }
 }
 
-
 .pokemon-details {
-  font-family: 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    sans-serif;
-  color: #2e2e8b; // adjust to your theme
+  font-family: 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #2e2e8b;
   font-size: 0.9rem;
 
-  &__section {
-    margin-bottom: 1.25rem;
-  }
-
-  &__title {
-    font-weight: 700;
-    font-size: 1rem;
-    margin: 0 0 0.35rem;
-  }
-
-  &__description {
-    margin: 0;
-    line-height: 1.4;
-    max-width: 420px;
-  }
-
-  /* --- STATS LAYOUT (DESKTOP) --- */
   &__stats-layout {
     display: grid;
-    grid-template-columns: 1fr 1fr auto; // left | right | total
+    grid-template-columns: 1fr 1fr auto;
     column-gap: 2rem;
     row-gap: 0.25rem;
     align-items: flex-start;
@@ -311,19 +248,10 @@ h2{
     white-space: nowrap;
   }
 
-  &__stat-label {
-    font-weight: 700;
-  }
-
-  &__stat-value {
-    font-weight: 400;
-  }
-
   &__stat-item--total {
     justify-self: end;
   }
 }
-
 
 .pokemon-card__section {
   margin-bottom: 4px;
@@ -356,22 +284,16 @@ h2{
   margin-left: 5px;
 }
 
-.description-section{
+.description-section {
   padding-bottom: 10%;
 }
 
-/* ---------- MOBILE (< 760px) ---------- */
 @media (max-width: 759px) {
-
   .pokemon-details {
     text-align: center;
-
-    &__description {
-      max-width: none;
-    }
-
+    
     &__stats-layout {
-      grid-template-columns: 1fr;   // one column tower
+      grid-template-columns: 1fr;
       justify-items: center;
     }
 
@@ -388,11 +310,11 @@ h2{
       margin-top: 0.5rem;
     }
   }
-  .pokemon-card-info{
+  .pokemon-card-info {
     margin-right: 10%;
     margin-left: 10%;
   }
-  .pokemon-card__description{
+  .pokemon-card__description {
     width: 100%;
   }
 }

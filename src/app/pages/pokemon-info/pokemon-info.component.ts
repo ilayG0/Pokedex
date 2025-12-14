@@ -12,12 +12,7 @@ import { combineLatest } from 'rxjs';
 @Component({
   selector: 'app-pokemon-info',
   standalone: true,
-  imports: [
-    CommonModule,
-    LoadingPokeBall,
-    PokemonCard,
-    PokemonErrorNotificationComponent,
-  ],
+  imports: [CommonModule, LoadingPokeBall, PokemonCard, PokemonErrorNotificationComponent],
   templateUrl: './pokemon-info.component.html',
   styleUrl: './pokemon-info.component.scss',
 })
@@ -33,30 +28,29 @@ export class PokemonInfoComponent {
   errorLoadingPokemon = false;
   totalStats = 0;
 
-ngOnInit(): void {
-  this.isLoading.set(true);
+  ngOnInit(): void {
+    this.isLoading.set(true);
 
-  combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(([params, query]) => {
-    const id = Number(params.get('id'));
-    const isFromFavorite = query.get('isFromFavorite') === 'true';
-    this.isFromFavorite = isFromFavorite;
+    combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(([params, query]) => {
+      const id = Number(params.get('id'));
+      const isFromFavorite = query.get('isFromFavorite') === 'true';
+      this.isFromFavorite = isFromFavorite;
 
-    this.pokemonService.getPokemon(id).subscribe({
-      next: (p) => {
-        this.pokemon = p;
-        this.totalStats = this.calculateTotalStats(p);
-        this.description = p.description || '';
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        console.error('Error loading pokemon', err);
-        this.isLoading.set(false);
-        this.errorLoadingPokemon = true;
-      },
+      this.pokemonService.getPokemon(id).subscribe({
+        next: (p) => {
+          this.pokemon = p;
+          this.totalStats = this.calculateTotalStats(p);
+          this.description = p.description || '';
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          console.error('Error loading pokemon', err);
+          this.isLoading.set(false);
+          this.errorLoadingPokemon = true;
+        },
+      });
     });
-  });
-}
-
+  }
 
   private calculateTotalStats(pokemon: Pokemon): number {
     return pokemon.stats.reduce((sum, s) => sum + s.base_stat, 0);

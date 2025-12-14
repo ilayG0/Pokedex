@@ -11,9 +11,9 @@ import { PokemonErrorNotificationComponent } from '../../shared/pokemon-error-no
   imports: [PokemonCard, LoadingPokeBall, PokemonErrorNotificationComponent],
   templateUrl: './favorit-pokemons.component.html',
   styleUrl: './favorit-pokemons.component.scss',
-    host: {
-    '[class.has-items]': 'hasItems()'
-  }
+  host: {
+    '[class.has-items]': 'hasItems()',
+  },
 })
 export class FavoritPokemonsComponent {
   pokemonService = inject(PokemonService);

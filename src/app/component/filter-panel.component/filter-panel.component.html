@@ -1,28 +1,26 @@
-<div class="filter-card" [formGroup]="filterForm">
+<form class="filter-card" [formGroup]="filterForm" (ngSubmit)="onSubmit()">
   <div class="all-filters">
     <div class="filter-card__header">
       <span class="filter-card__title">פילטור</span>
     </div>
 
-    <!-- height -->
     <div class="filter-card__row">
       <div class="field">
         <label for="height">גובה</label>
         <input id="height" type="number" formControlName="height" placeholder="בחירה" />
         @if (filterForm.get('height')?.invalid && filterForm.get('height')?.touched) {
-        <p class="field-error">נא להזין מספר תקין בלבד</p>
+          <p class="field-error">נא להזין מספר תקין בלבד</p>
         }
       </div>
     </div>
 
-    <!-- type + group (same row on desktop, stacked on mobile) -->
     <div class="filter-card__row filter-card__row--two-cols">
       <div class="field">
         <label for="type">סוג</label>
         <select id="type" formControlName="type">
           <option value="">בחירה</option>
           @for (opt of typeOptions; track opt.name) {
-          <option [value]="opt.value">{{ opt.name }}</option>
+            <option [value]="opt.value">{{ opt.name }}</option>
           }
         </select>
       </div>
@@ -32,59 +30,58 @@
         <select id="group" formControlName="group">
           <option value="">בחירה</option>
           @for (opt of groupOptions; track opt.name) {
-          <option [value]="opt.value">{{ opt.name }}</option>
+            <option [value]="opt.value">{{ opt.name }}</option>
           }
         </select>
       </div>
     </div>
 
-    <!-- color -->
     <div class="filter-card__row">
       <div class="field">
         <label>צבע</label>
 
         <div class="color-picker">
           @for (c of pokemonColors; track c.value) {
-          <button
-            type="button"
-            class="color-chip-pokeball"
-            [class.selected]="filterForm.get('color')?.value === c.value"
-            (click)="onColorSelect(c.value)"
-          >
-            <div class="pokeball">
-              <div
-                class="pokeball-top"
-                [ngStyle]="{ 'background-color': getColorHex(c.value) }"
-              ></div>
-              <div class="pokeball-bottom"></div>
-              <div class="pokeball-center">
-                <div class="pokeball-center-inner"></div>
-              </div>
-            </div>
-            <span
-              class="pokeball-label"
+            <button
+              type="button"
+              class="color-chip-pokeball"
               [class.selected]="filterForm.get('color')?.value === c.value"
-              >{{ c.label }}</span
+              (click)="onColorSelect(c.value)"
             >
-          </button>
+              <div class="pokeball">
+                <div
+                  class="pokeball-top"
+                  [ngStyle]="{ 'background-color': getColorHex(c.value) }"
+                ></div>
+                <div class="pokeball-bottom"></div>
+                <div class="pokeball-center">
+                  <div class="pokeball-center-inner"></div>
+                </div>
+              </div>
+
+              <span
+                class="pokeball-label"
+                [class.selected]="filterForm.get('color')?.value === c.value"
+              >
+                {{ c.label }}
+              </span>
+            </button>
           }
         </div>
+
         @if (filterForm.get('color')?.value) {
-        <p class="color-hint">לביטול בחירת הצבע, יש ללחוץ שוב על פוקבול הצבע שנבחר.</p>
+          <p class="color-hint">לביטול בחירת הצבע, יש ללחוץ שוב על פוקבול הצבע שנבחר.</p>
         }
       </div>
     </div>
-
-
-
-
   </div>
-      <hr class="line" />
-      <!-- buttons -->
-    <div class="all-buttons">
-      <div class="filter-card__actions">
-        <button type="button" class="btn btn--primary" (click)="onSubmit()">חיפוש</button>
-        <button type="button" class="btn btn--ghost" (click)="onCancel()">ביטול</button>
-      </div>
+
+  <hr class="line" />
+
+  <div class="all-buttons">
+    <div class="filter-card__actions">
+      <button type="submit" class="btn btn--primary">חיפוש</button>
+      <button type="button" class="btn btn--ghost" (click)="onCancel()">ביטול</button>
     </div>
-</div>
+  </div>
+</form>
