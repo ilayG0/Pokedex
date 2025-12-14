@@ -12,7 +12,6 @@
   font-family: 'Roboto';
 }
 
-/* card */
 .filter-card {
   width: 640px;
   max-width: 90%;
@@ -27,7 +26,6 @@
   flex-direction: column;
 }
 
-/* content area – will scroll if there are many errors */
 .all-filters {
   padding: 18px 24px 0;
   flex: 1 1 auto;
@@ -35,13 +33,11 @@
   overflow-y: auto;
 }
 
-/* footer area (hr + buttons) pinned to bottom */
 .all-buttons {
   padding: 0px 24px 12px;
   margin-top: auto;
 }
 
-/* header/title etc. (unchanged) */
 .filter-card__header {
   display: flex;
   justify-content: flex-start;
@@ -110,7 +106,6 @@
   color: #e53935;
 }
 
-/* actions row */
 .filter-card__actions {
   width: 100%;
   display: flex;
@@ -126,7 +121,6 @@
   margin-top: 45px;
 }
 
-/* buttons */
 .btn {
   min-width: 140px;
   height: 38px;
@@ -150,7 +144,6 @@
   border: 1px solid $color-primary-blue;
 }
 
-/* color picker */
 .color-picker {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
