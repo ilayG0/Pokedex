@@ -15,16 +15,11 @@ import { Pokemon } from '../models/pokemon.model';
 import { PokemonFilters } from '../models/pokemon-filters.model';
 import { SelectOption } from '../models/pokemon-filter-selected-option.model';
 import { PokemonListResponse } from '../models/pokemon-api-list-response.model';
-
+import { environment } from '../../environments/environment.dev';
 @Injectable({
   providedIn: 'root',
 })
 export class PokemonService {
-  private readonly baseUrl = 'https://pokeapi.co/api/v2';
-
-  private readonly RECENT_SEARCHES_KEY = 'pokemon_recent_searches';
-  private readonly FAVORITE_POKEMON_IDS = 'favorite_pokemons';
-
   private _pokemons = signal<Pokemon[]>([]);
   pokemons = this._pokemons.asReadonly();
 
@@ -54,7 +49,7 @@ export class PokemonService {
 
   private loadFavoriteIds(): number[] {
     try {
-      return JSON.parse(localStorage.getItem(this.FAVORITE_POKEMON_IDS) || '[]');
+      return JSON.parse(localStorage.getItem(environment.FAVORITE_POKEMON_IDS) || '[]');
     } catch {
       return [];
     }
@@ -62,7 +57,7 @@ export class PokemonService {
 
   private saveFavoriteIds(): void {
     try {
-      localStorage.setItem(this.FAVORITE_POKEMON_IDS, JSON.stringify(this.favoriteIds()));
+      localStorage.setItem(environment.FAVORITE_POKEMON_IDS, JSON.stringify(this.favoriteIds()));
     } catch {}
   }
 
@@ -87,7 +82,7 @@ export class PokemonService {
   }
 
   private fetchAllPokemonsFromApi(): Observable<Pokemon[]> {
-    const url = `${this.baseUrl}/pokemon?limit=2000&offset=0`;
+    const url = `${environment.POKEDEX_API_URL}/pokemon?limit=2000&offset=0`;
 
     return this.http.get<PokemonListResponse>(url).pipe(
       map((res) => res.results),
@@ -186,7 +181,7 @@ searchPokemonsByFilters(filters: PokemonFilters): Observable<Pokemon[]> {
   // color selected -> get allowed IDs first, then filter
   return this.http
     .get<{ pokemon_species: { name: string; url: string }[] }>(
-      `${this.baseUrl}/pokemon-color/${normalizedColor}`
+      `${environment.POKEDEX_API_URL}/pokemon-color/${normalizedColor}`
     )
     .pipe(
       map((res) => res.pokemon_species ?? []),
@@ -211,7 +206,7 @@ searchPokemonsByFilters(filters: PokemonFilters): Observable<Pokemon[]> {
 
   loadTypesAndGroups(): void {
     if (this._typeOptions().length === 0) {
-      this.http.get<any>(`${this.baseUrl}/type`).subscribe({
+      this.http.get<any>(`${environment.POKEDEX_API_URL}/type`).subscribe({
         next: (res) => {
           const options =
             (res.results || [])
@@ -229,7 +224,7 @@ searchPokemonsByFilters(filters: PokemonFilters): Observable<Pokemon[]> {
     }
 
     if (this._groupOptions().length === 0) {
-      this.http.get<any>(`${this.baseUrl}/egg-group`).subscribe({
+      this.http.get<any>(`${environment.POKEDEX_API_URL}/egg-group`).subscribe({
         next: (res) => {
           const options =
             (res.results || []).map((g: any) => ({
@@ -251,7 +246,7 @@ searchPokemonsByFilters(filters: PokemonFilters): Observable<Pokemon[]> {
       return throwError(() => new Error('Empty search term'));
     }
 
-    const url = `${this.baseUrl}/pokemon/${term}`;
+    const url = `${environment.POKEDEX_API_URL}/pokemon/${term}`;
 
     return this.http.get<Pokemon>(url).pipe(
       map((pokemonRes) => {
@@ -267,7 +262,7 @@ searchPokemonsByFilters(filters: PokemonFilters): Observable<Pokemon[]> {
 
   private loadRecentSearchesFromStorage(): string[] {
     try {
-      const raw = localStorage.getItem(this.RECENT_SEARCHES_KEY);
+      const raw = localStorage.getItem(environment.RECENT_SEARCHES_KEY);
       if (!raw) return [];
       const arr = JSON.parse(raw);
       if (!Array.isArray(arr)) return [];
@@ -279,7 +274,7 @@ searchPokemonsByFilters(filters: PokemonFilters): Observable<Pokemon[]> {
 
   private saveRecentSearchesToStorage(list: string[]): void {
     try {
-      localStorage.setItem(this.RECENT_SEARCHES_KEY, JSON.stringify(list.slice(0, 5)));
+      localStorage.setItem(environment.RECENT_SEARCHES_KEY, JSON.stringify(list.slice(0, 5)));
     } catch {}
   }
 
@@ -310,11 +305,11 @@ searchPokemonsByFilters(filters: PokemonFilters): Observable<Pokemon[]> {
   }
 
   getPokemon(idOrName: number | string): Observable<Pokemon> {
-    const url = `${this.baseUrl}/pokemon/${idOrName}`;
+    const url = `${environment.POKEDEX_API_URL}/pokemon/${idOrName}`;
 
     return this.http.get<any>(url).pipe(
       switchMap((pokemonRes) =>
-        this.http.get<any>(`${this.baseUrl}/pokemon-species/${pokemonRes.id}`).pipe(
+        this.http.get<any>(`${environment.POKEDEX_API_URL}/pokemon-species/${pokemonRes.id}`).pipe(
           map((speciesRes) => {
             const flavorEntry = speciesRes.flavor_text_entries.find(
               (e: any) => e.language.name === 'en'
