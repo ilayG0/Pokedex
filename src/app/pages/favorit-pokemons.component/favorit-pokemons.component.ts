@@ -5,6 +5,7 @@ import { Pokemon } from '../../models/pokemon.model';
 import { Router } from '@angular/router';
 import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
 import { PokemonErrorNotificationComponent } from '../../shared/pokemon-error-notification.component/pokemon-error-notification.component';
+
 @Component({
   selector: 'app-favorit-pokemons.component',
   imports: [PokemonCard, LoadingPokeBall, PokemonErrorNotificationComponent],

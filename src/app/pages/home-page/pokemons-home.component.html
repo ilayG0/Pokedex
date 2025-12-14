@@ -1,19 +1,19 @@
-
-<!-- Search bar -->
 <app-search-bar
   (openFilters)="onToggleFiltersForm()"
   (search)="onFoundPokemon($event)"
   (reset)="onReset()"
 />
 
-<!-- Pokemon list -->
 <ng-container>
   <app-pokemon-list [pokemons]="displayedPokemons()"></app-pokemon-list>
 </ng-container>
 
-<app-filter-panel *ngIf="showFilter()" (cancel)="onFiltersCancel()" (search)="onFilterSubmit($event)"/> 
-
+<app-filter-panel
+  *ngIf="showFilter()"
+  (cancel)="onFiltersCancel()"
+  (search)="onFilterSubmit($event)"
+/>
 
 @if(isLoading()){
-    <app-loading-poke-ball/>
+<app-loading-poke-ball />
 }

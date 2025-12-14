@@ -4,13 +4,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
 import { Pokemon } from '../../models/pokemon.model';
-import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
 import { PokemonCard } from '../../component/pokemon-card /pokemon-card.component';
 
 @Component({
   selector: 'app-pokemon-list',
   standalone: true,
-  imports: [CommonModule, LoadingPokeBall, PokemonCard],
+  imports: [CommonModule, PokemonCard],
   templateUrl: './pokemon-list.component.html',
   styleUrls: ['./pokemon-list.component.scss'],
 })

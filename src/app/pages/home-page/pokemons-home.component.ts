@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { SearchBar } from '../../component/search-bar/search-bar.component';
 import { PokemonListComponent } from '../../features/pokemon-list/pokemon-list.component';
 import { FilterPanelComponent } from '../../component/filter-panel.component/filter-panel.component';
+import { PokemonFilters } from '../../models/pokemon-filters.model';
 
 import { Pokemon } from '../../models/pokemon.model';
 import { PokemonService } from '../../services/pokemon.service';
@@ -11,14 +12,6 @@ import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-bal
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { finalize, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
-
-export interface PokemonFilters {
-  name?: string;
-  height?: number;
-  type?: string;
-  group?: string;
-  color?: string;
-}
 
 @Component({
   selector: 'app-pokemons-home',

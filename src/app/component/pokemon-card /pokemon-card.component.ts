@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { CapitalizeFirstLetterPipe } from '../../pipes/capitalize-first-letter.pipe';
 import { PokemonService } from '../../services/pokemon.service';
 import { LoadingPokeBall } from "../../shared/loading-poke-ball/loading-poke-ball.component";
+import { statsLeft, statsRight } from './pokemon-stats-consts';
 
 @Component({
   selector: 'app-pokemon-card',
@@ -23,19 +24,10 @@ export class PokemonCard {
 
   pokemonService = inject(PokemonService);
 
+  statsLeft = statsLeft;
+  statsRight = statsRight;
+
   private readonly router = inject(Router);
-
-  statsLeft = [
-    { label: 'HP', key: 'hp' },
-    { label: 'Attack', key: 'attack' },
-    { label: 'Defense', key: 'defense' },
-  ];
-
-  statsRight = [
-    { label: 'Special Atk', key: 'special-attack' },
-    { label: 'Special Def', key: 'special-defense' },
-    { label: 'Speed', key: 'speed' },
-  ];
 
   getStat(statName: string): number | string {
     if (!this.pokemon?.stats) return '-';

@@ -12,31 +12,9 @@ import {
   toArray,
 } from 'rxjs';
 import { Pokemon } from '../models/pokemon.model';
-
-export interface NamedAPIResource {
-  name: string;
-  url: string;
-}
-
-export interface PokemonListResponse {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: NamedAPIResource[];
-}
-
-export interface SelectOption {
-  name: string;
-  value: string;
-}
-
-export interface PokemonFilters {
-  name?: string;
-  height?: number;
-  type?: string;
-  group?: string;
-  color?: string;
-}
+import { PokemonFilters } from '../models/pokemon-filters.model';
+import { SelectOption } from '../models/pokemon-filter-selected-option.model';
+import { PokemonListResponse } from '../models/pokemon-api-list-response.model';
 
 @Injectable({
   providedIn: 'root',

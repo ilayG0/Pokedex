@@ -1,17 +1,9 @@
 import { Component, EventEmitter, OnInit, Output, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { PokemonService, SelectOption } from '../../services/pokemon.service';
+import { PokemonService } from '../../services/pokemon.service';
+import { SelectOption } from '../../models/pokemon-filter-selected-option.model';
 import { NgStyle } from '@angular/common';
-
-interface Option {
-  name: string;
-  value: string;
-}
-
-interface PokemonColorOption {
-  label: string;
-  value: string;
-}
+import { POKEMON_COLORS } from '../../models/pokemon-color-option.model';
 
 @Component({
   selector: 'app-filter-panel',
@@ -25,22 +17,10 @@ export class FilterPanelComponent implements OnInit {
   @Output() readonly cancel = new EventEmitter<void>();
 
   filterForm!: FormGroup;
+  pokemonColors = POKEMON_COLORS;
 
   private readonly fb = inject(FormBuilder);
   private readonly pokemonService = inject(PokemonService);
-
-  pokemonColors: PokemonColorOption[] = [
-    { label: 'שחור', value: 'black' },
-    { label: 'כחול', value: 'blue' },
-    { label: 'חום', value: 'brown' },
-    { label: 'אפור', value: 'gray' },
-    { label: 'ירוק', value: 'green' },
-    { label: 'ורוד', value: 'pink' },
-    { label: 'סגול', value: 'purple' },
-    { label: 'אדום', value: 'red' },
-    { label: 'לבן', value: 'white' },
-    { label: 'צהוב', value: 'yellow' },
-  ];
 
   ngOnInit(): void {
     this.filterForm = this.fb.group({

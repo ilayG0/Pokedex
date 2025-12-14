@@ -2,7 +2,6 @@ import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PokemonService } from '../../services/pokemon.service';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
 import { Pokemon } from '../../models/pokemon.model';
 import { PokemonCard } from '../../component/pokemon-card /pokemon-card.component';
@@ -15,7 +14,6 @@ import { combineLatest } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink,
     LoadingPokeBall,
     PokemonCard,
     PokemonErrorNotificationComponent,
@@ -42,7 +40,7 @@ ngOnInit(): void {
     const id = Number(params.get('id'));
     const isFromFavorite = query.get('isFromFavorite') === 'true';
     this.isFromFavorite = isFromFavorite;
-    
+
     this.pokemonService.getPokemon(id).subscribe({
       next: (p) => {
         this.pokemon = p;

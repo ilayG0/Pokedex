@@ -5,7 +5,10 @@
   (pokemonToRemove)="onRemoveFavorite($event)"
 />
 } @if (favorites().length === 0 && !isLoading()) {
-<app-pokemon-error-notification errorMessage="No Favorite Pokémon Yet" errorAction="Start exploring and add Pokémon you love"/>
+<app-pokemon-error-notification
+  errorMessage="No Favorite Pokémon Yet"
+  errorAction="Start exploring and add Pokémon you love"
+/>
 } @else if(isLoading()){
 <app-loading-poke-ball />
 }

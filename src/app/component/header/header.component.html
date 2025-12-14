@@ -1,17 +1,16 @@
 <header class="header">
-  <!-- Mobile: hamburger -->
   @if (isMobile()) {
-    <button
-      type="button"
-      class="mobile-toggle"
-      aria-label="Open navigation menu"
-      [attr.aria-expanded]="isMenuOpen()"
-      (click)="toggleMenu()"
-    >
-      <span class="mobile-toggle__bar"></span>
-      <span class="mobile-toggle__bar"></span>
-      <span class="mobile-toggle__bar"></span>
-    </button>
+  <button
+    type="button"
+    class="mobile-toggle"
+    aria-label="Open navigation menu"
+    [attr.aria-expanded]="isMenuOpen()"
+    (click)="toggleMenu()"
+  >
+    <span class="mobile-toggle__bar"></span>
+    <span class="mobile-toggle__bar"></span>
+    <span class="mobile-toggle__bar"></span>
+  </button>
   }
 
   <div class="header__logo">
@@ -20,76 +19,71 @@
     </a>
   </div>
 
-  <!-- Desktop nav (unchanged logic) -->
   @if (!isMobile()) {
-    <nav>
+  <nav>
+    <a
+      class="nav-home"
+      [routerLink]="['home']"
+      [queryParams]="{ page: 1 }"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Home
+    </a>
+
+    <a
+      class="nav-favorites"
+      [routerLink]="['/favorite-pokemons']"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      <span>Favorites</span>
+
+      @if (count > 0) {
+      <span class="pokeball-badge">
+        <span class="pokeball-badge__count">{{ count }}</span>
+      </span>
+      }
+    </a>
+  </nav>
+  } @if (isMobile()) {
+  <div class="mobile-menu" [class.mobile-menu--open]="isMenuOpen()">
+    <nav class="mobile-nav">
       <a
-        class="nav-home"
+        class="mobile-nav__link"
         [routerLink]="['home']"
         [queryParams]="{ page: 1 }"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeMenu()"
       >
         Home
       </a>
 
       <a
-        class="nav-favorites"
+        class="mobile-nav__link nav-favorites"
         [routerLink]="['/favorite-pokemons']"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeMenu()"
       >
         <span>Favorites</span>
 
         @if (count > 0) {
-          <span class="pokeball-badge">
-            <span class="pokeball-badge__count">{{ count }}</span>
-          </span>
+        <span class="pokeball-badge">
+          <span class="pokeball-badge__count">{{ count }}</span>
+        </span>
         }
       </a>
     </nav>
-  }
+  </div>
 
-  <!-- Mobile collapsible nav -->
-  @if (isMobile()) {
-    <div class="mobile-menu" [class.mobile-menu--open]="isMenuOpen()">
-      <nav class="mobile-nav">
-        <a
-          class="mobile-nav__link"
-          [routerLink]="['home']"
-          [queryParams]="{ page: 1 }"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-          (click)="closeMenu()"
-        >
-          Home
-        </a>
-
-        <a
-          class="mobile-nav__link nav-favorites"
-          [routerLink]="['/favorite-pokemons']"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-          (click)="closeMenu()"
-        >
-          <span>Favorites</span>
-
-          @if (count > 0) {
-            <span class="pokeball-badge">
-              <span class="pokeball-badge__count">{{ count }}</span>
-            </span>
-          }
-        </a>
-      </nav>
-    </div>
-
-    @if (isMenuOpen()) {
-      <button
-        type="button"
-        class="mobile-backdrop"
-        aria-label="Close navigation menu"
-        (click)="closeMenu()"
-      ></button>
-    }
-  }
+  @if (isMenuOpen()) {
+  <button
+    type="button"
+    class="mobile-backdrop"
+    aria-label="Close navigation menu"
+    (click)="closeMenu()"
+  ></button>
+  } }
 </header>
