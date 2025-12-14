@@ -8,9 +8,6 @@
       <div class="field">
         <label for="height">גובה</label>
         <input id="height" type="number" formControlName="height" placeholder="בחירה" />
-        @if (filterForm.get('height')?.invalid && filterForm.get('height')?.touched) {
-          <p class="field-error">נא להזין מספר תקין בלבד</p>
-        }
       </div>
     </div>
 
