@@ -13,10 +13,11 @@
 />
 
 <div class="home__pagination">
-  <button (click)="prevPage()" [disabled]="currentPage() === 1">Prev</button>
-  <span>Page {{ currentPage() }} / {{ totalPages() }}</span>
-  <button (click)="nextPage()" [disabled]="noResults()">Next</button>
+  <button (click)="prevPage()" [disabled]="!canGoPrev()">Prev</button>
+  <span>Page {{ currentPage() }}</span>
+  <button (click)="nextPage()" [disabled]="!canGoNext()">Next</button>
 </div>
+
 
 @if (isLoading()) {
   <app-loading-poke-ball />
