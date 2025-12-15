@@ -49,9 +49,9 @@ export class SearchBar {
 
   onSearchChange(value: string) {
     this.searchTerm = value;
-    this.search.emit(value);
   }
   onSearch() {
+    this.search.emit(this.searchTerm);
     this.pokemonService.addRecentSearch(this.searchTerm);
   }
 

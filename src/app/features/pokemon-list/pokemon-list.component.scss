@@ -1,48 +1,5 @@
 @import '../../../styles/src-colors';
 
-.no-results {
-  margin-top: 24px;
-  text-align: center;
-  font-size: 16px;
-  font-weight: 500;
-  color: #777;
-}
-
-.home__pagination {
-  margin: 24px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Roboto';
-  gap: 16px;
-
-  button {
-    padding: 8px 18px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    background: $color-text;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s ease;
-    color: white;
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    &:not(:disabled):hover {
-      background: #f3f3f3;
-    }
-  }
-
-  span {
-    font-size: 15px;
-    font-weight: 500;
-    color: #444;
-  }
-}
-
 .pokemon-grid {
   margin: 3% 15%;
   display: grid;

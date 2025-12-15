@@ -4,9 +4,7 @@
   (reset)="onReset()"
 />
 
-<ng-container>
-  <app-pokemon-list [pokemons]="displayedPokemons()"></app-pokemon-list>
-</ng-container>
+<app-pokemon-list [pokemons]="displayedPokemons()"></app-pokemon-list>
 
 <app-filter-panel
   *ngIf="showFilter()"
@@ -14,6 +12,12 @@
   (search)="onFilterSubmit($event)"
 />
 
-@if(isLoading()){
-<app-loading-poke-ball />
+<div class="home__pagination">
+  <button (click)="prevPage()" [disabled]="currentPage() === 1">Prev</button>
+  <span>Page {{ currentPage() }} / {{ totalPages() }}</span>
+  <button (click)="nextPage()" [disabled]="noResults()">Next</button>
+</div>
+
+@if (isLoading()) {
+  <app-loading-poke-ball />
 }

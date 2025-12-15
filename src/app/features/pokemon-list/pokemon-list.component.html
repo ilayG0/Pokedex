@@ -1,19 +1,9 @@
 <div class="pokemon-grid">
-  @for (pokemon of displayedPokemons; track pokemon.id) {
+  @for (pokemon of pokemons; track pokemon.id) {
   <app-pokemon-card [pokemon]="pokemon" page="home" />
   }
 </div>
 
-@if (pokemons.length === 0) {
-<div class="no-results">No Pokémon found.</div>
+@if (pokemons?.length === 0) {
+  <app-pokemon-error-notification errorTitle="No Pokémon found" errorMessage="Please enter the Pokémon’s full name or serial number"/>
 }
-
-<div class="home__pagination">
-  <button (click)="prevPage()" [disabled]="currentPage() === 1">Prev</button>
-
-  <span>Page {{ currentPage() }} / {{ totalPages }}</span>
-
-  <button (click)="nextPage()" [disabled]="currentPage() === totalPages || pokemons.length === 0">
-    Next
-  </button>
-</div>

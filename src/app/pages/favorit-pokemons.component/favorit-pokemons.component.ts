@@ -26,9 +26,7 @@ export class FavoritPokemonsComponent {
   isLoading = computed(() => this.favoriteIds().length > 0 && this.pokemons().length === 0);
   hasItems = computed(() => this.favorites().length > 0);
 
-  ngOnInit(): void {
-    this.pokemonService.getAllPokemons().subscribe();
-  }
+
 
   onRemoveFavorite(pokemon: Pokemon) {
     this.pokemonService.toggleFavorite(pokemon);
