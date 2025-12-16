@@ -32,7 +32,7 @@
   ></app-pokemon-list>
 </ng-container>
 
-<app-filter-panel *ngIf="showFilter()" (cancel)="onFiltersCancel()" />
+<app-filter-panel *ngIf="showFilter()" (cancel)="onFiltersCancel()" (search)="onSearchFilterSubmit($event)"/>
 } @else if(navigationError()){
 <app-pokemon-error-notification
   errorTitle="404 – Page Not Found"

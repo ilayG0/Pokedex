@@ -10,6 +10,7 @@ import {
   take,
   toArray,
   finalize,
+  combineLatest,
 } from 'rxjs';
 
 import { Pokemon } from '../models/pokemon.model';
@@ -137,7 +138,7 @@ export class PokemonService {
           this._pokemons.update((list) => {
             const byId = new Map<number, Pokemon>();
             for (const p of list) byId.set(p.id, p);
-            for (const p of newPokemons) byId.set(p.id, p); 
+            for (const p of newPokemons) byId.set(p.id, p);
             return Array.from(byId.values()).sort((a, b) => a.id - b.id);
           });
 
@@ -148,41 +149,37 @@ export class PokemonService {
       });
   }
 
-ensurePokemonsLoadedUpTo(page: number | null | undefined): void {
-  const safePage = Number(page);
+  ensurePokemonsLoadedUpTo(page: number | null | undefined): void {
+    const safePage = Number(page);
 
-  // ❌ עמוד לא תקין – לא נטען כלום
-  if (!Number.isFinite(safePage) || safePage < 1) {
-    return;
-  }
+    if (!Number.isFinite(safePage) || safePage < 1) {
+      return;
+    }
 
-  // ✅ עמוד ראשון – אם אין עדיין פוקימונים נטען את ה־12 הראשונים
-  if (safePage === 1) {
-    if (this.pokemons().length === 0 && !this.isLoadingPage()) {
+    if (safePage === 1) {
+      if (this.pokemons().length === 0 && !this.isLoadingPage()) {
+        this.load12Pokemons();
+      }
+      return;
+    }
+
+    const favoritesCount = this.favoriteIds().length;
+    const allPokemonsCount = this.pokemons().length;
+    const totalPokemonsCount = allPokemonsCount + favoritesCount;
+
+    const pageSize = this.pokemons_limit;
+    const totalPokemonsPages = Math.ceil(totalPokemonsCount / pageSize);
+
+    if (totalPokemonsPages >= safePage) {
+      return;
+    }
+
+    const requiredCountForPage = safePage * pageSize;
+
+    if (totalPokemonsCount < requiredCountForPage && !this.isLoadingPage()) {
       this.load12Pokemons();
     }
-    return;
   }
-
-  const favoritesCount = this.favoriteIds().length;
-  const allPokemonsCount = this.pokemons().length;
-  const totalPokemonsCount = allPokemonsCount + favoritesCount;
-
-  const pageSize = this.pokemons_limit;
-  const totalPokemonsPages = Math.ceil(totalPokemonsCount / pageSize);
-
-  // כבר יש מספיק כדי לכסות את העמוד הזה
-  if (totalPokemonsPages >= safePage) {
-    return;
-  }
-
-  const requiredCountForPage = safePage * pageSize;
-
-  if (totalPokemonsCount < requiredCountForPage && !this.isLoadingPage()) {
-    this.load12Pokemons();
-  }
-}
-
 
   loadTypesAndGroups(): void {
     if (this._typeOptions().length === 0) {
@@ -295,6 +292,92 @@ ensurePokemonsLoadedUpTo(page: number | null | undefined): void {
           })
         )
       )
+    );
+  }
+  private extractIdFromSpeciesUrl(url: string): number | null {
+    const match = url.match(/\/(\d+)\/?$/);
+    return match ? Number(match[1]) : null;
+  }
+
+  private getPokemonIdsByEggGroup(group: string): Observable<Set<number>> {
+    const url = `${environment.POKEDEX_API_URL}/egg-group/${group}`;
+    return this.http.get<any>(url).pipe(
+      map((res) => {
+        const ids = new Set<number>();
+        for (const s of res.pokemon_species ?? []) {
+          const id = this.extractIdFromSpeciesUrl(s.url);
+          if (id != null) {
+            ids.add(id);
+          }
+        }
+        return ids;
+      })
+    );
+  }
+
+  private getPokemonIdsByColor(color: string): Observable<Set<number>> {
+    const url = `${environment.POKEDEX_API_URL}/pokemon-color/${color}`;
+    return this.http.get<any>(url).pipe(
+      map((res) => {
+        const ids = new Set<number>();
+        for (const s of res.pokemon_species ?? []) {
+          const id = this.extractIdFromSpeciesUrl(s.url);
+          if (id != null) {
+            ids.add(id);
+          }
+        }
+        return ids;
+      })
+    );
+  }
+
+  searchPokemonsByFilters(filters: PokemonFilters | null | undefined): Observable<Pokemon[]> {
+    if (!filters) {
+      return of(this._pokemons());
+    }
+
+    const height =
+      typeof filters.height === 'number' && !Number.isNaN(filters.height) ? filters.height : null;
+
+    const type =
+      filters.type && filters.type.trim() !== '' ? filters.type.trim().toLowerCase() : null;
+
+    const group =
+      filters.group && filters.group.trim() !== '' ? filters.group.trim().toLowerCase() : null;
+
+    const color =
+      filters.color && filters.color.trim() !== '' ? filters.color.trim().toLowerCase() : null;
+
+    const groupIds$ = group ? this.getPokemonIdsByEggGroup(group) : of<Set<number> | null>(null);
+    const colorIds$ = color ? this.getPokemonIdsByColor(color) : of<Set<number> | null>(null);
+
+    return combineLatest([groupIds$, colorIds$]).pipe(
+      map(([groupIds, colorIds]) => {
+        return this._pokemons().filter((p) => {
+          if (height !== null && p.height !== height) {
+            return false;
+          }
+
+          if (type) {
+            const hasType =
+              Array.isArray(p.types) &&
+              p.types.some((t: any) => t?.type?.name?.toLowerCase() === type);
+            if (!hasType) {
+              return false;
+            }
+          }
+
+          if (groupIds && !groupIds.has(p.id)) {
+            return false;
+          }
+
+          if (colorIds && !colorIds.has(p.id)) {
+            return false;
+          }
+
+          return true;
+        });
+      })
     );
   }
 }
