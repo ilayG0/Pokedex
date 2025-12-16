@@ -51,6 +51,7 @@ export class SearchBar {
     this.searchTerm = value;
   }
   onSearch() {
+    this.search.emit(this.searchTerm);
     this.pokemonService.addRecentSearch(this.searchTerm);
     this.search.emit(this.searchTerm);
   }

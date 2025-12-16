@@ -1,7 +1,11 @@
 import { CommonModule } from '@angular/common';
+<<<<<<< HEAD
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
+=======
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+>>>>>>> 32dfd5ab10431e0fc12564017973f9084d421567
 
 import { Pokemon } from '../../models/pokemon.model';
 import { PokemonCard } from '../../component/pokemon-card /pokemon-card.component';
@@ -14,6 +18,7 @@ import { PokemonErrorNotificationComponent } from "../../shared/pokemon-error-no
   templateUrl: './pokemon-list.component.html',
   styleUrls: ['./pokemon-list.component.scss'],
 })
+<<<<<<< HEAD
 export class PokemonListComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -105,4 +110,8 @@ export class PokemonListComponent implements OnInit, OnDestroy {
       replaceUrl,
     });
   }
+=======
+export class PokemonListComponent {
+ @Input() pokemons?: Pokemon[];
+>>>>>>> 32dfd5ab10431e0fc12564017973f9084d421567
 }
