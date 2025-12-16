@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { PokemonCard } from '../../component/pokemon-card /pokemon-card.component';
 import { PokemonService } from '../../services/pokemon.service';
 import { Pokemon } from '../../models/pokemon.model';
@@ -15,7 +15,7 @@ import { PokemonErrorNotificationComponent } from '../../shared/pokemon-error-no
     '[class.has-items]': 'hasItems()',
   },
 })
-export class FavoritPokemonsComponent {
+export class FavoritPokemonsComponent implements OnInit {
   pokemonService = inject(PokemonService);
   private readonly router = inject(Router);
 
@@ -26,6 +26,9 @@ export class FavoritPokemonsComponent {
   isLoading = computed(() => this.favoriteIds().length > 0 && this.pokemons().length === 0);
   hasItems = computed(() => this.favorites().length > 0);
 
+  ngOnInit() {
+    this.pokemonService.ensurePokemonsLoadedUpTo(1);
+  }
 
   onRemoveFavorite(pokemon: Pokemon) {
     this.pokemonService.toggleFavorite(pokemon);

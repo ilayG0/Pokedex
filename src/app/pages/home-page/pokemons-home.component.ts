@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { SearchBar } from '../../component/search-bar/search-bar.component';
@@ -11,9 +11,9 @@ import { PokemonService } from '../../services/pokemon.service';
 import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { finalize, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { finalize } from 'rxjs';
 import { PokemonErrorNotificationComponent } from '../../shared/pokemon-error-notification.component/pokemon-error-notification.component';
-import { FormGroup } from '@angular/forms';
+
 @Component({
   selector: 'app-pokemons-home',
   standalone: true,
@@ -52,7 +52,12 @@ export class PokemonsHome implements OnInit {
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
       const raw = params['page'];
+      const search = params['search'];
       const page = raw ? Number(raw) : 1;
+      console.log(raw)
+      if (search && !this.initialQueryHandled) {
+        this.router.navigate(['home'], { queryParams: { page: 1 } });
+      }
 
       if (!Number.isFinite(page) || page < 1) {
         this.navigationError.set(true);
@@ -107,6 +112,11 @@ export class PokemonsHome implements OnInit {
       )
       .subscribe({
         next: (p) => {
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { page: 1, search: true, nameOrId: q },
+            replaceUrl: true,
+          });
           this.searchResult.set([p]);
         },
         error: (err) => {
@@ -144,7 +154,7 @@ export class PokemonsHome implements OnInit {
 
     this.pokemonService.searchPokemonsByFilters(formValue).subscribe({
       next: (result) => {
-        const filters = this.filters(); 
+        const filters = this.filters();
 
         this.router.navigate([], {
           relativeTo: this.route,
@@ -156,9 +166,8 @@ export class PokemonsHome implements OnInit {
             ...(typeof filters?.height === 'number' && !Number.isNaN(filters.height)
               ? { height: filters.height }
               : {}),
-              search: true
+            search: true,
           },
-          queryParamsHandling: 'merge',
           replaceUrl: true,
         });
         this.searchResult.set(result);
