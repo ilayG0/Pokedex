@@ -115,6 +115,12 @@ export class PokemonsHome implements OnInit {
     }
     this.navigationError.set(false);
   }
+    onToggleFiltersForm(): void {
+    this.showFilter.update((v) => !v);
+  }
+   onFiltersCancel(): void {
+    this.showFilter.set(false);
+  }
   /* 
   private listenToQueryParams(): void {
     this.route.queryParams
