@@ -11,7 +11,7 @@
 
 <div class="home__pagination">
   <div>
-  <button (click)="onLoadMorePokemons()" *ngIf="displayLoadPokemonsBtn">Load More Pokemons</button>
+  <button (click)="onLoadMorePokemons()" *ngIf="displayLoadPokemonsBtn && pokemons.length > 0">Load More Pokemons</button>
   </div>
   <div>
   <button (click)="prevPage()" [disabled]="currentPage() === 1">Prev</button>

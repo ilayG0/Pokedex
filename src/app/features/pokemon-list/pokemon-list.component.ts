@@ -43,7 +43,7 @@ export class PokemonListComponent implements OnInit, OnDestroy {
     this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe((m) => {
       const urlPage = m.get('page');
       const page = urlPage ? Number(urlPage) : 1;
-
+    
       this.requestedPage = Number.isFinite(page) ? Math.floor(page) : 1;
       this.currentPage.set(this.requestedPage);
     });

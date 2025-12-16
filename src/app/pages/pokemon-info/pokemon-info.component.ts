@@ -28,29 +28,35 @@ export class PokemonInfoComponent {
   errorLoadingPokemon = false;
   totalStats = 0;
 
-  ngOnInit(): void {
-    this.isLoading.set(true);
+ngOnInit(): void {
+  this.isLoading.set(true);
 
-    combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(([params, query]) => {
-      const id = Number(params.get('id'));
-      const isFromFavorite = query.get('isFromFavorite') === 'true';
-      this.isFromFavorite = isFromFavorite;
+  combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(([params, query]) => {
+    const id = Number(params.get('id'));
+    this.isFromFavorite = query.get('isFromFavorite') === 'true';
 
-      this.pokemonService.getPokemonByNameOrId(id).subscribe({
-        next: (p) => {
-          this.pokemon = p;
-          this.totalStats = this.calculateTotalStats(p);
-          this.description = p.description || '';
-          this.isLoading.set(false);
-        },
-        error: (err) => {
-          console.error('Error loading pokemon', err);
-          this.isLoading.set(false);
-          this.errorLoadingPokemon = true;
-        },
-      });
+    const cached = this.pokemonService.getPokemonById(id);
+    if (cached) {
+      this.pokemon = cached;
+      this.totalStats = this.calculateTotalStats(cached);
+      this.isLoading.set(false);
+      return;
+    }
+
+    this.pokemonService.getPokemonByNameOrId(id).subscribe({
+      next: (pokemon) => {
+        this.pokemon = pokemon;
+        this.totalStats = this.calculateTotalStats(pokemon);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.errorLoadingPokemon = true;
+        this.isLoading.set(false);
+      },
     });
-  }
+  });
+}
+
 
   private calculateTotalStats(pokemon: Pokemon): number {
     return pokemon.stats.reduce((sum, s) => sum + s.base_stat, 0);

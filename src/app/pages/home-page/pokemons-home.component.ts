@@ -64,7 +64,7 @@ export class PokemonsHome implements OnInit {
     this.route.queryParams.subscribe((params) => {
       const page = Number(params['page']);
 
-      if(page === 1) this.navigationError.set(false);
+      if (page === 1) this.navigationError.set(false);
 
       if (page !== 1) this.isValidPage(page);
     });
@@ -77,6 +77,7 @@ export class PokemonsHome implements OnInit {
   }
 
   onSearchPokemonByNameOrId(nameOrId: string): void {
+    this.isLoading = true;
     const q = nameOrId.trim();
     if (!q) {
       this.searchResult.set(null);
@@ -89,25 +90,26 @@ export class PokemonsHome implements OnInit {
     this.pokemonService.getPokemonByNameOrId(q).subscribe({
       next: (p) => {
         this.searchResult.set([p]);
+        this.isLoading = false;
       },
       error: (err) => {
         console.error('Error loading pokemon', err);
         this.searchResult.set([]);
         this.noResults.set(true);
+        this.isLoading = false;
       },
     });
   }
 
   isValidPage(page: number) {
-    if (page === 0 || page === null || page === undefined || isNaN(page)){
+    if (page === 0 || page === null || page === undefined || isNaN(page)) {
       this.navigationError.set(true);
       return;
     }
 
-    let numberOfPages = this.displayedPokemons.length / 12;
-    console.log(numberOfPages, page);
+    let numberOfPages = Math.ceil(this.displayedPokemons().length / 12);
 
-    if (numberOfPages > page) {
+    if (numberOfPages < page) {
       this.navigationError.set(true);
       return;
     }

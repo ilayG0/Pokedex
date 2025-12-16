@@ -1,24 +1,34 @@
 import { Injectable, signal, computed, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, from, map, mergeMap, of, shareReplay, switchMap, take, toArray } from 'rxjs';
+import {
+  Observable,
+  from,
+  map,
+  mergeMap,
+  of,
+  switchMap,
+  take,
+  toArray,
+  finalize,
+} from 'rxjs';
+
 import { Pokemon } from '../models/pokemon.model';
 import { PokemonFilters } from '../models/pokemon-filters.model';
 import { SelectOption } from '../models/pokemon-filter-selected-option.model';
 import { PokemonListResponse } from '../models/pokemon-api-list-response.model';
 import { environment } from '../../environments/environment.dev';
-@Injectable({
-  providedIn: 'root',
-})
+
+@Injectable({ providedIn: 'root' })
 export class PokemonService {
   private readonly pokemons_limit = 12;
   private pokemons_offset = 0;
+
   isLoadingPage = signal(false);
 
   private _pokemons = signal<Pokemon[]>([]);
   pokemons = this._pokemons.asReadonly();
 
   favoriteIds = signal<number[]>(this.loadFavoriteIds());
-
   favoriteCount = computed(() => this.favoriteIds().length);
 
   favoritePokemons = computed<Pokemon[]>(() => {
@@ -35,18 +45,32 @@ export class PokemonService {
   private _groupOptions = signal<SelectOption[]>([]);
   groupOptions = this._groupOptions.asReadonly();
 
+  private inFlightFavoriteLoads = new Set<number>();
+
   constructor(private http: HttpClient) {
     effect(() => {
       const ids = this.favoriteIds();
+      const list = this._pokemons();
+
+      if (list.length !== 0) return;
       if (ids.length === 0) return;
 
-      const loaded = new Set(this._pokemons().map((p) => p.id));
-      const missing = ids.filter((id) => !loaded.has(id));
+      for (const id of ids) {
+        if (this.inFlightFavoriteLoads.has(id)) continue;
+        this.inFlightFavoriteLoads.add(id);
 
-      for (const id of missing) {
-        this.getPokemonByNameOrId(id).pipe(take(1)).subscribe();
+        this.getPokemonByNameOrId(id)
+          .pipe(
+            take(1),
+            finalize(() => this.inFlightFavoriteLoads.delete(id))
+          )
+          .subscribe();
       }
     });
+  }
+
+  getPokemonById(id: number) {
+    return this._pokemons().find((p) => p.id === id);
   }
 
   private loadFavoriteIds(): number[] {
@@ -110,106 +134,18 @@ export class PokemonService {
           }));
 
           this._pokemons.update((list) => {
-            const existing = new Set(list.map((p) => p.id));
-            const deduped = newPokemons.filter((p) => !existing.has(p.id));
-            return [...list, ...deduped];
+            const byId = new Map<number, Pokemon>();
+            for (const p of list) byId.set(p.id, p);
+            for (const p of newPokemons) byId.set(p.id, p); 
+            return Array.from(byId.values()).sort((a, b) => a.id - b.id);
           });
 
           this.pokemons_offset += this.pokemons_limit;
         },
-        error: () => {
-          this.isLoadingPage.set(false);
-        },
-        complete: () => {
-          this.isLoadingPage.set(false);
-        },
+        error: () => this.isLoadingPage.set(false),
+        complete: () => this.isLoadingPage.set(false),
       });
   }
-
-  ///\\\\\\\\\\\\\\\\\\\\\\\\\\\
-
-  /* 
-
-  searchPokemonsByFilters(filters: PokemonFilters): Observable<Pokemon[]> {
-    const { name, height, type, group, color } = filters;
-
-    const normalizedName = (name ?? '').trim().toLowerCase();
-    const normalizedType = (type ?? '').trim().toLowerCase();
-    const normalizedGroup = (group ?? '').trim().toLowerCase();
-
-    const normalizedColor = (color ?? '').toString().trim().toLowerCase();
-    const hasColor =
-      normalizedColor.length > 0 && normalizedColor !== 'null' && normalizedColor !== 'undefined';
-
-    const applyFilters = (allPokemons: Pokemon[], allowedIds?: Set<number>): Pokemon[] => {
-      const favoriteIdsSet = new Set(this.favoriteIds());
-
-      return allPokemons
-        .map((p) => ({ ...p, isFavorit: favoriteIdsSet.has(p.id) }))
-        .filter((p) => {
-          if (allowedIds && !allowedIds.has(p.id)) return false;
-
-          if (normalizedName && !p.name?.toLowerCase().includes(normalizedName)) return false;
-
-          if (height != null) {
-            if (p.height == null || p.height !== height) return false;
-          }
-
-          if (normalizedType) {
-            const hasType = p.types?.some((t: any) => {
-              const typeName: string =
-                (t?.type?.name as string) ||
-                (t?.name as string) ||
-                (typeof t === 'string' ? t : '');
-              return typeName.toLowerCase() === normalizedType;
-            });
-            if (!hasType) return false;
-          }
-
-          if (normalizedGroup) {
-            const pokemonGroup = ((p as any).group as string | string[] | undefined) ?? undefined;
-
-            const hasGroup =
-              typeof pokemonGroup === 'string'
-                ? pokemonGroup.toLowerCase() === normalizedGroup
-                : Array.isArray(pokemonGroup)
-                ? pokemonGroup.some((g) => g.toLowerCase() === normalizedGroup)
-                : false;
-
-            if (!hasGroup) return false;
-          }
-
-          return true;
-        });
-    };
-
-    if (!hasColor) {
-      return this.getAllPokemons().pipe(map((all) => applyFilters(all)));
-    }
-
-    return this.http
-      .get<{ pokemon_species: { name: string; url: string }[] }>(
-        `${environment.POKEDEX_API_URL}/pokemon-color/${normalizedColor}`
-      )
-      .pipe(
-        map((res) => res.pokemon_species ?? []),
-        map((species) => {
-          const ids = species
-            .map((s) => {
-              const parts = s.url.split('/').filter(Boolean);
-              const idStr = parts[parts.length - 1];
-              return Number(idStr);
-            })
-            .filter((n) => Number.isFinite(n));
-
-          return new Set(ids);
-        }),
-        switchMap((allowedIds) => {
-          if (!allowedIds.size) return of([] as Pokemon[]);
-          return this.getAllPokemons().pipe(map((all) => applyFilters(all, allowedIds)));
-        })
-      );
-  }*/
 
   loadTypesAndGroups(): void {
     if (this._typeOptions().length === 0) {
@@ -218,15 +154,10 @@ export class PokemonService {
           const options =
             (res.results || [])
               .filter((t: any) => !['shadow', 'unknown'].includes(t.name))
-              .map((t: any) => ({
-                name: t.name,
-                value: t.name,
-              })) ?? [];
+              .map((t: any) => ({ name: t.name, value: t.name })) ?? [];
           this._typeOptions.set(options);
         },
-        error: () => {
-          this._typeOptions.set([]);
-        },
+        error: () => this._typeOptions.set([]),
       });
     }
 
@@ -234,15 +165,10 @@ export class PokemonService {
       this.http.get<any>(`${environment.POKEDEX_API_URL}/egg-group`).subscribe({
         next: (res) => {
           const options =
-            (res.results || []).map((g: any) => ({
-              name: g.name,
-              value: g.name,
-            })) ?? [];
+            (res.results || []).map((g: any) => ({ name: g.name, value: g.name })) ?? [];
           this._groupOptions.set(options);
         },
-        error: () => {
-          this._groupOptions.set([]);
-        },
+        error: () => this._groupOptions.set([]),
       });
     }
   }
@@ -317,7 +243,17 @@ export class PokemonService {
               description,
               isFavorit: isFav,
             };
-            this._pokemons.update((prev) => [...prev, pokemon].sort((a, b) => a.id - b.id));
+
+            this._pokemons.update((prev) => {
+              const idx = prev.findIndex((p) => p.id === pokemon.id);
+              if (idx >= 0) {
+                const next = prev.slice();
+                next[idx] = pokemon;
+                return next.sort((a, b) => a.id - b.id);
+              }
+              return [...prev, pokemon].sort((a, b) => a.id - b.id);
+            });
+
             return pokemon;
           })
         )
