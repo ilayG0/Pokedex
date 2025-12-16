@@ -17,6 +17,7 @@ import { PokemonFilters } from '../models/pokemon-filters.model';
 import { SelectOption } from '../models/pokemon-filter-selected-option.model';
 import { PokemonListResponse } from '../models/pokemon-api-list-response.model';
 import { environment } from '../../environments/environment.dev';
+import { FactoryTarget } from '@angular/compiler';
 
 @Injectable({ providedIn: 'root' })
 export class PokemonService {
@@ -146,6 +147,42 @@ export class PokemonService {
         complete: () => this.isLoadingPage.set(false),
       });
   }
+
+ensurePokemonsLoadedUpTo(page: number | null | undefined): void {
+  const safePage = Number(page);
+
+  // ❌ עמוד לא תקין – לא נטען כלום
+  if (!Number.isFinite(safePage) || safePage < 1) {
+    return;
+  }
+
+  // ✅ עמוד ראשון – אם אין עדיין פוקימונים נטען את ה־12 הראשונים
+  if (safePage === 1) {
+    if (this.pokemons().length === 0 && !this.isLoadingPage()) {
+      this.load12Pokemons();
+    }
+    return;
+  }
+
+  const favoritesCount = this.favoriteIds().length;
+  const allPokemonsCount = this.pokemons().length;
+  const totalPokemonsCount = allPokemonsCount + favoritesCount;
+
+  const pageSize = this.pokemons_limit;
+  const totalPokemonsPages = Math.ceil(totalPokemonsCount / pageSize);
+
+  // כבר יש מספיק כדי לכסות את העמוד הזה
+  if (totalPokemonsPages >= safePage) {
+    return;
+  }
+
+  const requiredCountForPage = safePage * pageSize;
+
+  if (totalPokemonsCount < requiredCountForPage && !this.isLoadingPage()) {
+    this.load12Pokemons();
+  }
+}
+
 
   loadTypesAndGroups(): void {
     if (this._typeOptions().length === 0) {

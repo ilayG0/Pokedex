@@ -23,10 +23,14 @@
   <nav>
     <a
       class="nav-home"
-      [routerLink]="['home']"
-      [queryParams]="{ page: 1 }"
+      [routerLink]="['/home']"
       routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
+      [routerLinkActiveOptions]="{
+        paths: 'exact',
+        queryParams: 'ignored',
+        fragment: 'ignored',
+        matrixParams: 'ignored'
+      }"
     >
       Home
     </a>
@@ -54,7 +58,7 @@
         [routerLink]="['home']"
         [queryParams]="{ page: 1 }"
         routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
+        [routerLinkActiveOptions]="{ exact: false }"
         (click)="closeMenu()"
       >
         Home

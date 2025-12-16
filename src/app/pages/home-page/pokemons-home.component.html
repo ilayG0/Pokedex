@@ -19,7 +19,10 @@
 } -->
 
 @if(!navigationError()){
-<app-search-bar (search)="onSearchPokemonByNameOrId($event)" (openFilters)="onToggleFiltersForm()" />
+<app-search-bar
+  (search)="onSearchPokemonByNameOrId($event)"
+  (openFilters)="onToggleFiltersForm()"
+/>
 
 <ng-container>
   <app-pokemon-list
@@ -29,7 +32,7 @@
   ></app-pokemon-list>
 </ng-container>
 
-<app-filter-panel *ngIf="showFilter()" (cancel)="onFiltersCancel()"/>
+<app-filter-panel *ngIf="showFilter()" (cancel)="onFiltersCancel()" />
 } @else if(navigationError()){
 <app-pokemon-error-notification
   errorTitle="404 – Page Not Found"
