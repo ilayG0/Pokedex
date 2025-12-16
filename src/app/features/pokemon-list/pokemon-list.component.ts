@@ -5,11 +5,12 @@ import { Subject, takeUntil } from 'rxjs';
 
 import { Pokemon } from '../../models/pokemon.model';
 import { PokemonCard } from '../../component/pokemon-card /pokemon-card.component';
+import { PokemonErrorNotificationComponent } from "../../shared/pokemon-error-notification.component/pokemon-error-notification.component";
 
 @Component({
   selector: 'app-pokemon-list',
   standalone: true,
-  imports: [CommonModule, PokemonCard],
+  imports: [CommonModule, PokemonCard, PokemonErrorNotificationComponent],
   templateUrl: './pokemon-list.component.html',
   styleUrls: ['./pokemon-list.component.scss'],
 })
@@ -21,8 +22,10 @@ export class PokemonListComponent implements OnInit, OnDestroy {
   @Input({required: true}) displayLoadPokemonsBtn!: Boolean;
   @Output() loadNextPage = new EventEmitter();
 
+
   readonly pageSize = 12;
   currentPage = signal(1);
+
 
   private _pokemons: Pokemon[] = [];
   private requestedPage = 1;
@@ -44,6 +47,7 @@ export class PokemonListComponent implements OnInit, OnDestroy {
       this.requestedPage = Number.isFinite(page) ? Math.floor(page) : 1;
       this.currentPage.set(this.requestedPage);
     });
+
   }
 
   ngOnDestroy(): void {

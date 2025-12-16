@@ -12,11 +12,19 @@ import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-bal
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { finalize, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { PokemonErrorNotificationComponent } from '../../shared/pokemon-error-notification.component/pokemon-error-notification.component';
 
 @Component({
   selector: 'app-pokemons-home',
   standalone: true,
-  imports: [CommonModule, SearchBar, PokemonListComponent, FilterPanelComponent, LoadingPokeBall],
+  imports: [
+    CommonModule,
+    SearchBar,
+    PokemonListComponent,
+    FilterPanelComponent,
+    LoadingPokeBall,
+    PokemonErrorNotificationComponent,
+  ],
   templateUrl: './pokemons-home.component.html',
   styleUrls: ['./pokemons-home.component.scss'],
 })
@@ -27,7 +35,7 @@ export class PokemonsHome implements OnInit {
 
   isLoading = this.pokemonService.isLoadingPage();
   showFilter = signal(false);
-
+  navigationError = signal(false);
   filters = signal<PokemonFilters | null>(null);
   noResults = signal(false);
 
@@ -52,6 +60,14 @@ export class PokemonsHome implements OnInit {
     }
 
     this.pokemonService.load12Pokemons();
+
+    this.route.queryParams.subscribe((params) => {
+      const page = Number(params['page']);
+
+      if(page === 1) this.navigationError.set(false);
+
+      if (page !== 1) this.isValidPage(page);
+    });
   }
 
   onLoad12Pokemons(): void {
@@ -82,6 +98,21 @@ export class PokemonsHome implements OnInit {
     });
   }
 
+  isValidPage(page: number) {
+    if (page === 0 || page === null || page === undefined || isNaN(page)){
+      this.navigationError.set(true);
+      return;
+    }
+
+    let numberOfPages = this.displayedPokemons.length / 12;
+    console.log(numberOfPages, page);
+
+    if (numberOfPages > page) {
+      this.navigationError.set(true);
+      return;
+    }
+    this.navigationError.set(false);
+  }
   /* 
   private listenToQueryParams(): void {
     this.route.queryParams

@@ -17,6 +17,8 @@
 @if(this.pokemonService.isLoadingPage()){
 <app-loading-poke-ball />
 } -->
+
+@if(!navigationError()){
 <app-search-bar (search)="onSearchPokemonByNameOrId($event)" />
 
 <ng-container>
@@ -28,7 +30,11 @@
 </ng-container>
 
 <app-filter-panel *ngIf="showFilter()" />
-
-@if(isLoading){
+} @else if(navigationError()){
+<app-pokemon-error-notification
+  errorTitle="404 – Page Not Found"
+  errorMessage="The page you’re looking for doesn’t exist. Please return to the home page and try again."
+/>
+} @if(isLoading){
 <app-loading-poke-ball />
 }
