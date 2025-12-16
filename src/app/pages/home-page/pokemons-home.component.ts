@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { SearchBar } from '../../component/search-bar/search-bar.component';
@@ -20,21 +20,25 @@ import { finalize, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
   templateUrl: './pokemons-home.component.html',
   styleUrls: ['./pokemons-home.component.scss'],
 })
-export class PokemonsHome implements OnInit, OnDestroy {
-  private readonly pokemonService = inject(PokemonService);
+export class PokemonsHome implements OnInit {
+  readonly pokemonService = inject(PokemonService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  private readonly destroy$ = new Subject<void>();
-
-  isLoading = signal(false);
+  isLoading = this.pokemonService.isLoadingPage();
   showFilter = signal(false);
 
   filters = signal<PokemonFilters | null>(null);
   noResults = signal(false);
 
-  allPokemons = signal<Pokemon[]>([]);
-  displayedPokemons = signal<Pokemon[]>([]);
+  private readonly searchResult = signal<Pokemon[] | null>(null);
+
+  readonly displayedPokemons = computed(
+    () => this.searchResult() ?? this.pokemonService.pokemons()
+  );
+  readonly displayedLoadPokemonsBtn = computed(
+    () => !this.searchResult() || this.searchResult()!.length === 0
+  );
 
   ngOnInit(): void {
     const initialQp = this.route.snapshot.queryParams;
@@ -47,25 +51,38 @@ export class PokemonsHome implements OnInit, OnDestroy {
       });
     }
 
-    this.isLoading.set(true);
-
-    this.pokemonService
-      .getAllPokemons()
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => this.isLoading.set(false)),
-        tap((pokemons) => this.allPokemons.set(pokemons))
-      )
-      .subscribe({
-        next: () => this.listenToQueryParams(),
-        error: () => {
-          this.allPokemons.set([]);
-          this.displayedPokemons.set([]);
-          this.noResults.set(true);
-        },
-      });
+    this.pokemonService.load12Pokemons();
   }
 
+  onLoad12Pokemons(): void {
+    this.searchResult.set(null);
+    this.noResults.set(false);
+    this.pokemonService.load12Pokemons();
+  }
+
+  onSearchPokemonByNameOrId(nameOrId: string): void {
+    const q = nameOrId.trim();
+    if (!q) {
+      this.searchResult.set(null);
+      this.noResults.set(false);
+      return;
+    }
+
+    this.noResults.set(false);
+
+    this.pokemonService.getPokemonByNameOrId(q).subscribe({
+      next: (p) => {
+        this.searchResult.set([p]);
+      },
+      error: (err) => {
+        console.error('Error loading pokemon', err);
+        this.searchResult.set([]);
+        this.noResults.set(true);
+      },
+    });
+  }
+
+  /* 
   private listenToQueryParams(): void {
     this.route.queryParams
       .pipe(
@@ -196,5 +213,5 @@ export class PokemonsHome implements OnInit, OnDestroy {
     const all = this.allPokemons();
     this.noResults.set(all.length === 0);
     this.displayedPokemons.set(all);
-  }
+  } */
 }

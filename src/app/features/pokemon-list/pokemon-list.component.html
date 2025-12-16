@@ -9,6 +9,10 @@
 }
 
 <div class="home__pagination">
+  <div>
+  <button (click)="onLoadMorePokemons()" *ngIf="displayLoadPokemonsBtn">Load More Pokemons</button>
+  </div>
+  <div>
   <button (click)="prevPage()" [disabled]="currentPage() === 1">Prev</button>
 
   <span>Page {{ currentPage() }} / {{ totalPages }}</span>
@@ -16,4 +20,5 @@
   <button (click)="nextPage()" [disabled]="currentPage() === totalPages || pokemons.length === 0">
     Next
   </button>
+  </div>
 </div>

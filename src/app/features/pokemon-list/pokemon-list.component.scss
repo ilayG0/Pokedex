@@ -15,6 +15,7 @@
   justify-content: center;
   font-family: 'Roboto';
   gap: 16px;
+  flex-direction: column;
 
   button {
     padding: 8px 18px;
@@ -40,6 +41,7 @@
     font-size: 15px;
     font-weight: 500;
     color: #444;
+    padding: 10px;
   }
 }
 
@@ -61,4 +63,3 @@
     grid-template-columns: repeat(1, 1fr);
   }
 }
-

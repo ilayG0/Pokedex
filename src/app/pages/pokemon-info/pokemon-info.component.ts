@@ -36,7 +36,7 @@ export class PokemonInfoComponent {
       const isFromFavorite = query.get('isFromFavorite') === 'true';
       this.isFromFavorite = isFromFavorite;
 
-      this.pokemonService.getPokemon(id).subscribe({
+      this.pokemonService.getPokemonByNameOrId(id).subscribe({
         next: (p) => {
           this.pokemon = p;
           this.totalStats = this.calculateTotalStats(p);

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -17,6 +17,9 @@ export class PokemonListComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly destroy$ = new Subject<void>();
+
+  @Input({required: true}) displayLoadPokemonsBtn!: Boolean;
+  @Output() loadNextPage = new EventEmitter();
 
   readonly pageSize = 12;
   currentPage = signal(1);
@@ -56,6 +59,10 @@ export class PokemonListComponent implements OnInit, OnDestroy {
 
   get totalPages(): number {
     return Math.max(1, Math.ceil(this._pokemons.length / this.pageSize));
+  }
+
+  onLoadMorePokemons(){
+    this.loadNextPage.emit();
   }
 
   nextPage(): void {

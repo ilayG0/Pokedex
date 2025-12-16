@@ -33,14 +33,6 @@
 
   <button class="search-btn" (click)="onSearch()">Search</button>
 
-  <button
-    class="search-btn"
-    type="button"
-    (click)="onResetClick()"
-    *ngIf="searchTerm !== '' && !isMobile()"
-  >
-    Reset
-  </button>
   <button class="filter-btn" (click)="onOpenForm()">
     <img src="filterIcon.svg" class="filter-icon" alt="filter icon" />
   </button>
