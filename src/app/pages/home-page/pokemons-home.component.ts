@@ -137,13 +137,30 @@ export class PokemonsHome implements OnInit {
   onFiltersCancel(): void {
     this.showFilter.set(false);
   }
-   onSearchFilterSubmit(formValue: PokemonFilters): void {
+  onSearchFilterSubmit(formValue: PokemonFilters): void {
     this.isLoading = true;
     this.filters.set(formValue);
     this.noResults.set(false);
 
     this.pokemonService.searchPokemonsByFilters(formValue).subscribe({
       next: (result) => {
+        const filters = this.filters(); 
+
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: {
+            page: 1,
+            ...(filters?.color && filters.color.trim() !== '' ? { color: filters.color } : {}),
+            ...(filters?.type && filters.type.trim() !== '' ? { type: filters.type } : {}),
+            ...(filters?.group && filters.group.trim() !== '' ? { group: filters.group } : {}),
+            ...(typeof filters?.height === 'number' && !Number.isNaN(filters.height)
+              ? { height: filters.height }
+              : {}),
+              search: true
+          },
+          queryParamsHandling: 'merge',
+          replaceUrl: true,
+        });
         this.searchResult.set(result);
         this.noResults.set(result.length === 0);
       },
