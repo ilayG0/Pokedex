@@ -189,7 +189,7 @@ nav a.active {
   nav {
     height: 100%;
   }
-  /* Dark overlay on the rest of the app */
+
   .mobile-backdrop {
     position: fixed;
     inset: 0;
@@ -198,8 +198,6 @@ nav a.active {
     z-index: 1000;
   }
 }
-
-/* ===== FAVORITES BADGE (desktop + mobile) ===== */
 
 .nav-favorites {
   position: relative;

@@ -3,12 +3,11 @@ import { PokemonCard } from '../../component/pokemon-card /pokemon-card.componen
 import { PokemonService } from '../../services/pokemon.service';
 import { Pokemon } from '../../models/pokemon.model';
 import { Router } from '@angular/router';
-import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
 import { PokemonErrorNotificationComponent } from '../../shared/pokemon-error-notification.component/pokemon-error-notification.component';
 
 @Component({
   selector: 'app-favorit-pokemons.component',
-  imports: [PokemonCard, LoadingPokeBall, PokemonErrorNotificationComponent],
+  imports: [PokemonCard, PokemonErrorNotificationComponent],
   templateUrl: './favorit-pokemons.component.html',
   styleUrl: './favorit-pokemons.component.scss',
   host: {
