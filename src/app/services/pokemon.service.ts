@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, effect } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {
   Observable,
@@ -7,10 +7,10 @@ import {
   mergeMap,
   of,
   switchMap,
-  take,
   toArray,
   finalize,
   combineLatest,
+  tap,
 } from 'rxjs';
 
 import { Pokemon } from '../models/pokemon.model';
@@ -18,14 +18,18 @@ import { PokemonFilters } from '../models/pokemon-filters.model';
 import { SelectOption } from '../models/pokemon-filter-selected-option.model';
 import { PokemonListResponse } from '../models/pokemon-api-list-response.model';
 import { environment } from '../../environments/environment.dev';
-import { FactoryTarget } from '@angular/compiler';
 
 @Injectable({ providedIn: 'root' })
 export class PokemonService {
   private readonly pokemons_limit = 12;
-  private pokemons_offset = 0;
 
   isLoadingPage = signal(false);
+
+  totalPokemonsCount = signal(0);
+  readonly totalPages = computed(() => {
+    const total = this.totalPokemonsCount();
+    return total > 0 ? Math.ceil(total / this.pokemons_limit) : 0;
+  });
 
   private _pokemons = signal<Pokemon[]>([]);
   pokemons = this._pokemons.asReadonly();
@@ -47,29 +51,7 @@ export class PokemonService {
   private _groupOptions = signal<SelectOption[]>([]);
   groupOptions = this._groupOptions.asReadonly();
 
-  private inFlightFavoriteLoads = new Set<number>();
-
-  constructor(private http: HttpClient) {
-    effect(() => {
-      const ids = this.favoriteIds();
-      const list = this._pokemons();
-
-      if (list.length !== 0) return;
-      if (ids.length === 0) return;
-
-      for (const id of ids) {
-        if (this.inFlightFavoriteLoads.has(id)) continue;
-        this.inFlightFavoriteLoads.add(id);
-
-        this.getPokemonByNameOrId(id)
-          .pipe(
-            take(1),
-            finalize(() => this.inFlightFavoriteLoads.delete(id))
-          )
-          .subscribe();
-      }
-    });
-  }
+  constructor(private http: HttpClient) {}
 
   getPokemonById(id: number) {
     return this._pokemons().find((p) => p.id === id);
@@ -109,76 +91,45 @@ export class PokemonService {
     );
   }
 
-  load12Pokemons(): void {
+  private fetchPokemonsPage(page: number): Observable<Pokemon[]> {
+    const dynamicOffset = (page - 1) * this.pokemons_limit;
+    const url = `${environment.POKEDEX_API_URL}/pokemon?limit=${this.pokemons_limit}&offset=${dynamicOffset}`;
+
+    return this.http.get<PokemonListResponse>(url).pipe(
+      tap((res) => {
+        if (this.totalPokemonsCount() === 0 && typeof res.count === 'number') {
+          this.totalPokemonsCount.set(res.count);
+        }
+      }),
+      map((res) => res.results ?? []),
+      mergeMap((results) =>
+        from(results).pipe(
+          mergeMap((r) => this.http.get<Pokemon>(r.url), 10),
+          toArray()
+        )
+      ),
+      map((arr) => arr.slice().sort((a, b) => a.id - b.id)),
+      map((sorted) => {
+        const favSet = new Set(this.favoriteIds());
+        const newPokemons = sorted.map((p) => ({
+          ...p,
+          isFavorit: favSet.has(p.id),
+        }));
+        this._pokemons.set(newPokemons);
+        return newPokemons;
+      })
+    );
+  }
+  load12Pokemons(page: number): void {
     if (this.isLoadingPage()) return;
     this.isLoadingPage.set(true);
 
-    const url = `${environment.POKEDEX_API_URL}/pokemon?limit=${this.pokemons_limit}&offset=${this.pokemons_offset}`;
-
-    this.http
-      .get<PokemonListResponse>(url)
-      .pipe(
-        map((res) => res.results ?? []),
-        mergeMap((results) =>
-          from(results).pipe(
-            mergeMap((r) => this.http.get<Pokemon>(r.url), 10),
-            toArray()
-          )
-        ),
-        map((arr) => arr.slice().sort((a, b) => a.id - b.id))
-      )
+    this.fetchPokemonsPage(page)
+      .pipe(finalize(() => this.isLoadingPage.set(false)))
       .subscribe({
-        next: (sorted) => {
-          const favSet = new Set(this.favoriteIds());
-          const newPokemons = sorted.map((p) => ({
-            ...p,
-            isFavorit: favSet.has(p.id),
-          }));
-
-          this._pokemons.update((list) => {
-            const byId = new Map<number, Pokemon>();
-            for (const p of list) byId.set(p.id, p);
-            for (const p of newPokemons) byId.set(p.id, p);
-            return Array.from(byId.values()).sort((a, b) => a.id - b.id);
-          });
-
-          this.pokemons_offset += this.pokemons_limit;
+        error: () => {
         },
-        error: () => this.isLoadingPage.set(false),
-        complete: () => this.isLoadingPage.set(false),
       });
-  }
-
-  ensurePokemonsLoadedUpTo(page: number | null | undefined): void {
-    const safePage = Number(page);
-
-    if (!Number.isFinite(safePage) || safePage < 1) {
-      return;
-    }
-
-    if (safePage === 1) {
-      if (this.pokemons().length === 0 && !this.isLoadingPage()) {
-        this.load12Pokemons();
-      }
-      return;
-    }
-
-    const favoritesCount = this.favoriteIds().length;
-    const allPokemonsCount = this.pokemons().length;
-    const totalPokemonsCount = allPokemonsCount + favoritesCount;
-
-    const pageSize = this.pokemons_limit;
-    const totalPokemonsPages = Math.ceil(totalPokemonsCount / pageSize);
-
-    if (totalPokemonsPages >= safePage) {
-      return;
-    }
-
-    const requiredCountForPage = safePage * pageSize;
-
-    if (totalPokemonsCount < requiredCountForPage && !this.isLoadingPage()) {
-      this.load12Pokemons();
-    }
   }
 
   loadTypesAndGroups(): void {
@@ -294,6 +245,7 @@ export class PokemonService {
       )
     );
   }
+
   private extractIdFromSpeciesUrl(url: string): number | null {
     const match = url.match(/\/(\d+)\/?$/);
     return match ? Number(match[1]) : null;
@@ -331,7 +283,10 @@ export class PokemonService {
     );
   }
 
-  searchPokemonsByFilters(filters: PokemonFilters | null | undefined): Observable<Pokemon[]> {
+  searchPokemonsByFilters(
+    filters: PokemonFilters | null | undefined,
+    page?: number
+  ): Observable<Pokemon[]> {
     if (!filters) {
       return of(this._pokemons());
     }
@@ -351,9 +306,14 @@ export class PokemonService {
     const groupIds$ = group ? this.getPokemonIdsByEggGroup(group) : of<Set<number> | null>(null);
     const colorIds$ = color ? this.getPokemonIdsByColor(color) : of<Set<number> | null>(null);
 
-    return combineLatest([groupIds$, colorIds$]).pipe(
-      map(([groupIds, colorIds]) => {
-        return this._pokemons().filter((p) => {
+    const basePokemons$ =
+      this._pokemons().length === 0 && page != null
+        ? this.fetchPokemonsPage(page)
+        : of(this._pokemons());
+
+    return combineLatest([groupIds$, colorIds$, basePokemons$]).pipe(
+      map(([groupIds, colorIds, pokemons]) => {
+        return pokemons.filter((p) => {
           if (height !== null && p.height !== height) {
             return false;
           }

@@ -1,6 +1,6 @@
 
 <div class="pokemon-grid">
-  @for (pokemon of displayedPokemons; track pokemon.id) {
+  @for (pokemon of pokemons; track pokemon.id) {
   <app-pokemon-card [pokemon]="pokemon" page="home" />
   }
 </div>
@@ -9,18 +9,13 @@
   <app-pokemon-error-notification errorTitle="No Pokémon found" errorMessage="Try searching with the full Pokémon name or its Pokédex number"/>
 }
 
-<div class="home__pagination">
-  <div>
-  <button (click)="onLoadMorePokemons()" *ngIf="displayLoadPokemonsBtn && pokemons.length > 0">Load More Pokemons</button>
-  </div>
-  <div>
+<div class="home__pagination" *ngIf="!searchMode()">
   <button (click)="prevPage()" [disabled]="currentPage() === 1">Prev</button>
 
-  <span>Page {{ currentPage() }} / {{ totalPages }}</span>
+  <span>Page {{ currentPage() }} / {{ totalPages() }}</span>
 
-  <button (click)="nextPage()" [disabled]="currentPage() === totalPages || pokemons.length === 0">
+  <button (click)="nextPage()" [disabled]="currentPage() === totalPages() || pokemons.length === 0">
     Next
   </button>
-  </div>
 </div>
 

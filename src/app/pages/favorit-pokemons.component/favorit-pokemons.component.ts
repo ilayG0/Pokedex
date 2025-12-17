@@ -27,7 +27,7 @@ export class FavoritPokemonsComponent implements OnInit {
   hasItems = computed(() => this.favorites().length > 0);
 
   ngOnInit() {
-    this.pokemonService.ensurePokemonsLoadedUpTo(1);
+   // this.pokemonService.ensurePokemonsLoadedUpTo(1);
   }
 
   onRemoveFavorite(pokemon: Pokemon) {

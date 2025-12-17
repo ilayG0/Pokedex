@@ -10,13 +10,8 @@
     <a
       class="nav-home"
       [routerLink]="['/home']"
+      [queryParams]="{ page: 1 }"
       routerLinkActive="active"
-      [routerLinkActiveOptions]="{
-        paths: 'exact',
-        queryParams: 'ignored',
-        fragment: 'ignored',
-        matrixParams: 'ignored'
-      }"
     >
       Home
     </a>
@@ -46,26 +41,17 @@
     [routerLink]="['/home']"
     [queryParams]="{ page: 1 }"
     routerLinkActive="active"
-    [routerLinkActiveOptions]="{
-      paths: 'exact',
-      queryParams: 'ignored',
-      fragment: 'ignored',
-      matrixParams: 'ignored'
-    }"
   >
     Home
   </a>
 
-<div
-  class="mobile-bottom-nav__center pokeball-nav-bar"
-  aria-hidden="true"
->
-  <span class="pokeball-badge mobile-bottom-nav__pokeball">
-    @if (count > 0) {
+  <div class="mobile-bottom-nav__center pokeball-nav-bar" aria-hidden="true">
+    <span class="pokeball-badge mobile-bottom-nav__pokeball">
+      @if (count > 0) {
       <span class="pokeball-badge__count">{{ count }}</span>
-    }
-  </span>
-</div>
+      }
+    </span>
+  </div>
 
   <a
     class="mobile-bottom-nav__link mobile-bottom-nav__link--favorites"

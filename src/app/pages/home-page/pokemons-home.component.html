@@ -1,23 +1,3 @@
-<!-- <app-search-bar
-  (openFilters)="onToggleFiltersForm()"
-  (search)="onFoundPokemon($event)"
-  (reset)="onReset()"
-/>
-
-<ng-container>
-  <app-pokemon-list [pokemons]="displayedPokemons()"></app-pokemon-list>
-</ng-container>
-
-<app-filter-panel
-  *ngIf="showFilter()"
-  (cancel)="onFiltersCancel()"
-  (search)="onFilterSubmit($event)"
-/>
-
-@if(this.pokemonService.isLoadingPage()){
-<app-loading-poke-ball />
-} -->
-
 @if(!navigationError()){
 <app-search-bar
   (search)="onSearchPokemonByNameOrId($event)"
@@ -27,7 +7,6 @@
 <ng-container>
   <app-pokemon-list
     [pokemons]="displayedPokemons()"
-    (loadNextPage)="onLoad12Pokemons()"
     [displayLoadPokemonsBtn]="displayedLoadPokemonsBtn()"
   ></app-pokemon-list>
 </ng-container>
@@ -38,6 +17,6 @@
   errorTitle="404 – Page Not Found"
   errorMessage="The page you’re looking for doesn’t exist. Please return to the home page and try again."
 />
-} @if(isLoading){
+} @if(isLoading()){
 <app-loading-poke-ball />
 }

@@ -15,8 +15,9 @@ import { POKEMON_COLORS } from '../../models/pokemon-color-option.model';
 export class FilterPanelComponent implements OnInit {
   @Output() readonly search = new EventEmitter<any>();
   @Output() readonly cancel = new EventEmitter<void>();
-
+  
   filterForm!: FormGroup;
+  page = 1;
   pokemonColors = POKEMON_COLORS;
 
   private readonly fb = inject(FormBuilder);
