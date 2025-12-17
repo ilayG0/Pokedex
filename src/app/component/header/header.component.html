@@ -1,4 +1,4 @@
-<header class="header">
+<!-- <header class="header">
   <div class="header__logo">
     <a [routerLink]="['home']" [queryParams]="{ page: 1 }">
       <img src="pokedex.png" alt="PokeDex logo" />
@@ -63,3 +63,101 @@
   </a>
 </nav>
 }
+ -->
+
+<header class="header">
+  @if (isMobile()) {
+  <button
+    type="button"
+    class="mobile-toggle"
+    [class.mobile-toggle--open]="isMenuOpen()"
+    aria-label="Open navigation menu"
+    [attr.aria-expanded]="isMenuOpen()"
+    (click)="toggleMenu()"
+  >
+    <span class="mobile-toggle__bar"></span>
+    <span class="mobile-toggle__bar"></span>
+    <span class="mobile-toggle__bar"></span>
+  </button>
+  }
+
+  <!-- Logo (centered on mobile, left on desktop) -->
+  <div class="header__logo">
+    <a [routerLink]="['home']" [queryParams]="{ page: 1 }">
+      <img src="pokedex.png" alt="PokeDex logo" />
+    </a>
+  </div>
+
+  <!-- Desktop nav stays the same -->
+  @if (!isMobile()) {
+  <nav>
+    <a
+      class="nav-home"
+      [routerLink]="['/home']"
+      routerLinkActive="active"
+      [queryParams]="{ page: 1 }"
+      routerLinkActive="active"
+    >
+      Home
+    </a>
+
+    <a
+      class="nav-favorites"
+      [routerLink]="['/favorite-pokemons']"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      <span>Favorites</span>
+
+      @if (count > 0) {
+      <span class="pokeball-badge">
+        <span class="pokeball-badge__count">{{ count }}</span>
+      </span>
+      }
+    </a>
+  </nav>
+  }
+
+  <!-- Mobile dropdown panel from the TOP (40% height) -->
+  @if (isMobile()) {
+  <div class="mobile-menu" [class.mobile-menu--open]="isMenuOpen()">
+    <div class="mobile-menu__panel">
+      <nav class="mobile-nav">
+        <a
+          class="mobile-nav__link"
+          [routerLink]="['home']"
+          [queryParams]="{ page: 1 }"
+          routerLinkActive="active"
+          (click)="closeMenu()"
+        >
+          Home
+        </a>
+
+        <a
+          class="mobile-nav__link nav-favorites"
+          [routerLink]="['/favorite-pokemons']"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: false }"
+          (click)="closeMenu()"
+        >
+          <span>Favorites</span>
+
+          @if (count > 0) {
+          <span class="pokeball-badge">
+            <span class="pokeball-badge__count">{{ count }}</span>
+          </span>
+          }
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  @if (isMenuOpen()) {
+  <button
+    type="button"
+    class="mobile-backdrop"
+    aria-label="Close navigation menu"
+    (click)="closeMenu()"
+  ></button>
+  } }
+</header>
