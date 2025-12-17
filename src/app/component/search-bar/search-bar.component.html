@@ -1,5 +1,7 @@
 <div class="search-container">
   <div class="search-input-wrapper">
+    <button type="button" class="search-icon" (click)="onSearch()">🔍</button>
+
     <input
       type="text"
       [(ngModel)]="searchTerm"
@@ -10,24 +12,25 @@
     />
 
     @if (showDropdown && recentSearches.length) {
-    <div class="recent-dropdown" (mousedown)="$event.preventDefault()">
-      <div class="recent-header">
-        <span class="recent-title">RECENT SEARCHES</span>
-        <button type="button" class="recent-clear" (click)="onClearRecent($event)">CLEAR</button>
-      </div>
+      <div class="recent-dropdown" (mousedown)="$event.preventDefault()">
+        <div class="recent-header">
+          <span class="recent-title">RECENT SEARCHES</span>
+          <button type="button" class="recent-clear" (click)="onClearRecent($event)">CLEAR</button>
+        </div>
 
-      <ul class="recent-list">
-        @for (term of recentSearches; track term) {
-        <li class="recent-item" (click)="onSelectRecent(term)">
-          <span class="recent-text">{{ term }}</span>
-          <button type="button" class="recent-remove" (click)="onRemoveRecent(term, $event)">
-            ✕
-          </button>
-        </li>
-        }
-      </ul>
-    </div>
+        <ul class="recent-list">
+          @for (term of recentSearches; track term) {
+            <li class="recent-item" (click)="onSelectRecent(term)">
+              <span class="recent-text">{{ term }}</span>
+              <button type="button" class="recent-remove" (click)="onRemoveRecent(term, $event)">
+                ✕
+              </button>
+            </li>
+          }
+        </ul>
+      </div>
     }
+    
   </div>
 
   <button class="search-btn" (click)="onSearch()">Search</button>
@@ -38,5 +41,5 @@
 </div>
 
 @if (isLoading){
-<app-loading-poke-ball />
+  <app-loading-poke-ball />
 }

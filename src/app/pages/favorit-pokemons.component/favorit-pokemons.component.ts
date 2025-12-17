@@ -1,14 +1,13 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { PokemonCard } from '../../component/pokemon-card /pokemon-card.component';
 import { PokemonService } from '../../services/pokemon.service';
 import { Pokemon } from '../../models/pokemon.model';
 import { Router } from '@angular/router';
-import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
 import { PokemonErrorNotificationComponent } from '../../shared/pokemon-error-notification.component/pokemon-error-notification.component';
 
 @Component({
   selector: 'app-favorit-pokemons.component',
-  imports: [PokemonCard, LoadingPokeBall, PokemonErrorNotificationComponent],
+  imports: [PokemonCard, PokemonErrorNotificationComponent],
   templateUrl: './favorit-pokemons.component.html',
   styleUrl: './favorit-pokemons.component.scss',
   host: {
@@ -23,13 +22,7 @@ export class FavoritPokemonsComponent {
   favoriteIds = this.pokemonService.favoriteIds;
   pokemons = this.pokemonService.pokemons;
 
-  isLoading = computed(() => this.favoriteIds().length > 0 && this.pokemons().length === 0);
   hasItems = computed(() => this.favorites().length > 0);
-
-<<<<<<< HEAD
-=======
-
->>>>>>> 32dfd5ab10431e0fc12564017973f9084d421567
 
   onRemoveFavorite(pokemon: Pokemon) {
     this.pokemonService.toggleFavorite(pokemon);

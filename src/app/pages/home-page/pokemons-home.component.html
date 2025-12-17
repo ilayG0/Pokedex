@@ -1,50 +1,22 @@
-<!-- <app-search-bar
-  (openFilters)="onToggleFiltersForm()"
-  (search)="onFoundPokemon($event)"
-  (reset)="onReset()"
-/>
-
-<app-pokemon-list [pokemons]="displayedPokemons()"></app-pokemon-list>
-
-<app-filter-panel
-  *ngIf="showFilter()"
-  (cancel)="onFiltersCancel()"
-  (search)="onFilterSubmit($event)"
-/>
-
-<<<<<<< HEAD
-@if(this.pokemonService.isLoadingPage()){
-<app-loading-poke-ball />
-} -->
-
 @if(!navigationError()){
-<app-search-bar (search)="onSearchPokemonByNameOrId($event)" />
+<app-search-bar
+  (search)="onSearchPokemonByNameOrId($event)"
+  (openFilters)="onToggleFiltersForm()"
+/>
 
 <ng-container>
   <app-pokemon-list
     [pokemons]="displayedPokemons()"
-    (loadNextPage)="onLoad12Pokemons()"
     [displayLoadPokemonsBtn]="displayedLoadPokemonsBtn()"
   ></app-pokemon-list>
 </ng-container>
 
-<app-filter-panel *ngIf="showFilter()" />
+<app-filter-panel *ngIf="showFilter()" (cancel)="onFiltersCancel()" (search)="onSearchFilterSubmit($event)"/>
 } @else if(navigationError()){
 <app-pokemon-error-notification
   errorTitle="404 – Page Not Found"
   errorMessage="The page you’re looking for doesn’t exist. Please return to the home page and try again."
 />
-} @if(isLoading){
+} @if(isLoading()){
 <app-loading-poke-ball />
-=======
-<div class="home__pagination">
-  <button (click)="prevPage()" [disabled]="!canGoPrev()">Prev</button>
-  <span>Page {{ currentPage() }}</span>
-  <button (click)="nextPage()" [disabled]="!canGoNext()">Next</button>
-</div>
-
-
-@if (isLoading()) {
-  <app-loading-poke-ball />
->>>>>>> 32dfd5ab10431e0fc12564017973f9084d421567
 }
