@@ -1,70 +1,3 @@
-<!-- <header class="header">
-  <div class="header__logo">
-    <a [routerLink]="['home']" [queryParams]="{ page: 1 }">
-      <img src="pokedex.png" alt="PokeDex logo" />
-    </a>
-  </div>
-
-  @if (!isMobile()) {
-  <nav>
-    <a
-      class="nav-home"
-      [routerLink]="['/home']"
-      [queryParams]="{ page: 1 }"
-      routerLinkActive="active"
-    >
-      Home
-    </a>
-
-    <a
-      class="nav-favorites"
-      [routerLink]="['/favorite-pokemons']"
-      routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
-    >
-      <span>Favorites</span>
-
-      @if (count > 0) {
-      <span class="pokeball-badge">
-        <span class="pokeball-badge__count">{{ count }}</span>
-      </span>
-      }
-    </a>
-  </nav>
-  }
-</header>
-
-@if (isMobile()) {
-<nav class="mobile-bottom-nav" aria-label="Primary navigation">
-  <a
-    class="mobile-bottom-nav__link mobile-bottom-nav__link--home"
-    [routerLink]="['/home']"
-    [queryParams]="{ page: 1 }"
-    routerLinkActive="active"
-  >
-    Home
-  </a>
-
-  <div class="mobile-bottom-nav__center pokeball-nav-bar" aria-hidden="true">
-    <span class="pokeball-badge mobile-bottom-nav__pokeball">
-      @if (count > 0) {
-      <span class="pokeball-badge__count">{{ count }}</span>
-      }
-    </span>
-  </div>
-
-  <a
-    class="mobile-bottom-nav__link mobile-bottom-nav__link--favorites"
-    [routerLink]="['/favorite-pokemons']"
-    routerLinkActive="active"
-    [routerLinkActiveOptions]="{ exact: true }"
-  >
-    Favorites
-  </a>
-</nav>
-}
- -->
-
 <header class="header">
   @if (isMobile()) {
   <button
@@ -81,14 +14,11 @@
   </button>
   }
 
-  <!-- Logo (centered on mobile, left on desktop) -->
   <div class="header__logo">
     <a [routerLink]="['home']" [queryParams]="{ page: 1 }">
       <img src="pokedex.png" alt="PokeDex logo" />
     </a>
   </div>
-
-  <!-- Desktop nav stays the same -->
   @if (!isMobile()) {
   <nav>
     <a
@@ -116,10 +46,7 @@
       }
     </a>
   </nav>
-  }
-
-  <!-- Mobile dropdown panel from the TOP (40% height) -->
-  @if (isMobile()) {
+  } @if (isMobile()) {
   <div class="mobile-menu" [class.mobile-menu--open]="isMenuOpen()">
     <div class="mobile-menu__panel">
       <nav class="mobile-nav">

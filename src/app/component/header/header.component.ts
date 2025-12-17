@@ -1,18 +1,17 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, HostListener } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { PokemonService } from '../../services/pokemon.service';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, RouterLinkActive],
   standalone: true,
+  imports: [RouterLink, RouterLinkActive],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
 export class Header {
   isHome = signal(true);
   isMobile = signal(window.innerWidth < 670);
-
   readonly isMenuOpen = signal(false);
 
   constructor(private pokemonService: PokemonService) {
@@ -31,5 +30,12 @@ export class Header {
 
   closeMenu(): void {
     this.isMenuOpen.set(false);
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    if (this.isMobile() && this.isMenuOpen()) {
+      this.closeMenu();
+    }
   }
 }
