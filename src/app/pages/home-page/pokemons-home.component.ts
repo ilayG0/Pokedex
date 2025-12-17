@@ -54,7 +54,11 @@ export class PokemonsHome implements OnInit {
       const raw = params['page'];
       const search = params['search'];
       const page = raw ? Number(raw) : 1;
-      console.log(raw)
+      
+      if(!raw){
+        this.router.navigate(['home'], { queryParams: { page: 1 } });
+      }
+
       if (search && !this.initialQueryHandled) {
         this.router.navigate(['home'], { queryParams: { page: 1 } });
       }
@@ -108,15 +112,15 @@ export class PokemonsHome implements OnInit {
       .pipe(
         finalize(() => {
           this.isLoading = false;
+             this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { search: true, nameOrId: q },
+            replaceUrl: true,
+          });
         })
       )
       .subscribe({
         next: (p) => {
-          this.router.navigate([], {
-            relativeTo: this.route,
-            queryParams: { page: 1, search: true, nameOrId: q },
-            replaceUrl: true,
-          });
           this.searchResult.set([p]);
         },
         error: (err) => {
