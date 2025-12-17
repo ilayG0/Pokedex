@@ -1,18 +1,4 @@
 <header class="header">
-  @if (isMobile()) {
-  <button
-    type="button"
-    class="mobile-toggle"
-    aria-label="Open navigation menu"
-    [attr.aria-expanded]="isMenuOpen()"
-    (click)="toggleMenu()"
-  >
-    <span class="mobile-toggle__bar"></span>
-    <span class="mobile-toggle__bar"></span>
-    <span class="mobile-toggle__bar"></span>
-  </button>
-  }
-
   <div class="header__logo">
     <a [routerLink]="['home']" [queryParams]="{ page: 1 }">
       <img src="pokedex.png" alt="PokeDex logo" />
@@ -50,44 +36,44 @@
       }
     </a>
   </nav>
-  } @if (isMobile()) {
-  <div class="mobile-menu" [class.mobile-menu--open]="isMenuOpen()">
-    <nav class="mobile-nav">
-      <a
-        class="mobile-nav__link"
-        [routerLink]="['home']"
-        [queryParams]="{ page: 1 }"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: false }"
-        (click)="closeMenu()"
-      >
-        Home
-      </a>
-
-      <a
-        class="mobile-nav__link nav-favorites"
-        [routerLink]="['/favorite-pokemons']"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        (click)="closeMenu()"
-      >
-        <span>Favorites</span>
-
-        @if (count > 0) {
-        <span class="pokeball-badge">
-          <span class="pokeball-badge__count">{{ count }}</span>
-        </span>
-        }
-      </a>
-    </nav>
-  </div>
-
-  @if (isMenuOpen()) {
-  <button
-    type="button"
-    class="mobile-backdrop"
-    aria-label="Close navigation menu"
-    (click)="closeMenu()"
-  ></button>
-  } }
+  }
 </header>
+
+@if (isMobile()) {
+<nav class="mobile-bottom-nav" aria-label="Primary navigation">
+  <a
+    class="mobile-bottom-nav__link mobile-bottom-nav__link--home"
+    [routerLink]="['/home']"
+    [queryParams]="{ page: 1 }"
+    routerLinkActive="active"
+    [routerLinkActiveOptions]="{
+      paths: 'exact',
+      queryParams: 'ignored',
+      fragment: 'ignored',
+      matrixParams: 'ignored'
+    }"
+  >
+    Home
+  </a>
+
+<div
+  class="mobile-bottom-nav__center pokeball-nav-bar"
+  aria-hidden="true"
+>
+  <span class="pokeball-badge mobile-bottom-nav__pokeball">
+    @if (count > 0) {
+      <span class="pokeball-badge__count">{{ count }}</span>
+    }
+  </span>
+</div>
+
+  <a
+    class="mobile-bottom-nav__link mobile-bottom-nav__link--favorites"
+    [routerLink]="['/favorite-pokemons']"
+    routerLinkActive="active"
+    [routerLinkActiveOptions]="{ exact: true }"
+  >
+    Favorites
+  </a>
+</nav>
+}
