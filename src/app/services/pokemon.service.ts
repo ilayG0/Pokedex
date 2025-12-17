@@ -37,10 +37,8 @@ export class PokemonService {
   favoriteIds = signal<number[]>(this.loadFavoriteIds());
   favoriteCount = computed(() => this.favoriteIds().length);
 
-  favoritePokemons = computed<Pokemon[]>(() => {
-    const favSet = new Set(this.favoriteIds());
-    return this._pokemons().filter((p) => favSet.has(p.id));
-  });
+  private _favoritePokemons = signal<Pokemon[]>([]);
+  favoritePokemons = this._favoritePokemons.asReadonly();
 
   private _recentSearches = signal<string[]>(this.loadRecentSearchesFromStorage());
   recentSearches = this._recentSearches.asReadonly();
@@ -51,7 +49,9 @@ export class PokemonService {
   private _groupOptions = signal<SelectOption[]>([]);
   groupOptions = this._groupOptions.asReadonly();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.initFavoritePokemonsFromStorage();
+  }
 
   getPokemonById(id: number) {
     return this._pokemons().find((p) => p.id === id);
@@ -89,6 +89,28 @@ export class PokemonService {
     this._pokemons.update((list) =>
       list.map((p) => (p.id === id ? { ...p, isFavorit: !exists } : p))
     );
+
+    if (exists) {
+      this._favoritePokemons.update((list) => list.filter((p) => p.id !== id));
+    } else {
+      this._favoritePokemons.update((list) => {
+        const idx = list.findIndex((p) => p.id === id);
+        if (idx >= 0) return list;
+        return [...list, { ...pokemon, isFavorit: true }].sort((a, b) => a.id - b.id);
+      });
+    }
+  }
+
+  private initFavoritePokemonsFromStorage(): void {
+    const ids = this.favoriteIds();
+    if (!ids.length) {
+      this._favoritePokemons.set([]);
+      return;
+    }
+    this._favoritePokemons.set([]);
+    ids.forEach((id) => {
+      this.getPokemonByNameOrId(id, { addToList: false, addToFavorites: true }).subscribe();
+    });
   }
 
   private fetchPokemonsPage(page: number): Observable<Pokemon[]> {
@@ -120,6 +142,7 @@ export class PokemonService {
       })
     );
   }
+
   load12Pokemons(page: number): void {
     if (this.isLoadingPage()) return;
     this.isLoadingPage.set(true);
@@ -127,8 +150,7 @@ export class PokemonService {
     this.fetchPokemonsPage(page)
       .pipe(finalize(() => this.isLoadingPage.set(false)))
       .subscribe({
-        error: () => {
-        },
+        error: () => {},
       });
   }
 
@@ -202,7 +224,13 @@ export class PokemonService {
     });
   }
 
-  getPokemonByNameOrId(idOrName: number | string): Observable<Pokemon> {
+  getPokemonByNameOrId(
+    idOrName: number | string,
+    options?: { addToList?: boolean; addToFavorites?: boolean }
+  ): Observable<Pokemon> {
+    const addToList = options?.addToList ?? true;
+    const addToFavorites = options?.addToFavorites ?? false;
+
     const url = `${environment.POKEDEX_API_URL}/pokemon/${idOrName}`;
 
     return this.http.get<any>(url).pipe(
@@ -229,15 +257,29 @@ export class PokemonService {
               isFavorit: isFav,
             };
 
-            this._pokemons.update((prev) => {
-              const idx = prev.findIndex((p) => p.id === pokemon.id);
-              if (idx >= 0) {
-                const next = prev.slice();
-                next[idx] = pokemon;
-                return next.sort((a, b) => a.id - b.id);
-              }
-              return [...prev, pokemon].sort((a, b) => a.id - b.id);
-            });
+            if (addToList) {
+              this._pokemons.update((prev) => {
+                const idx = prev.findIndex((p) => p.id === pokemon.id);
+                if (idx >= 0) {
+                  const next = prev.slice();
+                  next[idx] = pokemon;
+                  return next.sort((a, b) => a.id - b.id);
+                }
+                return [...prev, pokemon].sort((a, b) => a.id - b.id);
+              });
+            }
+
+            if (addToFavorites && isFav) {
+              this._favoritePokemons.update((prev) => {
+                const idx = prev.findIndex((p) => p.id === pokemon.id);
+                if (idx >= 0) {
+                  const next = prev.slice();
+                  next[idx] = pokemon;
+                  return next.sort((a, b) => a.id - b.id);
+                }
+                return [...prev, pokemon].sort((a, b) => a.id - b.id);
+              });
+            }
 
             return pokemon;
           })

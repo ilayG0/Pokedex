@@ -15,7 +15,7 @@ import { PokemonErrorNotificationComponent } from '../../shared/pokemon-error-no
     '[class.has-items]': 'hasItems()',
   },
 })
-export class FavoritPokemonsComponent implements OnInit {
+export class FavoritPokemonsComponent {
   pokemonService = inject(PokemonService);
   private readonly router = inject(Router);
 
@@ -23,12 +23,7 @@ export class FavoritPokemonsComponent implements OnInit {
   favoriteIds = this.pokemonService.favoriteIds;
   pokemons = this.pokemonService.pokemons;
 
-  isLoading = computed(() => this.favoriteIds().length > 0 && this.pokemons().length === 0);
   hasItems = computed(() => this.favorites().length > 0);
-
-  ngOnInit() {
-   // this.pokemonService.ensurePokemonsLoadedUpTo(1);
-  }
 
   onRemoveFavorite(pokemon: Pokemon) {
     this.pokemonService.toggleFavorite(pokemon);

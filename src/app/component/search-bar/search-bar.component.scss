@@ -36,6 +36,9 @@ $search-bar-border-radius: 9px;
   font-size: 16px;
 }
 
+.search-icon {
+  display: none;
+}
 
 .recent-dropdown {
   position: absolute;
@@ -146,14 +149,47 @@ $search-bar-border-radius: 9px;
 }
 
 @media (max-width: 760px) {
-  .search-input-wrapper input {
-    width: 85%;
+  :host {
+    padding-bottom: 5%;
+    padding-top: 4%;
   }
+  .search-container {
+    width: 90%;
+    flex-direction: row-reverse;
+  }
+
   .search-input-wrapper {
-    position: relative;
-    flex: 0 0 60%;
+    flex: 0 0 87%;
   }
-  .search-container{ 
-      width: 90%;
+
+  .search-input-wrapper input {
+    width: 90%;
+    direction: rtl;
+    text-align: right;
+    border-radius: 20px;
+  }
+
+  .search-btn {
+    display: none;
+  }
+
+  .search-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0;
+  }
+  .filter-btn {
+    background-color: transparent;
   }
 }
