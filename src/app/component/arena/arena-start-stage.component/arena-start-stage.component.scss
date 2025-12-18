@@ -1,0 +1,45 @@
+:host {
+  display: block;
+  margin: 0 auto;
+}
+.startCard {
+  border-radius: 26px;
+  padding: 22px 18px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+}
+
+.title {
+  font-size: 30px;
+  font-weight: 950;
+  letter-spacing: 0.02em;
+}
+
+.sub {
+  margin-top: 6px;
+  opacity: 0.85;
+  font-weight: 700;
+}
+
+.startBtn {
+  margin-top: 16px;
+  width: min(420px, 100%);
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 0;
+  cursor: pointer;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  color: #071020;
+  background: linear-gradient(135deg, #4cc9f0 0%, #ffb703 60%, #ff6a00 100%);
+  box-shadow: 0 24px 60px rgba(76, 201, 240, 0.14), 0 24px 60px rgba(255, 106, 0, 0.14);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.startBtn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.03);
+}

@@ -1,0 +1,180 @@
+.arena {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  position: relative;
+  overflow: hidden;
+  color: #f6f7fb;
+  font-family: 'Roboto';
+  background: radial-gradient(1200px 700px at 50% 20%, #1a2d5f 0%, #0b1020 45%, #070a12 100%);
+}
+
+.bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.lights {
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(closest-side at 25% 20%, rgba(255, 140, 0, 0.16), transparent 60%),
+    radial-gradient(closest-side at 75% 25%, rgba(76, 201, 240, 0.14), transparent 60%),
+    radial-gradient(closest-side at 50% 0%, rgba(255, 255, 255, 0.1), transparent 55%);
+  filter: blur(10px);
+  animation: drift 10s ease-in-out infinite;
+}
+
+.crowd {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -35%;
+  height: 55%;
+  background: radial-gradient(80% 60% at 50% 10%, rgba(0, 0, 0, 0.55), transparent 70%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.04) 0,
+      rgba(255, 255, 255, 0.04) 10px,
+      rgba(255, 255, 255, 0.02) 10px,
+      rgba(255, 255, 255, 0.02) 22px
+    );
+  transform: perspective(900px) rotateX(55deg);
+  opacity: 0.35;
+}
+
+.top {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 18px 10px;
+}
+
+.brand .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  font-size: 12px;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.status .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #44ff9a;
+  box-shadow: 0 0 0 6px rgba(68, 255, 154, 0.12);
+}
+
+.status--busy .dot {
+  background: #ffb703;
+  box-shadow: 0 0 0 6px rgba(255, 183, 3, 0.14);
+  animation: pulse 0.9s ease-in-out infinite;
+}
+
+.status .text {
+  font-weight: 700;
+  font-size: 13px;
+  opacity: 0.92;
+}
+
+.stage {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  padding: 10px 18px 18px;
+}
+
+.cta {
+  position: relative;
+  z-index: 2;
+  padding: 14px 18px 22px;
+  display: grid;
+  place-items: center;
+}
+
+.fight {
+  width: min(680px, 100%);
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 0;
+  cursor: pointer;
+  color: #071020;
+  background: linear-gradient(135deg, #ffb703 0%, #ff6a00 50%, #ffb703 100%);
+  box-shadow: 0 24px 60px rgba(255, 106, 0, 0.22), 0 18px 40px rgba(0, 0, 0, 0.45);
+  transition: transform 0.15s ease, filter 0.15s ease;
+  display: grid;
+  gap: 2px;
+}
+
+.fight:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.03);
+}
+
+.fight:active {
+  transform: translateY(0px);
+}
+
+.fight:disabled {
+  cursor: not-allowed;
+  filter: grayscale(0.2) brightness(0.88);
+  opacity: 0.92;
+}
+
+.fight__label {
+  font-weight: 950;
+  font-size: 26px;
+  letter-spacing: 0.08em;
+}
+
+.fight__sub {
+  font-weight: 800;
+  opacity: 0.85;
+  font-size: 13px;
+}
+
+@media (max-width: 670px) {
+  .arena {
+    min-height: 95dvh;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(18px, -10px, 0);
+  }
+}
