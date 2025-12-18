@@ -35,14 +35,6 @@ ngOnInit(): void {
     const id = Number(params.get('id'));
     this.isFromFavorite = query.get('isFromFavorite') === 'true';
 
-    const cached = this.pokemonService.getPokemonById(id);
-    if (cached) {
-      this.pokemon = cached;
-      this.totalStats = this.calculateTotalStats(cached);
-      this.isLoading.set(false);
-      return;
-    }
-
     this.pokemonService.getPokemonByNameOrId(id).subscribe({
       next: (pokemon) => {
         this.pokemon = pokemon;
