@@ -23,8 +23,10 @@
       cursor: not-allowed;
     }
 
-    &:not(:disabled):hover {
-      background: #f3f3f3;
+    @media (hover: hover) and (pointer: fine) {
+      &:not(:disabled):hover {
+        background: #f3f3f3;
+      }
     }
   }
 
@@ -52,7 +54,7 @@
 
   @media (max-width: 600px) {
     grid-template-columns: repeat(2, 1fr);
-     margin: 3% 5%;
-     gap: 1.5rem;
+    margin: 3% 5%;
+    gap: 1.5rem;
   }
 }
