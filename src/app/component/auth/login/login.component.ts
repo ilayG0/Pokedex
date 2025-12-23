@@ -57,7 +57,6 @@ export class LoginComponent {
     this.isSubmitting = true;
     this.submitError = null;
 
-    // getRawValue keeps the strong typing of LoginForm
     const payload = this.loginForm.getRawValue();
 
     this.authService.login(payload).subscribe({

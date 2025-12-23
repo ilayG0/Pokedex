@@ -28,7 +28,6 @@ export class ArenaShellComponent {
   }
 
   get showFooterFight(): boolean {
-    // keep footer button only in fight stage (as you want)
     return this.stage === 'fight';
   }
 

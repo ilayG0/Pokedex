@@ -1,67 +1,26 @@
-// services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {
-  BehaviorSubject,
-  Observable,
-  map,
-  tap,
-  of,
-  catchError,
-  firstValueFrom,
-} from 'rxjs';
+import { BehaviorSubject, Observable, map, tap, of, catchError, firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment.dev';
-
-export interface LoginPayload {
-  email: string;
-  password: string;
-}
-
-export interface SignupPayload {
-  email: string;
-  username: string;
-  password: string;
-}
-
-export interface JwtPayload {
-  sub: string;
-  email: string;
-  name: string;
-  iat?: number;
-  exp?: number;
-}
-
-export interface AuthUser {
-  id: string;
-  email: string;
-  username: string;
-}
-
-interface AuthResponse {
-  token: string;
-}
-
-interface MeResponse {
-  user: {
-    id: string;
-    email: string;
-    name: string;
-  };
-}
+import type {
+  LoginPayload,
+  SignupPayload,
+  JwtPayload,
+  AuthUser,
+  AuthResponse,
+  MeResponse,
+} from '../models/auth.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly baseUrl = environment.SERVER_URL+ '/auth';
+  private readonly baseUrl = environment.SERVER_URL + '/auth';
   private readonly TOKEN_KEY = 'access_token';
 
   private currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
   readonly currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) {
-    // לא עושים פה HTTP – רק נשתמש ב-initAuth למטה
-  }
+  constructor(private http: HttpClient) {}
 
-  /** נקרא פעם אחת בהעלאת האפליקציה */
   async initAuth(): Promise<void> {
     const token = this.getAccessToken();
     if (!token) return;
@@ -72,7 +31,6 @@ export class AuthService {
       return;
     }
 
-    // יש טוקן שנראה תקין → נוודא אותו מול השרת ונביא את המשתמש
     await firstValueFrom(
       this.http.get<MeResponse>(`${this.baseUrl}/me`).pipe(
         tap((res) => {
@@ -84,7 +42,6 @@ export class AuthService {
           this.currentUserSubject.next(user);
         }),
         catchError((err) => {
-          // אם הטוקן כבר לא תקף / 401 – מנקים
           console.error('initAuth /me error', err);
           this.logout();
           return of(null);
@@ -93,12 +50,9 @@ export class AuthService {
     );
   }
 
-  // ---------- PUBLIC API ----------
-
   login(data: LoginPayload): Observable<AuthUser> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/login`, data).pipe(
       tap((res) => this.handleAuthSuccess(res.token)),
-      // אחרי login אפשר לקרוא /me אם אתה רוצה, אבל כרגע אנחנו מסתמכים על ה-JWT
       map(() => this.currentUserSubject.value as AuthUser)
     );
   }
@@ -134,8 +88,6 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  // ---------- INTERNAL ----------
-
   private handleAuthSuccess(token: string): void {
     localStorage.setItem(this.TOKEN_KEY, token);
 
@@ -157,9 +109,7 @@ export class AuthService {
       const [, payloadBase64] = token.split('.');
       if (!payloadBase64) return null;
 
-      const payloadJson = atob(
-        payloadBase64.replace(/-/g, '+').replace(/_/g, '/')
-      );
+      const payloadJson = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
       return JSON.parse(payloadJson);
     } catch {
       return null;

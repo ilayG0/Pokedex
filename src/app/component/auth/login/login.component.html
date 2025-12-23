@@ -1,6 +1,4 @@
-<!-- login.component.html -->
 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form" novalidate>
-  <!-- Email -->
   <div class="field">
     <label for="login-email">Email</label>
     <input
@@ -18,7 +16,6 @@
     </div>
   </div>
 
-  <!-- Password -->
   <div class="field">
     <label for="login-password">Password</label>
     <div class="field__password-wrapper">
@@ -40,7 +37,6 @@
     </div>
   </div>
 
-  <!-- Submit -->
   <button
     type="submit"
     class="auth-btn auth-btn--primary"
@@ -49,13 +45,11 @@
     {{ isSubmitting ? 'Logging in…' : 'Login' }}
   </button>
 
-  <!-- Switch to signup -->
   <p class="auth-switch">
     Don’t have an account?
     <a routerLink="../signup" class="auth-link">Create one</a>
   </p>
 
-  <!-- Server error -->
   <p *ngIf="submitError" class="field__errors">
     {{ submitError }}
   </p>

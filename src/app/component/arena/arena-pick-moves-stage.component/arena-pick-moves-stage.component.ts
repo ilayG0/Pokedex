@@ -18,7 +18,6 @@ export class ArenaPickMovesStageComponent {
 
   readonly chosen = new Set<string>();
 
-  // only first 5 moves of pokemon
   get firstFiveMoves(): any[] {
     const moves = this.pokemon?.moves ?? [];
     return Array.isArray(moves) ? moves.slice(0, 5) : [];

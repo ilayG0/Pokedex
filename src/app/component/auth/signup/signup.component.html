@@ -1,11 +1,4 @@
-<!-- signup.component.html -->
-<form
-  [formGroup]="signupForm"
-  (ngSubmit)="onSubmit()"
-  class="auth-form"
-  novalidate
->
-  <!-- Email -->
+<form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="auth-form" novalidate>
   <div class="field">
     <label for="signup-email">Email</label>
     <input
@@ -18,13 +11,10 @@
     />
     <div class="field__errors" *ngIf="email.touched && email.invalid">
       <span *ngIf="email.errors?.['required']">Email is required.</span>
-      <span *ngIf="email.errors?.['email']">
-        Please enter a valid email.
-      </span>
+      <span *ngIf="email.errors?.['email']"> Please enter a valid email. </span>
     </div>
   </div>
 
-  <!-- Username -->
   <div class="field">
     <label for="signup-username">Username</label>
     <input
@@ -36,16 +26,11 @@
       [class.field__input--invalid]="username.touched && username.invalid"
     />
     <div class="field__errors" *ngIf="username.touched && username.invalid">
-      <span *ngIf="username.errors?.['required']">
-        Username is required.
-      </span>
-      <span *ngIf="username.errors?.['minlength']">
-        Username must be at least 3 characters.
-      </span>
+      <span *ngIf="username.errors?.['required']"> Username is required. </span>
+      <span *ngIf="username.errors?.['minlength']"> Username must be at least 3 characters. </span>
     </div>
   </div>
 
-  <!-- Password -->
   <div class="field">
     <label for="signup-password">Password</label>
     <div class="field__password-wrapper">
@@ -57,11 +42,7 @@
         autocomplete="new-password"
         [class.field__input--invalid]="password.touched && password.invalid"
       />
-      <button
-        type="button"
-        class="field__password-toggle"
-        (click)="showPassword = !showPassword"
-      >
+      <button type="button" class="field__password-toggle" (click)="showPassword = !showPassword">
         {{ showPassword ? 'Hide' : 'Show' }}
       </button>
     </div>
@@ -76,19 +57,14 @@
     </div>
 
     <div class="field__errors" *ngIf="password.touched && password.invalid">
-      <span *ngIf="password.errors?.['required']">
-        Password is required.
-      </span>
-      <span *ngIf="password.errors?.['minlength']">
-        Password must be at least 8 characters.
-      </span>
+      <span *ngIf="password.errors?.['required']"> Password is required. </span>
+      <span *ngIf="password.errors?.['minlength']"> Password must be at least 8 characters. </span>
       <span *ngIf="password.errors?.['pattern']">
         Password must contain at least one letter and one number.
       </span>
     </div>
   </div>
 
-  <!-- Submit -->
   <button
     type="submit"
     class="auth-btn auth-btn--primary"
@@ -97,13 +73,11 @@
     {{ isSubmitting ? 'Creating account…' : 'Create account' }}
   </button>
 
-  <!-- Switch to login -->
   <p class="auth-switch">
     Already have an account?
     <a routerLink="../login" class="auth-link">Login</a>
   </p>
 
-  <!-- Server error -->
   <p *ngIf="submitError" class="field__errors">
     {{ submitError }}
   </p>

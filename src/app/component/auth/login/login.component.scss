@@ -3,7 +3,6 @@
   font-family: 'Roboto';
 }
 
-/* Form layout */
 .auth-form {
   margin-top: 16px;
   display: flex;
@@ -11,7 +10,6 @@
   gap: 16px;
 }
 
-/* Field group */
 .field {
   display: flex;
   flex-direction: column;
@@ -24,7 +22,6 @@
   color: #e5e7eb;
 }
 
-/* Our dedicated input style – overrides global input rules */
 .auth-form .field__input {
   border-radius: 14px;
   border: 1px solid rgba(148, 163, 184, 0.5);
@@ -33,14 +30,11 @@
   color: #f9fafb;
   font-size: 0.9rem;
   outline: none;
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease,
-    background 0.15s ease,
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease,
     transform 0.08s ease;
 }
-#login-password{
-      width: 100%;
+#login-password {
+  width: 100%;
 }
 .auth-form .field__input::placeholder {
   color: rgba(148, 163, 184, 0.85);
@@ -53,12 +47,10 @@
   transform: translateY(-0.5px);
 }
 
-/* Invalid state */
 .auth-form .field__input--invalid {
   border-color: #f97373;
 }
 
-/* Password wrapper */
 .field__password-wrapper {
   position: relative;
   display: flex;
@@ -69,7 +61,6 @@
   padding-right: 80px;
 }
 
-/* Show/Hide button */
 .field__password-toggle {
   position: absolute;
   right: 8px;
@@ -82,10 +73,7 @@
   padding: 4px 12px;
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 184, 0.6);
-  transition:
-    background 0.15s ease,
-    border-color 0.15s ease,
-    transform 0.08s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
 }
 
 .field__password-toggle:hover {
@@ -94,7 +82,6 @@
   transform: translateY(-0.5px);
 }
 
-/* Helper text (password rules – only in signup) */
 .field__helper {
   font-size: 0.72rem;
   line-height: 1.4;
@@ -109,14 +96,12 @@
   color: #f97373;
 }
 
-/* Error text */
 .field__errors {
   font-size: 0.72rem;
   color: #fecaca;
   font-family: inherit;
 }
 
-/* Primary button */
 .auth-btn {
   border: none;
   border-radius: 999px;
@@ -125,10 +110,7 @@
   margin-top: 6px;
   cursor: pointer;
   font-weight: 600;
-  transition:
-    transform 0.1s ease,
-    box-shadow 0.1s ease,
-    opacity 0.1s ease;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.1s ease;
 }
 
 .auth-btn--primary {
@@ -148,7 +130,6 @@
   box-shadow: 0 12px 30px rgba(248, 250, 252, 0.35);
 }
 
-/* Bottom link (Login / Signup) */
 .auth-switch {
   margin-top: 12px;
   font-size: 0.8rem;

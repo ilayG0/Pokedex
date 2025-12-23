@@ -13,7 +13,6 @@ type AnyPokemon = any;
 export class ArenaPickPokemonStageComponent {
   @Input() favorites: AnyPokemon[] = [];
 
-  // Pass functions from parent to avoid template casts
   @Input() artworkUrlFn!: (id: number | null) => string;
   @Input() titleCaseFn!: (v: string) => string;
   @Input() pokemonIdFn!: (p: AnyPokemon | null) => number | null;

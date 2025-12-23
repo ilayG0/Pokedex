@@ -43,7 +43,6 @@ export class SignupComponent {
         [
           Validators.required,
           Validators.minLength(8),
-          // at least one letter and one digit
           Validators.pattern(
             /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+$/
           ),
@@ -52,7 +51,6 @@ export class SignupComponent {
     });
   }
 
-  // Typed getters for template
   get email() {
     return this.signupForm.controls.email;
   }
