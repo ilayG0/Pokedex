@@ -1,6 +1,7 @@
-import { Component, signal, HostListener } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, signal, HostListener, inject, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { PokemonService } from '../../services/pokemon.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -9,14 +10,24 @@ import { PokemonService } from '../../services/pokemon.service';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
-export class Header {
+export class Header implements OnInit {
   isHome = signal(true);
   isMobile = signal(window.innerWidth < 670);
   readonly isMenuOpen = signal(false);
 
+  auth = inject(AuthService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+
   constructor(private pokemonService: PokemonService) {
     window.addEventListener('resize', () => {
       this.isMobile.set(window.innerWidth < 670);
+    });
+  }
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe((params) => {
+      console.log(params)
     });
   }
 
@@ -37,5 +48,10 @@ export class Header {
     if (this.isMobile() && this.isMenuOpen()) {
       this.closeMenu();
     }
+  }
+
+  onLogout() {
+    this.auth.logout();
+    this.router.navigate(['/auth/login']);
   }
 }
