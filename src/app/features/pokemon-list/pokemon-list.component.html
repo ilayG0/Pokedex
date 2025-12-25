@@ -9,7 +9,7 @@
   <app-pokemon-error-notification errorTitle="No Pokémon found" errorMessage="Try searching with the full Pokémon name or its Pokédex number"/>
 }
 
-<div class="home__pagination" *ngIf="!searchMode()">
+<div class="home__pagination" >
   <button (click)="prevPage()" [disabled]="currentPage() === 1">Prev</button>
 
   <span>Page {{ currentPage() }} / {{ 86 }}</span>

@@ -6,6 +6,7 @@ import { Pokemon } from '../models/pokemon.model';
 import { PokemonFilters } from '../models/pokemon-filters.model';
 import { SelectOption } from '../models/pokemon-filter-selected-option.model';
 import { environment } from '../../environments/environment.dev';
+import { PokemonPageResponse } from '../models/pokemon-api-list-response.model';
 
 @Injectable({ providedIn: 'root' })
 export class PokemonService {
@@ -39,17 +40,16 @@ export class PokemonService {
     });
   }
 
-  getPokemons(page: number, limit: number): Observable<Pokemon[]> {
-    const headers = this.createAuthHeaders();
-    const params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
+getPokemons(page: number, limit: number) {
+  const headers = this.createAuthHeaders();
+  const params = new HttpParams()
+    .set('page', String(page))
+    .set('limit', String(limit));
 
-    return this.http
-      .get<{ page: number; limit: number; total: number; totalPages: number; data: Pokemon[] }>(
-        this.pokemonsURL,
-        { headers, params }
-      )
-      .pipe(map((res) => res.data ?? []));
-  }
+  return this.http
+    .get<PokemonPageResponse>(this.pokemonsURL, { headers, params })
+    .pipe(map((res) => res.data ?? []));
+}
 
   getPokemonByNameOrId(idOrName: number | string): Observable<Pokemon> {
     const headers = this.createAuthHeaders();
@@ -177,10 +177,18 @@ export class PokemonService {
       return next;
     });
   }
-  searchPokemonsByFilters(filters: PokemonFilters) {
+
+
+  searchPokemonsByFilters(
+    filters: PokemonFilters,
+    page: number,
+    limit: number
+  ): Observable<Pokemon[]> {
     const headers = this.createAuthHeaders();
 
-    let params = new HttpParams();
+    let params = new HttpParams()
+      .set('page', String(page))
+      .set('limit', String(limit));
 
     if (filters.height !== undefined && filters.height !== null) {
       params = params.set('height', String(filters.height));
@@ -199,7 +207,7 @@ export class PokemonService {
     }
 
     return this.http
-      .get<{ total: number; data: Pokemon[] }>(`${this.pokemonsURL}/search`, {
+      .get<PokemonPageResponse>(`${this.pokemonsURL}/search`, {
         headers,
         params,
       })

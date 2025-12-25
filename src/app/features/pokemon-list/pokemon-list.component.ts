@@ -21,12 +21,8 @@ export class PokemonListComponent implements OnInit {
   private readonly destroy$ = new Subject<void>();
   readonly pokemonService = inject(PokemonService);
 
-  @Input({ required: true }) displayLoadPokemonsBtn!: Boolean;
-
   readonly pageSize = 12;
   currentPage = signal(1);
-  searchMode = signal(false);
-/*   totalPages = this.pokemonService.totalPages; */
 
   private _pokemons: Pokemon[] = [];
   private requestedPage = 1;
@@ -45,7 +41,6 @@ export class PokemonListComponent implements OnInit {
       const urlPage = m.get('page');
       const page = urlPage ? Number(urlPage) : 1;
       const search = m.get('search') === 'true';
-      this.searchMode.set(search);
 
       this.requestedPage = Number.isFinite(page) ? Math.floor(page) : 1;
       this.currentPage.set(this.requestedPage);

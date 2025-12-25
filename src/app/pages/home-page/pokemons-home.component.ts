@@ -51,9 +51,10 @@ export class PokemonsHome implements OnInit {
     return this._searchResult();
   }
 
-  readonly displayedLoadPokemonsBtn = computed(
-    () => !this._searchResult() || this._searchResult()!.length === 0
-  );
+  get displayedPokemons(): Pokemon[] {
+    return this._searchResult() ?? this._pokemons();
+  }
+
 
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
@@ -67,6 +68,7 @@ export class PokemonsHome implements OnInit {
 
       if (search) {
         if (nameOrId) {
+          this.runSearchByNameOrId(nameOrId);
           return;
         }
 
@@ -89,6 +91,7 @@ export class PokemonsHome implements OnInit {
           };
 
           this.filters.set(filterValue);
+          this.searchWithFilters(filterValue, page);
           return;
         }
 
@@ -107,21 +110,122 @@ export class PokemonsHome implements OnInit {
     });
   }
 
-  loadPage(page: number): void {
+  private runSearchByNameOrId(term: string): void {
+    const value = term.trim();
+    if (!value) {
+      this._searchResult.set(null);
+      this.noResults.set(false);
+      this.currentPage.set(1);
+      this.loadPage(1);
+      return;
+    }
+
     this.loading.set(true);
+    this._searchResult.set(null);
+    this.noResults.set(false);
 
     this.pokemonService
-      .getPokemons(page, this.limit)
+      .getPokemonByNameOrId(value)
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: (list) => {
-          console.log(list)
-          this._pokemons.set(list);
+        next: (pokemon) => {
+          this._searchResult.set([pokemon]);
+          this.noResults.set(false);
         },
         error: (err) => {
-          console.error('Error loading pokemons', err);
+          console.error('Error searching pokemon by name or id', err);
+          this._searchResult.set([]);
+          this.noResults.set(true);
         },
       });
+  }
+private searchWithFilters(filters: PokemonFilters, page: number): void {
+  this.loading.set(true);
+  this._searchResult.set(null);
+  this.noResults.set(false);
+
+  this.pokemonService
+    .searchPokemonsByFilters(filters, page, this.limit)
+    .pipe(finalize(() => this.loading.set(false)))
+    .subscribe({
+      next: (list) => {
+        this._searchResult.set(list);
+        this.noResults.set(list.length === 0);
+      },
+      error: (err) => {
+        console.error('Error searching pokemons with filters', err);
+        this._searchResult.set([]);
+        this.noResults.set(true);
+      },
+    });
+}
+
+loadPage(page: number): void {
+  this.loading.set(true);
+
+  this.pokemonService
+    .getPokemons(page, this.limit)
+    .pipe(finalize(() => this.loading.set(false)))
+    .subscribe({
+      next: (list) => {
+        this._pokemons.set(list);
+      },
+      error: (err) => {
+        console.error('Error loading pokemons', err);
+      },
+    });
+}
+  onSearchPokemonByNameOrId(term: string): void {
+    const value = term.trim();
+
+    if (!value) {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: {
+          search: null,
+          nameOrId: null,
+          filters: null,
+          color: null,
+          group: null,
+          type: null,
+          height: null,
+          page: 1,
+        },
+      });
+      return;
+    }
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        search: 'true',
+        nameOrId: value,
+        filters: null,
+        color: null,
+        group: null,
+        type: null,
+        height: null,
+        page: null,
+      },
+    });
+  }
+
+  onSearchFilterSubmit(filters: PokemonFilters): void {
+    this.showFilter.set(false);
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        search: 'true',
+        filters: 'true',
+        nameOrId: null,
+        color: filters.color ?? null,
+        group: filters.group ?? null,
+        type: filters.type ?? null,
+        height: filters.height ?? null,
+        page: 1,
+      },
+    });
   }
 
   onToggleFiltersForm(): void {
@@ -133,8 +237,24 @@ export class PokemonsHome implements OnInit {
   }
 
   onResetFilters(): void {
+    this.showFilter.set(false);
+
     this.filters.set(null);
     this._searchResult.set(null);
     this.noResults.set(false);
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        search: null,
+        filters: null,
+        nameOrId: null,
+        color: null,
+        group: null,
+        type: null,
+        height: null,
+        page: 1,
+      },
+    });
   }
 }
