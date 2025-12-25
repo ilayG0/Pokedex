@@ -26,9 +26,7 @@ export class Header implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe((params) => {
-      console.log(params)
-    });
+    this.pokemonService.loadFavorites();
   }
 
   get count() {
@@ -50,7 +48,7 @@ export class Header implements OnInit {
     }
   }
 
-  onLogout() {
+  onLogout(): void {
     this.auth.logout();
     this.router.navigate(['/auth/login']);
   }

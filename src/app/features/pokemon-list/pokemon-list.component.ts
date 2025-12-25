@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
 import { Pokemon } from '../../models/pokemon.model';
-import { PokemonCard } from '../../component/pokemon-card /pokemon-card.component';
+import { PokemonCard } from '../../component/pokemon-card/pokemon-card.component';
 import { PokemonErrorNotificationComponent } from '../../shared/pokemon-error-notification.component/pokemon-error-notification.component';
 import { PokemonService } from '../../services/pokemon.service';
 
@@ -26,7 +26,7 @@ export class PokemonListComponent implements OnInit {
   readonly pageSize = 12;
   currentPage = signal(1);
   searchMode = signal(false);
-  totalPages = this.pokemonService.totalPages;
+/*   totalPages = this.pokemonService.totalPages; */
 
   private _pokemons: Pokemon[] = [];
   private requestedPage = 1;
@@ -54,7 +54,7 @@ export class PokemonListComponent implements OnInit {
 
   nextPage(): void {
     const next = this.currentPage() + 1;
-    if (next <= this.totalPages()) {
+    if (next <= 86) {
       this.navigateToPage(next, true);
     }
   }

@@ -1,44 +1,25 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import {
-  Observable,
-  from,
-  map,
-  mergeMap,
-  of,
-  switchMap,
-  toArray,
-  finalize,
-  combineLatest,
-  tap,
-} from 'rxjs';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Observable, map, of, finalize, tap } from 'rxjs';
 
 import { Pokemon } from '../models/pokemon.model';
 import { PokemonFilters } from '../models/pokemon-filters.model';
 import { SelectOption } from '../models/pokemon-filter-selected-option.model';
-import { PokemonListResponse } from '../models/pokemon-api-list-response.model';
 import { environment } from '../../environments/environment.dev';
 
 @Injectable({ providedIn: 'root' })
 export class PokemonService {
-  private readonly pokemons_limit = 12;
+  private pokemonsURL = environment.SERVER_URL + '/pokemons';
+  private favoritesURL = environment.SERVER_URL + '/favorite';
 
   isLoadingPage = signal(false);
 
-  totalPokemonsCount = signal(0);
-  readonly totalPages = computed(() => {
-    const total = this.totalPokemonsCount();
-    return total > 0 ? Math.ceil(total / this.pokemons_limit) : 0;
-  });
+  private readonly _favorites = signal<Pokemon[]>([]);
+  private readonly _isFavoritesLoading = signal(false);
 
-  private _pokemons = signal<Pokemon[]>([]);
-  pokemons = this._pokemons.asReadonly();
-
-  favoriteIds = signal<number[]>(this.loadFavoriteIds());
-  favoriteCount = computed(() => this.favoriteIds().length);
-
-  private _favoritePokemons = signal<Pokemon[]>([]);
-  favoritePokemons = this._favoritePokemons.asReadonly();
+  readonly favorites = this._favorites.asReadonly();
+  readonly isFavoritesLoading = this._isFavoritesLoading.asReadonly();
+  readonly favoriteCount = computed(() => this._favorites().length);
 
   private _recentSearches = signal<string[]>(this.loadRecentSearchesFromStorage());
   recentSearches = this._recentSearches.asReadonly();
@@ -49,109 +30,82 @@ export class PokemonService {
   private _groupOptions = signal<SelectOption[]>([]);
   groupOptions = this._groupOptions.asReadonly();
 
-  constructor(private http: HttpClient) {
-    this.initFavoritePokemonsFromStorage();
-  }
+  constructor(private http: HttpClient) {}
 
-  getPokemonById(id: number) {
-    return this._pokemons().find((p) => p.id === id);
-  }
-
-  private loadFavoriteIds(): number[] {
-    try {
-      return JSON.parse(localStorage.getItem(environment.FAVORITE_POKEMON_IDS) || '[]');
-    } catch {
-      return [];
-    }
-  }
-
-  private saveFavoriteIds(): void {
-    try {
-      localStorage.setItem(environment.FAVORITE_POKEMON_IDS, JSON.stringify(this.favoriteIds()));
-    } catch {}
-  }
-
-  isFavorite(id: number): boolean {
-    return this.favoriteIds().includes(id);
-  }
-
-  toggleFavorite(pokemon: Pokemon): void {
-    const id = pokemon.id;
-    const exists = this.favoriteIds().includes(id);
-
-    const updatedIds = exists
-      ? this.favoriteIds().filter((x) => x !== id)
-      : [...this.favoriteIds(), id];
-
-    this.favoriteIds.set(updatedIds);
-    this.saveFavoriteIds();
-
-    this._pokemons.update((list) =>
-      list.map((p) => (p.id === id ? { ...p, isFavorit: !exists } : p))
-    );
-
-    if (exists) {
-      this._favoritePokemons.update((list) => list.filter((p) => p.id !== id));
-    } else {
-      this._favoritePokemons.update((list) => {
-        const idx = list.findIndex((p) => p.id === id);
-        if (idx >= 0) return list;
-        return [...list, { ...pokemon, isFavorit: true }].sort((a, b) => a.id - b.id);
-      });
-    }
-  }
-
-  private initFavoritePokemonsFromStorage(): void {
-    const ids = this.favoriteIds();
-    if (!ids.length) {
-      this._favoritePokemons.set([]);
-      return;
-    }
-    this._favoritePokemons.set([]);
-    ids.forEach((id) => {
-      this.getPokemonByNameOrId(id, { addToList: false, addToFavorites: true }).subscribe();
+  private createAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      Authorization: `Bearer ${token ?? ''}`,
     });
   }
 
-  private fetchPokemonsPage(page: number): Observable<Pokemon[]> {
-    const dynamicOffset = (page - 1) * this.pokemons_limit;
-    const url = `${environment.POKEDEX_API_URL}/pokemon?limit=${this.pokemons_limit}&offset=${dynamicOffset}`;
+  getPokemons(page: number, limit: number): Observable<Pokemon[]> {
+    const headers = this.createAuthHeaders();
+    const params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
 
-    return this.http.get<PokemonListResponse>(url).pipe(
-      tap((res) => {
-        if (this.totalPokemonsCount() === 0 && typeof res.count === 'number') {
-          this.totalPokemonsCount.set(res.count);
-        }
-      }),
-      map((res) => res.results ?? []),
-      mergeMap((results) =>
-        from(results).pipe(
-          mergeMap((r) => this.http.get<Pokemon>(r.url), 10),
-          toArray()
-        )
-      ),
-      map((arr) => arr.slice().sort((a, b) => a.id - b.id)),
-      map((sorted) => {
-        const favSet = new Set(this.favoriteIds());
-        const newPokemons = sorted.map((p) => ({
-          ...p,
-          isFavorit: favSet.has(p.id),
-        }));
-        this._pokemons.set(newPokemons);
-        return newPokemons;
-      })
-    );
+    return this.http
+      .get<{ page: number; limit: number; total: number; totalPages: number; data: Pokemon[] }>(
+        this.pokemonsURL,
+        { headers, params }
+      )
+      .pipe(map((res) => res.data ?? []));
   }
 
-  load12Pokemons(page: number): void {
-    if (this.isLoadingPage()) return;
-    this.isLoadingPage.set(true);
+  getPokemonByNameOrId(idOrName: number | string): Observable<Pokemon> {
+    const headers = this.createAuthHeaders();
+    return this.http.get<Pokemon>(`${this.pokemonsURL}/${idOrName}`, { headers });
+  }
 
-    this.fetchPokemonsPage(page)
-      .pipe(finalize(() => this.isLoadingPage.set(false)))
+  isFavorite(pokedexId: number): Observable<boolean> {
+    const headers = this.createAuthHeaders();
+
+    return this.http
+      .get<{ liked: boolean }>(`${this.favoritesURL}/check/${pokedexId}`, {
+        headers,
+      })
+      .pipe(map((res) => res.liked));
+  }
+
+  getFavoritesCount(): Observable<number> {
+    return of(this.favoriteCount());
+  }
+
+  getFavorites(): Observable<Pokemon[]> {
+    const headers = this.createAuthHeaders();
+
+    return this.http
+      .get<{ favorites: Pokemon[] }>(`${this.favoritesURL}/me`, { headers })
+      .pipe(map((res) => res.favorites ?? []));
+  }
+
+  loadFavorites(): void {
+    this._isFavoritesLoading.set(true);
+
+    this.getFavorites()
+      .pipe(finalize(() => this._isFavoritesLoading.set(false)))
       .subscribe({
-        error: () => {},
+        next: (list) => this._favorites.set(list),
+        error: (err) => {
+          console.error('Failed to load favorites', err);
+          this._favorites.set([]);
+        },
       });
+  }
+
+  toggleFavorite(pokedexId: number, isLiked: boolean): Observable<boolean> {
+    const headers = this.createAuthHeaders();
+
+    if (isLiked) {
+      return this.http.delete(`${this.favoritesURL}/${pokedexId}`, { headers }).pipe(
+        map(() => false),
+        tap(() => this.loadFavorites())
+      );
+    } else {
+      return this.http.post(this.favoritesURL, { pokedexId }, { headers }).pipe(
+        map(() => true),
+        tap(() => this.loadFavorites())
+      );
+    }
   }
 
   loadTypesAndGroups(): void {
@@ -223,163 +177,32 @@ export class PokemonService {
       return next;
     });
   }
+  searchPokemonsByFilters(filters: PokemonFilters) {
+    const headers = this.createAuthHeaders();
 
-  getPokemonByNameOrId(
-    idOrName: number | string,
-    options?: { addToList?: boolean; addToFavorites?: boolean }
-  ): Observable<Pokemon> {
-    const addToList = options?.addToList ?? true;
-    const addToFavorites = options?.addToFavorites ?? false;
+    let params = new HttpParams();
 
-    const url = `${environment.POKEDEX_API_URL}/pokemon/${idOrName}`;
-
-    return this.http.get<any>(url).pipe(
-      switchMap((pokemonRes) =>
-        this.http.get<any>(`${environment.POKEDEX_API_URL}/pokemon-species/${pokemonRes.id}`).pipe(
-          map((speciesRes) => {
-            const flavorEntry = speciesRes.flavor_text_entries.find(
-              (e: any) => e.language.name === 'en'
-            );
-
-            const description: string = flavorEntry
-              ? flavorEntry.flavor_text
-                  .replace(/\f/g, ' ')
-                  .replace(/\n/g, ' ')
-                  .replace(/\s+/g, ' ')
-                  .trim()
-              : '';
-
-            const isFav = this.isFavorite(pokemonRes.id);
-
-            const pokemon: Pokemon = {
-              ...pokemonRes,
-              description,
-              isFavorit: isFav,
-            };
-
-            if (addToList) {
-              this._pokemons.update((prev) => {
-                const idx = prev.findIndex((p) => p.id === pokemon.id);
-                if (idx >= 0) {
-                  const next = prev.slice();
-                  next[idx] = pokemon;
-                  return next.sort((a, b) => a.id - b.id);
-                }
-                return [...prev, pokemon].sort((a, b) => a.id - b.id);
-              });
-            }
-
-            if (addToFavorites && isFav) {
-              this._favoritePokemons.update((prev) => {
-                const idx = prev.findIndex((p) => p.id === pokemon.id);
-                if (idx >= 0) {
-                  const next = prev.slice();
-                  next[idx] = pokemon;
-                  return next.sort((a, b) => a.id - b.id);
-                }
-                return [...prev, pokemon].sort((a, b) => a.id - b.id);
-              });
-            }
-
-            return pokemon;
-          })
-        )
-      )
-    );
-  }
-
-  private extractIdFromSpeciesUrl(url: string): number | null {
-    const match = url.match(/\/(\d+)\/?$/);
-    return match ? Number(match[1]) : null;
-  }
-
-  private getPokemonIdsByEggGroup(group: string): Observable<Set<number>> {
-    const url = `${environment.POKEDEX_API_URL}/egg-group/${group}`;
-    return this.http.get<any>(url).pipe(
-      map((res) => {
-        const ids = new Set<number>();
-        for (const s of res.pokemon_species ?? []) {
-          const id = this.extractIdFromSpeciesUrl(s.url);
-          if (id != null) {
-            ids.add(id);
-          }
-        }
-        return ids;
-      })
-    );
-  }
-
-  private getPokemonIdsByColor(color: string): Observable<Set<number>> {
-    const url = `${environment.POKEDEX_API_URL}/pokemon-color/${color}`;
-    return this.http.get<any>(url).pipe(
-      map((res) => {
-        const ids = new Set<number>();
-        for (const s of res.pokemon_species ?? []) {
-          const id = this.extractIdFromSpeciesUrl(s.url);
-          if (id != null) {
-            ids.add(id);
-          }
-        }
-        return ids;
-      })
-    );
-  }
-
-  searchPokemonsByFilters(
-    filters: PokemonFilters | null | undefined,
-    page?: number
-  ): Observable<Pokemon[]> {
-    if (!filters) {
-      return of(this._pokemons());
+    if (filters.height !== undefined && filters.height !== null) {
+      params = params.set('height', String(filters.height));
     }
 
-    const height =
-      typeof filters.height === 'number' && !Number.isNaN(filters.height) ? filters.height : null;
+    if (filters.type) {
+      params = params.set('type', filters.type);
+    }
 
-    const type =
-      filters.type && filters.type.trim() !== '' ? filters.type.trim().toLowerCase() : null;
+    if (filters.group) {
+      params = params.set('group', filters.group);
+    }
 
-    const group =
-      filters.group && filters.group.trim() !== '' ? filters.group.trim().toLowerCase() : null;
+    if (filters.color) {
+      params = params.set('color', filters.color);
+    }
 
-    const color =
-      filters.color && filters.color.trim() !== '' ? filters.color.trim().toLowerCase() : null;
-
-    const groupIds$ = group ? this.getPokemonIdsByEggGroup(group) : of<Set<number> | null>(null);
-    const colorIds$ = color ? this.getPokemonIdsByColor(color) : of<Set<number> | null>(null);
-
-    const basePokemons$ =
-      this._pokemons().length === 0 && page != null
-        ? this.fetchPokemonsPage(page)
-        : of(this._pokemons());
-
-    return combineLatest([groupIds$, colorIds$, basePokemons$]).pipe(
-      map(([groupIds, colorIds, pokemons]) => {
-        return pokemons.filter((p) => {
-          if (height !== null && p.height !== height) {
-            return false;
-          }
-
-          if (type) {
-            const hasType =
-              Array.isArray(p.types) &&
-              p.types.some((t: any) => t?.type?.name?.toLowerCase() === type);
-            if (!hasType) {
-              return false;
-            }
-          }
-
-          if (groupIds && !groupIds.has(p.id)) {
-            return false;
-          }
-
-          if (colorIds && !colorIds.has(p.id)) {
-            return false;
-          }
-
-          return true;
-        });
+    return this.http
+      .get<{ total: number; data: Pokemon[] }>(`${this.pokemonsURL}/search`, {
+        headers,
+        params,
       })
-    );
+      .pipe(map((res) => res.data ?? []));
   }
 }
