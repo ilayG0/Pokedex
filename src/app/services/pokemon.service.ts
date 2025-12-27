@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, map, of, finalize, tap } from 'rxjs';
+import { Observable, map, of, finalize, tap, switchMap, shareReplay } from 'rxjs';
 
 import { Pokemon } from '../models/pokemon.model';
 import { PokemonFilters } from '../models/pokemon-filters.model';
@@ -14,6 +14,8 @@ export class PokemonService {
   private favoritesURL = environment.SERVER_URL + '/favorite';
 
   isLoadingPage = signal(false);
+
+  totalPages = signal(0);
 
   private readonly _favorites = signal<Pokemon[]>([]);
   private readonly _isFavoritesLoading = signal(false);
@@ -31,6 +33,8 @@ export class PokemonService {
   private _groupOptions = signal<SelectOption[]>([]);
   groupOptions = this._groupOptions.asReadonly();
 
+  private favoritesInit$?: Observable<Pokemon[]>;
+
   constructor(private http: HttpClient) {}
 
   private createAuthHeaders(): HttpHeaders {
@@ -40,16 +44,45 @@ export class PokemonService {
     });
   }
 
-getPokemons(page: number, limit: number) {
-  const headers = this.createAuthHeaders();
-  const params = new HttpParams()
-    .set('page', String(page))
-    .set('limit', String(limit));
+  private initFavorites(): Observable<Pokemon[]> {
+    if (this._favorites().length > 0) {
+      return of(this._favorites());
+    }
 
-  return this.http
-    .get<PokemonPageResponse>(this.pokemonsURL, { headers, params })
-    .pipe(map((res) => res.data ?? []));
-}
+    if (this.favoritesInit$) {
+      return this.favoritesInit$;
+    }
+
+    const headers = this.createAuthHeaders();
+
+    this._isFavoritesLoading.set(true);
+
+    this.favoritesInit$ = this.http
+      .get<{ favorites: Pokemon[] }>(`${this.favoritesURL}/me`, { headers })
+      .pipe(
+        map((res) => res.favorites ?? []),
+        tap((list) => this._favorites.set(list)),
+        finalize(() => {
+          this._isFavoritesLoading.set(false);
+          this.favoritesInit$ = undefined;
+        }),
+        shareReplay(1)
+      );
+
+    return this.favoritesInit$;
+  }
+
+  getPokemons(page: number, limit: number) {
+    const headers = this.createAuthHeaders();
+    const params = new HttpParams().set('page', String(page)).set('limit', String(limit));
+
+    return this.http.get<PokemonPageResponse>(this.pokemonsURL, { headers, params }).pipe(
+      tap((res) => {
+        this.totalPages.set(res.totalPages);
+      }),
+      map((res) => res.data ?? [])
+    );
+  }
 
   getPokemonByNameOrId(idOrName: number | string): Observable<Pokemon> {
     const headers = this.createAuthHeaders();
@@ -57,55 +90,56 @@ getPokemons(page: number, limit: number) {
   }
 
   isFavorite(pokedexId: number): Observable<boolean> {
-    const headers = this.createAuthHeaders();
-
-    return this.http
-      .get<{ liked: boolean }>(`${this.favoritesURL}/check/${pokedexId}`, {
-        headers,
-      })
-      .pipe(map((res) => res.liked));
+    return this.initFavorites().pipe(
+      map((favorites) => favorites.some((p) => p.pokedexId === pokedexId))
+    );
   }
 
   getFavoritesCount(): Observable<number> {
-    return of(this.favoriteCount());
+    return this.initFavorites().pipe(map(() => this.favoriteCount()));
   }
 
   getFavorites(): Observable<Pokemon[]> {
-    const headers = this.createAuthHeaders();
-
-    return this.http
-      .get<{ favorites: Pokemon[] }>(`${this.favoritesURL}/me`, { headers })
-      .pipe(map((res) => res.favorites ?? []));
+    return this.initFavorites();
   }
 
   loadFavorites(): void {
-    this._isFavoritesLoading.set(true);
-
-    this.getFavorites()
-      .pipe(finalize(() => this._isFavoritesLoading.set(false)))
-      .subscribe({
-        next: (list) => this._favorites.set(list),
-        error: (err) => {
-          console.error('Failed to load favorites', err);
-          this._favorites.set([]);
-        },
-      });
+    this.initFavorites().subscribe({
+      error: (err) => {
+        console.error('Failed to load favorites', err);
+        this._favorites.set([]);
+      },
+    });
   }
 
   toggleFavorite(pokedexId: number, isLiked: boolean): Observable<boolean> {
     const headers = this.createAuthHeaders();
 
-    if (isLiked) {
-      return this.http.delete(`${this.favoritesURL}/${pokedexId}`, { headers }).pipe(
-        map(() => false),
-        tap(() => this.loadFavorites())
-      );
-    } else {
-      return this.http.post(this.favoritesURL, { pokedexId }, { headers }).pipe(
-        map(() => true),
-        tap(() => this.loadFavorites())
-      );
-    }
+    return this.initFavorites().pipe(
+      switchMap(() => {
+        if (isLiked) {
+          return this.http.delete(`${this.favoritesURL}/${pokedexId}`, { headers }).pipe(
+            tap(() => {
+              this._favorites.update((current) =>
+                current.filter((pokemon) => pokemon.pokedexId !== pokedexId)
+              );
+            }),
+            map(() => false)
+          );
+        }
+
+        return this.http.post(this.favoritesURL, { pokedexId }, { headers }).pipe(
+          switchMap(() => this.getPokemonByNameOrId(pokedexId)),
+          tap((pokemon) => {
+            const exists = this._favorites().some((p) => p.pokedexId === pokedexId);
+            if (!exists) {
+              this._favorites.update((current) => [...current, pokemon]);
+            }
+          }),
+          map(() => true)
+        );
+      })
+    );
   }
 
   loadTypesAndGroups(): void {
@@ -178,7 +212,6 @@ getPokemons(page: number, limit: number) {
     });
   }
 
-
   searchPokemonsByFilters(
     filters: PokemonFilters,
     page: number,
@@ -186,9 +219,7 @@ getPokemons(page: number, limit: number) {
   ): Observable<Pokemon[]> {
     const headers = this.createAuthHeaders();
 
-    let params = new HttpParams()
-      .set('page', String(page))
-      .set('limit', String(limit));
+    let params = new HttpParams().set('page', String(page)).set('limit', String(limit));
 
     if (filters.height !== undefined && filters.height !== null) {
       params = params.set('height', String(filters.height));
@@ -211,6 +242,11 @@ getPokemons(page: number, limit: number) {
         headers,
         params,
       })
-      .pipe(map((res) => res.data ?? []));
+      .pipe(
+      tap((res) => {
+        this.totalPages.set(res.totalPages ?? 0);
+      }),
+      map((res) => res.data ?? [])
+    );
   }
 }

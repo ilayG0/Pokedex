@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-type AnyPokemon = any;
+import { Pokemon } from '../../../models/pokemon.model';
+import { PokemonService } from '../../../services/pokemon.service';
 
 @Component({
   selector: 'app-arena-pick-pokemon-stage',
@@ -10,17 +10,23 @@ type AnyPokemon = any;
   templateUrl: './arena-pick-pokemon-stage.component.html',
   styleUrl: './arena-pick-pokemon-stage.component.scss',
 })
-export class ArenaPickPokemonStageComponent {
-  @Input() favorites: AnyPokemon[] = [];
+export class ArenaPickPokemonStageComponent implements OnInit {
+  pokemonService = inject(PokemonService);
+
+  readonly favorites = this.pokemonService.favorites;
 
   @Input() artworkUrlFn!: (id: number | null) => string;
   @Input() titleCaseFn!: (v: string) => string;
-  @Input() pokemonIdFn!: (p: AnyPokemon | null) => number | null;
-  @Input() pokemonNameFn!: (p: AnyPokemon | null) => string;
+  @Input() pokemonIdFn!: (p: Pokemon | null) => number | null;
+  @Input() pokemonNameFn!: (p: Pokemon | null) => string;
 
-  @Output() selectPokemon = new EventEmitter<AnyPokemon>();
+  @Output() selectPokemon = new EventEmitter<Pokemon>();
 
-  onPick(p: AnyPokemon): void {
+  ngOnInit(): void {
+    this.pokemonService.loadFavorites();
+  }
+
+  onPick(p: Pokemon): void {
     this.selectPokemon.emit(p);
   }
 }

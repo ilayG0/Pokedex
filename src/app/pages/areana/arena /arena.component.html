@@ -13,7 +13,7 @@
   <!-- STAGE: PICK FAVORITE POKEMON -->
   <app-arena-pick-pokemon-stage
     *ngIf="stage() === 'pickPokemon'"
-    [favorites]="favoritePokemons()"
+
     (selectPokemon)="onPokemonChosen($event)"
     [artworkUrlFn]="artworkUrl.bind(this)"
     [titleCaseFn]="titleCase.bind(this)"

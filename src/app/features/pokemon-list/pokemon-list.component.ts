@@ -21,6 +21,7 @@ export class PokemonListComponent implements OnInit {
   private readonly destroy$ = new Subject<void>();
   readonly pokemonService = inject(PokemonService);
 
+  totalPages = this.pokemonService.totalPages;
   readonly pageSize = 12;
   currentPage = signal(1);
 
@@ -45,13 +46,15 @@ export class PokemonListComponent implements OnInit {
       this.requestedPage = Number.isFinite(page) ? Math.floor(page) : 1;
       this.currentPage.set(this.requestedPage);
     });
+    console.log(this.totalPages())
   }
 
   nextPage(): void {
     const next = this.currentPage() + 1;
-    if (next <= 86) {
+    if (next <= this.totalPages()) {
       this.navigateToPage(next, true);
     }
+        console.log(this.totalPages())
   }
 
   prevPage(): void {

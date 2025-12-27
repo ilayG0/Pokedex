@@ -12,9 +12,9 @@
 <div class="home__pagination" >
   <button (click)="prevPage()" [disabled]="currentPage() === 1">Prev</button>
 
-  <span>Page {{ currentPage() }} / {{ 86 }}</span>
+  <span>Page {{ currentPage() }} / {{ totalPages() }}</span>
 
-  <button (click)="nextPage()" [disabled]="currentPage() === 86 || pokemons.length === 0">
+  <button (click)="nextPage()" [disabled]="currentPage() === totalPages() || pokemons.length === 0">
     Next
   </button>
 </div>

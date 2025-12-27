@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+/* import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BattleService } from '../../services/battle.service';
 import { BattleMoveDetails } from '../../models/battle.models';
@@ -83,4 +83,4 @@ export class ArenaSelectComponent {
     this.battle.lockInIfReady();
     this.router.navigateByUrl('/areana');
   }
-}
+} */

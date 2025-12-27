@@ -4,9 +4,9 @@
     <div class="sub">Only from your favorites</div>
   </div>
 
-  <div class="grid" *ngIf="favorites?.length; else empty">
-    <button class="card" *ngFor="let p of favorites" (click)="onPick(p)">
-      <img class="img" [src]="artworkUrlFn(pokemonIdFn(p))" [alt]="titleCaseFn(pokemonNameFn(p))" draggable="false" />
+  <div class="grid" *ngIf="favorites()?.length; else empty">
+    <button class="card" *ngFor="let p of favorites()" (click)="onPick(p)">
+      <img class="img" [src]="artworkUrlFn(p.pokedexId)" [alt]="titleCaseFn(pokemonNameFn(p))" draggable="false" />
       <div class="name">{{ titleCaseFn(pokemonNameFn(p)) }}</div>
     </button>
   </div>
