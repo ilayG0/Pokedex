@@ -29,11 +29,11 @@ export class ArenaSocketService {
     });
 
     this.socket.on('connect', () => {
-      console.log('✅ Socket connected, id =', this.socket?.id);
+      console.log('Socket connected, id =', this.socket?.id);
     });
 
     this.socket.on('connect_error', (err) => {
-      console.error('❌ Socket connect_error:', err);
+      console.error('Socket connect_error:', err);
     });
   }
 

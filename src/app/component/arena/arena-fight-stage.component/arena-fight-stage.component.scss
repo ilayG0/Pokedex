@@ -1,16 +1,35 @@
 :host{
+    display: block;
     width: 100%
+}
+.arena {
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+}
+
+.stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px 32px;
 }
 .ring {
   width: min(920px, 100%);
   height: min(520px, 54vh);
   position: relative;
-  border-radius: 26px;
+  margin: 0 auto;
+  border-radius: 32px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   overflow: hidden;
+  transition: box-shadow 0.2s ease-out, transform 0.2s ease-out;
 }
+
 .ring {
   position: relative;
   border-radius: 32px;

@@ -137,13 +137,13 @@ export class ArenaComponent implements OnInit, OnDestroy {
     console.log('selectedMoves:', moves);
 
     if (!pokemon || !moves || moves.length === 0) {
-      console.log('❌ missing pokemon or moves, not sending find_match');
+      console.log(' missing pokemon or moves, not sending find_match');
       return;
     }
 
     const pokemonId = this.pokemonId(pokemon);
     if (!pokemonId) {
-      console.log('❌ invalid pokemonId, not sending find_match');
+      console.log(' invalid pokemonId, not sending find_match');
       return;
     }
 
@@ -154,7 +154,7 @@ export class ArenaComponent implements OnInit, OnDestroy {
       moves,
     };
 
-    console.log('✅ sending find_match payload:', payload);
+    console.log(' sending find_match payload:', payload);
 
     this.isFindingMatch.set(true);
     this.arenaSocket.findMatch(payload);

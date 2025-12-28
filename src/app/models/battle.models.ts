@@ -8,11 +8,11 @@ type BattlePlayerState = {
 };
 
 type BattleState = {
-  id: string;                // battleId = roomId
+  id: string;              
   players: [BattlePlayerState, BattlePlayerState];
-  activePlayerId: string;    // userId של מי שהתור שלו
+  activePlayerId: string;    
   turnNumber: number;
-  turnExpiresAt: number;     // timestamp (ms) עכשיו + 30s
+  turnExpiresAt: number;    
   status: 'PENDING' | 'ACTIVE' | 'FINISHED';
   winnerId?: string;
 };
