@@ -18,11 +18,4 @@
   <section class="stage">
     <ng-content></ng-content>
   </section>
-
-  <footer class="cta" *ngIf="showFooterFight">
-    <button class="fight" (click)="onFight()" [disabled]="isFindingMatch">
-      <span class="fight__label">{{ fightLabel }}</span>
-      <span class="fight__sub">{{ fightSub }}</span>
-    </button>
-  </footer>
 </div>

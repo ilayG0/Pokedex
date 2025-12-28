@@ -4,16 +4,13 @@
   (fight)="enterBattle()"
   (backToStart)="goStart()"
 >
-  <!-- STAGE: START -->
   <app-arena-start-stage
     *ngIf="stage() === 'start'"
     (start)="startBattle()"
   />
 
-  <!-- STAGE: PICK FAVORITE POKEMON -->
   <app-arena-pick-pokemon-stage
     *ngIf="stage() === 'pickPokemon'"
-
     (selectPokemon)="onPokemonChosen($event)"
     [artworkUrlFn]="artworkUrl.bind(this)"
     [titleCaseFn]="titleCase.bind(this)"
@@ -21,7 +18,6 @@
     [pokemonNameFn]="pokemonName.bind(this)"
   />
 
-  <!-- STAGE: PICK 3 MOVES (ONLY FIRST 5 MOVES) -->
   <app-arena-pick-moves-stage
     *ngIf="stage() === 'pickMoves'"
     [pokemon]="selectedPokemon()"
@@ -29,13 +25,21 @@
     [titleCaseFn]="titleCase.bind(this)"
   />
 
-  <!-- STAGE: FIGHT (YOUR EXISTING RING DESIGN) -->
-  <app-arena-fight-stage
-    *ngIf="stage() === 'fight'"
-    [playerPokemon]="selectedPokemon()"
-    [playerMoves]="selectedMoves()"
-    [playerArtwork]="artworkUrl(pokemonId(selectedPokemon()))"
-    [playerName]="titleCase(pokemonName(selectedPokemon())) || 'Player'"
-    [isFindingMatch]="isFindingMatch()"
-  />
+<app-arena-fight-stage
+  *ngIf="stage() === 'fight'"
+  [playerPokemon]="selectedPokemon()"
+  [playerMoves]="selectedMoves()"
+  [playerArtwork]="artworkUrl(pokemonId(selectedPokemon()))"
+  [playerName]="titleCase(pokemonName(selectedPokemon())) || 'Player'"
+  [isFindingMatch]="isFindingMatch()"
+  [opponentName]="opponentName()"
+  [opponentArtwork]="opponentArtwork()"
+  [opponentMoves]="opponentMoves()"
+  [battleState]="battleState()"
+  [battleEvents]="battleEvents()"
+  [selfUserId]="selfUserId()"
+  (moveChosen)="onMoveChosen($event)"
+  (backToStart)="goStart()"
+/>
+
 </app-arena-shell>

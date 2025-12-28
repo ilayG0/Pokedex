@@ -28,7 +28,8 @@ export class ArenaShellComponent {
   }
 
   get showFooterFight(): boolean {
-    return this.stage === 'fight';
+    console.log(this.stage)
+    return this.stage === 'start';
   }
 
   onFight(): void {

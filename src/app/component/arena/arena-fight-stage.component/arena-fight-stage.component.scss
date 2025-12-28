@@ -11,6 +11,17 @@
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   overflow: hidden;
 }
+.ring {
+  position: relative;
+  border-radius: 32px;
+  transition: box-shadow 0.2s ease-out, transform 0.2s ease-out;
+
+  &.ring--active {
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.55);
+    transform: translateY(-2px);
+  }
+}
+
 
 .floor {
   position: absolute;
@@ -182,5 +193,292 @@
   }
   50% {
     transform: translateY(18px);
+  }
+}
+
+.match-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  pointer-events: none;
+
+  &__loader {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 4px solid rgba(255, 255, 255, 0.25);
+    border-top-color: #fff;
+    animation: spin 0.8s linear infinite;
+  }
+
+  &__text {
+    font-weight: 600;
+    font-size: 1rem;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.hp-bar {
+  position: relative;
+  width: 100px;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.4);
+  margin-top: 4px;
+
+  &__fill {
+    height: 100%;
+    width: 100%;
+    transform-origin: left center;
+    background: #4ade80;
+
+    &--opponent {
+      background: #f87171;
+    }
+  }
+}
+
+.battle-ui {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.turn-timer {
+  font-size: 0.9rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+
+  &--danger {
+    background: rgba(220, 38, 38, 0.9);
+  }
+}
+
+.moves-panel {
+  display: flex;
+  gap: 8px;
+}
+
+.move-btn {
+  min-width: 90px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(15, 23, 42, 0.9);
+  color: #fff;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.turn-banner {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  background: rgba(15, 23, 42, 0.8);
+  color: #e5e7eb;
+  backdrop-filter: blur(8px);
+
+  &--my {
+    background: rgba(16, 185, 129, 0.9);
+    color: #0b1120;
+  }
+}
+
+.fighter {
+  transition: transform 0.18s ease-out, box-shadow 0.18s ease-out, filter 0.18s ease-out;
+
+  &--active {
+    box-shadow: 0 0 32px rgba(16, 185, 129, 0.7);
+    filter: saturate(1.15);
+    transform: translateY(-4px);
+  }
+}
+
+.hp-bar {
+  position: relative;
+  width: 110px;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.4);
+  margin-top: 4px;
+
+  &__fill {
+    height: 100%;
+    width: 100%;
+    transform-origin: left center;
+    background: #4ade80;
+
+    &--opponent {
+      background: #f97373;
+    }
+  }
+}
+
+.damage-badge {
+  position: absolute;
+  top: -18px;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(239, 68, 68, 0.95);
+  color: #f9fafb;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+  animation: damage-pop 0.4s ease-out;
+
+  &--me {
+    left: 0;
+  }
+
+  &--opponent {
+    right: 0;
+  }
+}
+
+@keyframes damage-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.9);
+  }
+}
+
+/* random hit FX */
+.fx-hit-1 {
+  animation: shake-1 0.4s ease-out;
+}
+
+.fx-hit-2 {
+  animation: shake-2 0.4s ease-out;
+}
+
+.fx-hit-3 {
+  animation: shake-3 0.4s ease-out;
+}
+
+@keyframes shake-1 {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-3px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes shake-2 {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-4px, -4px); }
+  50% { transform: translate(5px, 3px); }
+  75% { transform: translate(-3px, 2px); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes shake-3 {
+  0% { transform: translateX(0) scale(1); }
+  30% { transform: translateX(-5px) scale(1.03); }
+  60% { transform: translateX(4px) scale(0.98); }
+  100% { transform: translateX(0) scale(1); }
+}
+
+.ring {
+  position: relative;
+  border-radius: 32px;
+  transition: box-shadow 0.2s ease-out, transform 0.2s ease-out;
+
+  &.ring--active {
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.55);
+    transform: translateY(-2px);
+  }
+}
+
+.win-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  z-index: 6;
+  background: radial-gradient(circle at top, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.96));
+}
+
+.win-overlay__confetti {
+  position: absolute;
+  inset: -40%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+
+.win-overlay__card {
+  position: relative;
+  padding: 24px 32px;
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.94);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  text-align: center;
+  color: #e5e7eb;
+  min-width: 260px;
+}
+
+.win-overlay__title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.win-overlay__subtitle {
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  opacity: 0.85;
+}
+
+.win-overlay__btn {
+  border: none;
+  outline: none;
+  padding: 10px 24px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg, #38bdf8, #22c55e);
+  color: #0b1120;
+  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
   }
 }

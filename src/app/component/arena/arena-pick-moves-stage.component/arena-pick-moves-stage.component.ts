@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-type AnyPokemon = any;
+import { Pokemon } from '../../../models/pokemon.model';
 
 @Component({
   selector: 'app-arena-pick-moves-stage',
@@ -11,7 +10,7 @@ type AnyPokemon = any;
   styleUrl: './arena-pick-moves-stage.component.scss',
 })
 export class ArenaPickMovesStageComponent {
-  @Input() pokemon: AnyPokemon | null = null;
+  @Input() pokemon: Pokemon | null = null;
   @Input() titleCaseFn!: (v: string) => string;
 
   @Output() confirmMoves = new EventEmitter<any[]>();
@@ -43,9 +42,7 @@ export class ArenaPickMovesStageComponent {
   onConfirm(): void {
     const pool = this.firstFiveMoves;
 
-    const selected = pool
-      .filter((m) => this.chosen.has((m?.move?.name ?? '').toString()))
-      .map((m) => m?.move);
+    const selected = pool.filter((m) => this.chosen.has(m?.name ?? ''));
 
     if (selected.length !== 3) return;
 

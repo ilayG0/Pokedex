@@ -1,49 +1,66 @@
-// battle-socket.service.ts
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { AuthService } from './auth.service';
-import { environment } from '../../environments/environment.dev';
+import { Observable } from 'rxjs';
+import { AuthService } from './auth.service'; // לפי הנתיב שלך
+
+export type BattleState = any;
+export type BattleEvent = any;
 
 @Injectable({ providedIn: 'root' })
 export class BattleSocketService {
-  private readonly auth = inject(AuthService);
-  private socket?: Socket;
+  private socket: Socket | null = null;
 
-  private state$ = new BehaviorSubject<any>(null);
-  battleState$: Observable<any> = this.state$.asObservable();
+  constructor(private readonly authService: AuthService) {}
 
-  connect() {
-    if (this.socket?.connected) return;
+  private connect(): void {
+    if (this.socket) return;
 
-    const token = this.auth.getAccessToken(); // מה-localStorage. 
-    this.socket = io(`/battle`, {
+    const token = this.authService.getAccessToken(); 
+
+    this.socket = io('http://localhost:3000/battle', {
+      withCredentials: true,
       auth: { token },
-      transports: ['websocket'],
     });
 
-    this.socket.on('connect', () => console.log('battle socket connected'));
-    this.socket.on('battle:state', (state) => this.state$.next(state));
-    this.socket.on('battle:events', (events) => {
-      // אפשר להפוך ל-stream נוסף אם צריך
+    this.socket.on('connect', () => {
+      console.log('✅ Battle socket connected:', this.socket?.id);
     });
 
     this.socket.on('connect_error', (err) => {
-      console.error('socket connect_error', err.message);
+      console.error('❌ Battle socket connect_error:', err);
     });
   }
 
-  joinBattle(battleId: string) {
-    this.socket?.emit('battle:join', { battleId });
-  }
-
-  sendAction(battleId: string, action: any) {
-    this.socket?.emit('battle:action', { battleId, action });
-  }
-
-  disconnect() {
+  disconnect(): void {
     this.socket?.disconnect();
-    this.socket = undefined;
-    this.state$.next(null);
+    this.socket = null;
+  }
+
+  joinBattle(battleId: string): void {
+    this.connect();
+    this.socket!.emit('battle:join', { battleId });
+  }
+
+  sendAction(battleId: string, action: any): void {
+    this.connect();
+    this.socket!.emit('battle:action', { battleId, action });
+  }
+
+  onBattleState(): Observable<BattleState> {
+    return new Observable((sub) => {
+      this.connect();
+      const handler = (state: BattleState) => sub.next(state);
+      this.socket!.on('battle:state', handler);
+      return () => this.socket?.off('battle:state', handler);
+    });
+  }
+
+  onBattleEvents(): Observable<BattleEvent[]> {
+    return new Observable((sub) => {
+      this.connect();
+      const handler = (events: BattleEvent[]) => sub.next(events);
+      this.socket!.on('battle:events', handler);
+      return () => this.socket?.off('battle:events', handler);
+    });
   }
 }
