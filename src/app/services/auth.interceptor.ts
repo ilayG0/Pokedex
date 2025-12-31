@@ -1,6 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from './auth.service';
+import {environment} from "../../environments/environment.dev";
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
@@ -12,7 +13,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   const isApiRequest =
     req.url.startsWith('/api/') ||
-    req.url.startsWith('http://localhost:3000/api/');
+    req.url.startsWith(environment.SERVER_URL);
 
   if (!isApiRequest) {
     return next(req);

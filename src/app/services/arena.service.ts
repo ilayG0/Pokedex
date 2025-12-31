@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
+import {environment} from "../../environments/environment.dev";
 
 export type MatchFoundPayload = {
   roomId: string;
@@ -24,7 +25,7 @@ export class ArenaSocketService {
   connect(): void {
     if (this.socket) return;
 
-    this.socket = io('http://localhost:3000', {
+    this.socket = io("http://ec2-34-227-9-63.compute-1.amazonaws.com", {
       withCredentials: true,
     });
 

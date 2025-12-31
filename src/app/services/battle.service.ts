@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
-import { AuthService } from './auth.service'; // לפי הנתיב שלך
+import { AuthService } from './auth.service'; 
+
+import { environment } from '../../environments/environment.dev';
 
 export type BattleState = any;
 export type BattleEvent = any;
@@ -17,7 +19,7 @@ export class BattleSocketService {
 
     const token = this.authService.getAccessToken(); 
 
-    this.socket = io('http://localhost:3000/battle', {
+    this.socket = io(environment.SERVER_URL + '/battle', {
       withCredentials: true,
       auth: { token },
     });
