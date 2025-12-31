@@ -1,0 +1,27 @@
+<div class="moves">
+  <div class="head">
+    <div class="title">Choose 3 moves</div>
+    <div class="sub">Pick only from the first 5 moves of this Pokémon</div>
+  </div>
+
+  <div class="list">
+    <button
+      class="move"
+      *ngFor="let m of firstFiveMoves"
+      (click)="toggle(m?.name, m)"
+      [class.move--picked]="isPicked(m?.name)"
+      [disabled]="!isPicked(m?.name) && chosen.size >= 3"
+    >
+      <div class="moveName">{{ titleCaseFn((m?.name ?? '').toString()) }}</div>
+      <div class="meta">
+        <span *ngIf="isPicked(m?.name)">Selected</span>
+        <span *ngIf="!isPicked(m?.name) && chosen.size < 3">Tap to select</span>
+        <span *ngIf="!isPicked(m?.name) && chosen.size >= 3">Limit reached</span>
+      </div>
+    </button>
+  </div>
+
+  <button class="confirm" (click)="onConfirm()" [disabled]="chosen.size !== 3">
+    CONFIRM ({{ chosen.size }}/3)
+  </button>
+</div>

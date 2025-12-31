@@ -1,4 +1,6 @@
-@for (pokemon of this.favorites(); track pokemon.id) {
+@if(isLoading()){
+<app-loading-poke-ball />
+} @else { @for (pokemon of favorites(); track pokemon.pokedexId) {
 <app-pokemon-card
   [pokemon]="pokemon"
   page="favorite"
@@ -9,4 +11,4 @@
   errorMessage="No Favorite Pokémon Yet"
   errorAction="Start exploring and add Pokémon you love"
 />
-} 
+} }

@@ -1,0 +1,45 @@
+<app-arena-shell
+  [isFindingMatch]="isFindingMatch()"
+  [stage]="stage()"
+  (fight)="enterBattle()"
+  (backToStart)="goStart()"
+>
+  <app-arena-start-stage
+    *ngIf="stage() === 'start'"
+    (start)="startBattle()"
+  />
+
+  <app-arena-pick-pokemon-stage
+    *ngIf="stage() === 'pickPokemon'"
+    (selectPokemon)="onPokemonChosen($event)"
+    [artworkUrlFn]="artworkUrl.bind(this)"
+    [titleCaseFn]="titleCase.bind(this)"
+    [pokemonIdFn]="pokemonId.bind(this)"
+    [pokemonNameFn]="pokemonName.bind(this)"
+  />
+
+  <app-arena-pick-moves-stage
+    *ngIf="stage() === 'pickMoves'"
+    [pokemon]="selectedPokemon()"
+    (confirmMoves)="onMovesChosen($event)"
+    [titleCaseFn]="titleCase.bind(this)"
+  />
+
+<app-arena-fight-stage
+  *ngIf="stage() === 'fight'"
+  [playerPokemon]="selectedPokemon()"
+  [playerMoves]="selectedMoves()"
+  [playerArtwork]="artworkUrl(pokemonId(selectedPokemon()))"
+  [playerName]="titleCase(pokemonName(selectedPokemon())) || 'Player'"
+  [isFindingMatch]="isFindingMatch()"
+  [opponentName]="opponentName()"
+  [opponentArtwork]="opponentArtwork()"
+  [opponentMoves]="opponentMoves()"
+  [battleState]="battleState()"
+  [battleEvents]="battleEvents()"
+  [selfUserId]="selfUserId()"
+  (moveChosen)="onMoveChosen($event)"
+  (backToStart)="goStart()"
+/>
+
+</app-arena-shell>

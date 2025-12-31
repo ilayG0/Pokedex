@@ -1,0 +1,95 @@
+<div class="page">
+  <header class="top">
+    <a class="link" routerLink="/arena">← Back</a>
+    <div class="title">Choose Pokémon & Attacks</div>
+    <button class="btn btn--ghost" (click)="battle.reset()">Reset</button>
+  </header>
+
+  <section class="card">
+    <div class="row">
+      <input
+        class="input"
+        [value]="query()"
+        (input)="query.set(($any($event.target).value || '').trim())"
+        placeholder="Enter Pokémon name or id (example: 5)"
+      />
+      <button
+        class="btn btn--primary"
+        [disabled]="!query() || battle.isBusy()"
+        (click)="loadPokemon()"
+      >
+        Load
+      </button>
+    </div>
+
+    <div class="hint">Data comes from PokeAPI /pokemon/:idOrName</div>
+  </section>
+
+  <section class="card" *ngIf="battle.myPokemon() as p">
+    <div class="card__title">Selected Pokémon</div>
+
+    <div class="pick">
+      <img *ngIf="p.imageUrl" [src]="p.imageUrl" class="img" />
+      <div class="info">
+        <div class="name">#{{ p.id }} {{ p.name }}</div>
+        <div class="pillRow">
+          <span class="pill" *ngFor="let t of p.types">{{ t }}</span>
+        </div>
+        <div class="stats">
+          <div class="stat" *ngFor="let k of statKeys()">
+            <span class="k">{{ k }}</span>
+            <span class="v">{{ p.stats[k] }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" *ngIf="battle.myPokemon() as p">
+    <div class="card__title">Choose 2 attacks (selected: {{ battle.myAttacks().length }}/2)</div>
+
+    <div class="grid">
+      <button
+        class="move"
+        *ngFor="let m of p.allMoves"
+        (click)="previewOrToggle(m.url)"
+        [class.selected]="selectedMoveUrlSet().has(m.url)"
+      >
+        {{ m.name }}
+      </button>
+    </div>
+
+    <div class="preview" *ngIf="preview() as mv">
+      <div class="preview__title">{{ mv.name }}</div>
+      <div class="preview__meta">
+        <span class="pill">{{ mv.type?.name }}</span>
+        <span class="pill">{{ mv.damage_class?.name }}</span>
+        <span class="pill">power: {{ mv.power ?? '—' }}</span>
+        <span class="pill">acc: {{ mv.accuracy ?? '—' }}</span>
+        <span class="pill">pp: {{ mv.pp ?? '—' }}</span>
+      </div>
+
+      <div class="preview__text" *ngIf="previewEffectText() as t">{{ t }}</div>
+
+      <div class="row" style="margin-top: 10px">
+        <button class="btn" (click)="toggleFromPreview()" [disabled]="battle.isBusy()">
+          Toggle selection
+        </button>
+        <button
+          class="btn btn--primary"
+          (click)="lockIn()"
+          [disabled]="battle.myAttacks().length !== 2"
+        >
+          Lock in
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" *ngIf="battle.myAttacks().length">
+    <div class="card__title">Your selected attacks</div>
+    <div class="pillRow">
+      <span class="pill strong" *ngFor="let a of battle.myAttacks()">{{ a.name }}</span>
+    </div>
+  </section>
+</div>

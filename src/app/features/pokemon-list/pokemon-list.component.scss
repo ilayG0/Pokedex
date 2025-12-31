@@ -1,6 +1,5 @@
 @import '../../../styles/src-colors';
 
-<<<<<<< HEAD
 .home__pagination {
   margin: 24px 0;
   display: flex;
@@ -24,8 +23,10 @@
       cursor: not-allowed;
     }
 
-    &:not(:disabled):hover {
-      background: #f3f3f3;
+    @media (hover: hover) and (pointer: fine) {
+      &:not(:disabled):hover {
+        background: #f3f3f3;
+      }
     }
   }
 
@@ -37,8 +38,6 @@
   }
 }
 
-=======
->>>>>>> 32dfd5ab10431e0fc12564017973f9084d421567
 .pokemon-grid {
   margin: 3% 15%;
   display: grid;
@@ -55,7 +54,7 @@
 
   @media (max-width: 600px) {
     grid-template-columns: repeat(2, 1fr);
-     margin: 3% 5%;
-     gap: 1.5rem;
+    margin: 3% 5%;
+    gap: 1.5rem;
   }
 }

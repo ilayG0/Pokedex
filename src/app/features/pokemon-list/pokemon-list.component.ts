@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
 import { Pokemon } from '../../models/pokemon.model';
-import { PokemonCard } from '../../component/pokemon-card /pokemon-card.component';
+import { PokemonCard } from '../../component/pokemon-card/pokemon-card.component';
 import { PokemonErrorNotificationComponent } from '../../shared/pokemon-error-notification.component/pokemon-error-notification.component';
 import { PokemonService } from '../../services/pokemon.service';
 
@@ -21,12 +21,9 @@ export class PokemonListComponent implements OnInit {
   private readonly destroy$ = new Subject<void>();
   readonly pokemonService = inject(PokemonService);
 
-  @Input({ required: true }) displayLoadPokemonsBtn!: Boolean;
-
+  totalPages = this.pokemonService.totalPages;
   readonly pageSize = 12;
   currentPage = signal(1);
-  searchMode = signal(false);
-  totalPages = this.pokemonService.totalPages;
 
   private _pokemons: Pokemon[] = [];
   private requestedPage = 1;
@@ -45,11 +42,11 @@ export class PokemonListComponent implements OnInit {
       const urlPage = m.get('page');
       const page = urlPage ? Number(urlPage) : 1;
       const search = m.get('search') === 'true';
-      this.searchMode.set(search);
 
       this.requestedPage = Number.isFinite(page) ? Math.floor(page) : 1;
       this.currentPage.set(this.requestedPage);
     });
+    console.log(this.totalPages())
   }
 
   nextPage(): void {
@@ -57,6 +54,7 @@ export class PokemonListComponent implements OnInit {
     if (next <= this.totalPages()) {
       this.navigateToPage(next, true);
     }
+        console.log(this.totalPages())
   }
 
   prevPage(): void {

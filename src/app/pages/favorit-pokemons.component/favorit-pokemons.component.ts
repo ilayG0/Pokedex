@@ -1,30 +1,39 @@
 import { Component, computed, inject, OnInit } from '@angular/core';
-import { PokemonCard } from '../../component/pokemon-card /pokemon-card.component';
+import { PokemonCard } from '../../component/pokemon-card/pokemon-card.component';
 import { PokemonService } from '../../services/pokemon.service';
 import { Pokemon } from '../../models/pokemon.model';
-import { Router } from '@angular/router';
 import { PokemonErrorNotificationComponent } from '../../shared/pokemon-error-notification.component/pokemon-error-notification.component';
+import { take } from 'rxjs';
+import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
 
 @Component({
   selector: 'app-favorit-pokemons.component',
-  imports: [PokemonCard, PokemonErrorNotificationComponent],
+  imports: [PokemonCard, PokemonErrorNotificationComponent, LoadingPokeBall],
   templateUrl: './favorit-pokemons.component.html',
   styleUrl: './favorit-pokemons.component.scss',
   host: {
     '[class.has-items]': 'hasItems()',
   },
 })
-export class FavoritPokemonsComponent {
-  pokemonService = inject(PokemonService);
-  private readonly router = inject(Router);
+export class FavoritPokemonsComponent implements OnInit {
+  private readonly pokemonService = inject(PokemonService);
 
-  favorites = this.pokemonService.favoritePokemons;
-  favoriteIds = this.pokemonService.favoriteIds;
-  pokemons = this.pokemonService.pokemons;
+  readonly favorites = this.pokemonService.favorites;
+  readonly isLoading = this.pokemonService.isFavoritesLoading;
+  readonly hasItems = computed(() => this.favorites().length > 0);
 
-  hasItems = computed(() => this.favorites().length > 0);
+  ngOnInit(): void {
+    this.pokemonService.loadFavorites();
+  }
 
-  onRemoveFavorite(pokemon: Pokemon) {
-    this.pokemonService.toggleFavorite(pokemon);
+  onRemoveFavorite(pokemon: Pokemon): void {
+    this.pokemonService
+      .toggleFavorite(pokemon.pokedexId, true)
+      .pipe(take(1))
+      .subscribe({
+        error: (err) => {
+          console.error('Failed to remove favorite', err);
+        },
+      });
   }
 }

@@ -1,17 +1,15 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { finalize } from 'rxjs';
 
 import { SearchBar } from '../../component/search-bar/search-bar.component';
 import { PokemonListComponent } from '../../features/pokemon-list/pokemon-list.component';
 import { FilterPanelComponent } from '../../component/filter-panel.component/filter-panel.component';
 import { PokemonFilters } from '../../models/pokemon-filters.model';
-
 import { Pokemon } from '../../models/pokemon.model';
 import { PokemonService } from '../../services/pokemon.service';
 import { LoadingPokeBall } from '../../shared/loading-poke-ball/loading-poke-ball.component';
-import { ActivatedRoute, Router } from '@angular/router';
-
-import { finalize } from 'rxjs';
 import { PokemonErrorNotificationComponent } from '../../shared/pokemon-error-notification.component/pokemon-error-notification.component';
 
 @Component({
@@ -29,160 +27,234 @@ import { PokemonErrorNotificationComponent } from '../../shared/pokemon-error-no
   styleUrls: ['./pokemons-home.component.scss'],
 })
 export class PokemonsHome implements OnInit {
-  readonly pokemonService = inject(PokemonService);
+  private readonly limit = 12;
+
+  private readonly pokemonService = inject(PokemonService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  isLoading = this.pokemonService.isLoadingPage;
-  showFilter = signal(false);
-  navigationError = signal(false);
-  filters = signal<PokemonFilters | null>(null);
-  noResults = signal(false);
-  currentPage = signal(1);
+  private readonly _pokemons = signal<Pokemon[]>([]);
+  private readonly _searchResult = signal<Pokemon[] | null>(null);
 
-  private readonly searchResult = signal<Pokemon[] | null>(null);
+  readonly loading = signal(false);
+  readonly showFilter = signal(false);
+  readonly navigationError = signal(false);
+  readonly noResults = signal(false);
+  readonly currentPage = signal(1);
+  readonly filters = signal<PokemonFilters | null>(null);
 
-  readonly displayedPokemons = computed(
-    () => this.searchResult() ?? this.pokemonService.pokemons()
-  );
-  readonly displayedLoadPokemonsBtn = computed(
-    () => !this.searchResult() || this.searchResult()!.length === 0
-  );
+  get pokemons(): Pokemon[] {
+    return this._pokemons();
+  }
 
-ngOnInit(): void {
-  this.route.queryParams.subscribe((params) => {
-    const rawPage = params['page'];
-    const page = rawPage ? Number(rawPage) : 1;
-    this.currentPage.set(page);
+  get searchResult(): Pokemon[] | null {
+    return this._searchResult();
+  }
 
-    const search = params['search'] === 'true';
-    const hasFilters = params['filters'] === 'true';
-    const nameOrId = params['nameOrId'];
+  get displayedPokemons(): Pokemon[] {
+    return this._searchResult() ?? this._pokemons();
+  }
 
-    if (search) {
-      if (nameOrId) {
-        this.onSearchPokemonByNameOrId(nameOrId);
-        return; 
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe((params) => {
+      const rawPage = params['page'];
+      const page = rawPage ? Number(rawPage) : 1;
+      this.currentPage.set(page);
+
+      const search = params['search'] === 'true';
+      const hasFilters = params['filters'] === 'true';
+      const nameOrId = params['nameOrId'];
+
+      if (search) {
+        if (nameOrId) {
+          this.runSearchByNameOrId(nameOrId);
+          return;
+        }
+
+        if (hasFilters) {
+          const color = params['color'] ?? null;
+          const group = params['group'] ?? null;
+          const type = params['type'] ?? null;
+
+          const heightParam = params['height'];
+          const height =
+            heightParam !== undefined && heightParam !== null && heightParam !== ''
+              ? Number(heightParam)
+              : undefined;
+
+          const filterValue: PokemonFilters = {
+            height,
+            type,
+            group,
+            color,
+          };
+
+          this.filters.set(filterValue);
+          this.searchWithFilters(filterValue, page);
+          return;
+        }
+
+        this._searchResult.set(null);
+        this.noResults.set(false);
       }
-      if (hasFilters) {
-        const color = params['color'] ?? null;
-        const group = params['group'] ?? null;
-        const type = params['type'] ?? null;
 
-        const heightParam = params['height'];
-        const height =
-          heightParam !== undefined && heightParam !== null && heightParam !== ''
-            ? Number(heightParam)
-            : undefined;
-
-        const filters: PokemonFilters = {
-          height: height,
-          type: type,
-          group: group,
-          color: color,
-        };
-      this.onSearchFilterSubmit(filters);
-        return; 
+      if (!Number.isFinite(page) || page < 1) {
+        this.navigationError.set(true);
+        return;
       }
 
-      this.searchResult.set(null);
+      this._searchResult.set(null);
       this.noResults.set(false);
-    }
+      this.loadPage(page);
+    });
+  }
 
-    if (!Number.isFinite(page) || page < 1) {
-      this.navigationError.set(true);
+  private runSearchByNameOrId(term: string): void {
+    const value = term.trim();
+    if (!value) {
+      this._searchResult.set(null);
+      this.noResults.set(false);
+      this.currentPage.set(1);
+      this.loadPage(1);
       return;
     }
 
-    this.searchResult.set(null);
-    this.noResults.set(false);
-    this.pokemonService.load12Pokemons(page);
-  });
-}
-
-
-  onSearchPokemonByNameOrId(nameOrId: string): void {
-    const q = nameOrId.trim();
-
-    if (!q) {
-      this.searchResult.set(null);
-      this.noResults.set(false);
-      return;
-    }
-
-    this.isLoading.set(true);
+    this.loading.set(true);
+    this._searchResult.set(null);
     this.noResults.set(false);
 
     this.pokemonService
-      .getPokemonByNameOrId(q)
-      .pipe(
-        finalize(() => {
-          this.isLoading.set(false);
-          this.router.navigate([], {
-            relativeTo: this.route,
-            queryParams: { search: true, nameOrId: q },
-            replaceUrl: true,
-          });
-        })
-      )
+      .getPokemonByNameOrId(value)
+      .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: (p) => {
-          this.searchResult.set([p]);
+        next: (pokemon) => {
+          this._searchResult.set([pokemon]);
+          this.noResults.set(false);
         },
         error: (err) => {
-          console.error('Error loading pokemon', err);
-          this.searchResult.set([]);
+          console.error('Error searching pokemon by name or id', err);
+          this._searchResult.set([]);
           this.noResults.set(true);
         },
       });
   }
-  onToggleFiltersForm(): void {
-    this.showFilter.update((v) => !v);
-  }
-  onFiltersCancel(): void {
-    this.showFilter.set(false);
-  }
-  onSearchFilterSubmit(formValue: PokemonFilters): void {
-    this.isLoading.set(true);
-    this.filters.set(formValue);
-    this.noResults.set(false);
+private searchWithFilters(filters: PokemonFilters, page: number): void {
+  this.loading.set(true);
+  this._searchResult.set(null);
+  this.noResults.set(false);
 
-    this.pokemonService.searchPokemonsByFilters(formValue, this.currentPage()).subscribe({
-      next: (result) => {
-        const filters = this.filters();
-
-        this.router.navigate([], {
-          relativeTo: this.route,
-          queryParams: {
-            page: this.currentPage(),
-            ...(filters?.color && filters.color.trim() !== '' ? { color: filters.color } : {}),
-            ...(filters?.type && filters.type.trim() !== '' ? { type: filters.type } : {}),
-            ...(filters?.group && filters.group.trim() !== '' ? { group: filters.group } : {}),
-            ...(typeof filters?.height === 'number' && !Number.isNaN(filters.height)
-              ? { height: filters.height }
-              : {}),
-            search: true,
-            filters: true,
-          },
-          replaceUrl: true,
-        });
-        this.searchResult.set(result);
-        this.noResults.set(result.length === 0);
+  this.pokemonService
+    .searchPokemonsByFilters(filters, page, this.limit)
+    .pipe(finalize(() => this.loading.set(false)))
+    .subscribe({
+      next: (list) => {
+        this._searchResult.set(list);
+        this.noResults.set(list.length === 0);
       },
-      error: () => {
-        this.searchResult.set([]);
+      error: (err) => {
+        console.error('Error searching pokemons with filters', err);
+        this._searchResult.set([]);
         this.noResults.set(true);
       },
-      complete: () => {
-        this.isLoading.set(false);
-        this.onFiltersCancel();
+    });
+}
+
+loadPage(page: number): void {
+  this.loading.set(true);
+
+  this.pokemonService
+    .getPokemons(page, this.limit)
+    .pipe(finalize(() => this.loading.set(false)))
+    .subscribe({
+      next: (list) => {
+        this._pokemons.set(list);
+      },
+      error: (err) => {
+        console.error('Error loading pokemons', err);
+      },
+    });
+}
+  onSearchPokemonByNameOrId(term: string): void {
+    const value = term.trim();
+
+    if (!value) {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: {
+          search: null,
+          nameOrId: null,
+          filters: null,
+          color: null,
+          group: null,
+          type: null,
+          height: null,
+          page: 1,
+        },
+      });
+      return;
+    }
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        search: 'true',
+        nameOrId: value,
+        filters: null,
+        color: null,
+        group: null,
+        type: null,
+        height: null,
+        page: null,
       },
     });
   }
 
+  onSearchFilterSubmit(filters: PokemonFilters): void {
+    this.showFilter.set(false);
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        search: 'true',
+        filters: 'true',
+        nameOrId: null,
+        color: filters.color ?? null,
+        group: filters.group ?? null,
+        type: filters.type ?? null,
+        height: filters.height ?? null,
+        page: 1,
+      },
+    });
+  }
+
+  onToggleFiltersForm(): void {
+    this.showFilter.update((v) => !v);
+  }
+
+  onFiltersCancel(): void {
+    this.showFilter.set(false);
+  }
+
   onResetFilters(): void {
+    this.showFilter.set(false);
+
     this.filters.set(null);
-    this.searchResult.set(null);
+    this._searchResult.set(null);
     this.noResults.set(false);
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        search: null,
+        filters: null,
+        nameOrId: null,
+        color: null,
+        group: null,
+        type: null,
+        height: null,
+        page: 1,
+      },
+    });
   }
 }
