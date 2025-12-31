@@ -1,0 +1,250 @@
+@import '../../../styles/src-colors';
+
+$nav-bar-height: 67px;
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: $color-primary-blue;
+  padding: 0 15%;
+  height: $nav-bar-height;
+  position: relative;
+  z-index: 1500;
+}
+
+.header__logo {
+  display: flex;
+  align-items: center;
+
+  img {
+    height: 48px;
+    width: auto;
+    display: block;
+  }
+}
+
+nav {
+  height: 67px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+nav a {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 24px;
+  gap: 10px;
+  font-family: 'Roboto';
+  font-weight: 400;
+  font-size: 16px;
+  cursor: pointer;
+  color: $color-light;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+nav a.active {
+  background-color: $color-primary-green;
+  color: $color-primary-blue;
+  font-weight: 500;
+}
+
+@media (max-width: 760px) {
+  $mobile-header-height: 56px;
+
+  .header {
+    background-color: #ffffff;
+    padding: 0 16px;
+    height: $mobile-header-height;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  }
+
+  .header__logo {
+    justify-content: center;
+    width: 100%;
+    z-index: 1599;
+    display: block;
+
+    img {
+      height: 32px; 
+      width: auto;
+      display: block;
+    }
+  }
+  .mobile-toggle {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    z-index: 1600;
+
+    .mobile-toggle__bar {
+      width: 18px;
+      height: 2px;
+      background: #111;
+      border-radius: 999px;
+      transition: transform 0.22s ease, opacity 0.18s ease;
+    }
+  }
+
+  .mobile-toggle--open {
+    .mobile-toggle__bar:nth-child(1) {
+      transform: translateY(6px) rotate(45deg);
+    }
+
+    .mobile-toggle__bar:nth-child(2) {
+      opacity: 0;
+    }
+
+    .mobile-toggle__bar:nth-child(3) {
+      transform: translateY(-6px) rotate(-45deg);
+    }
+  }
+
+  .mobile-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.22s ease-out, opacity 0.22s ease-out;
+    z-index: 1550;
+  }
+
+  .mobile-menu--open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mobile-menu__panel {
+    margin-top: 0;
+    background: #ffffff;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.18);
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 70px;
+  }
+
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mobile-nav__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 8px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-family: 'Roboto';
+    font-size: 15px;
+    color: #222222;
+    background: transparent;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    &.active {
+      color: $color-primary-green;
+      font-weight: 600;
+    }
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.03);
+    }
+  }
+  nav a {
+    color: $color-primary-blue;
+    width: 100%;
+    font-size: 20px;
+  }
+  nav a.active {
+    background-color: #ffffff;
+    color: $color-primary-green;
+    font-weight: 600;
+
+  }
+
+  nav {
+    height: 100%;
+  }
+
+  .mobile-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.25);
+    border: 0;
+    z-index: 1000;
+  }
+}
+
+.nav-favorites {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pokeball-badge {
+  position: relative;
+  width: 35px;
+  height: 35px;
+  margin-left: 4px;
+  border-radius: 50%;
+  border: 2px solid #111;
+  box-sizing: border-box;
+  background: linear-gradient(to bottom, #ff1c1c 0 50%, #ffffff 50% 100%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pokeball-badge::before {
+  content: '';
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 50%;
+  height: 2px;
+  background: #111;
+  transform: translateY(-50%);
+}
+
+.pokeball-badge::after {
+  content: '';
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #111;
+}
+
+.pokeball-badge__count {
+  position: relative;
+  z-index: 1;
+  font-size: 10px;
+  font-weight: 700;
+  color: #111;
+}

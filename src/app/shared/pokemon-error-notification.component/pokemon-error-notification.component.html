@@ -1,0 +1,17 @@
+<section class="error-state">
+  <div class="error-state__card">
+    <div class="error-state__icon">
+      <div class="pokeball-circle">
+        <span class="pokeball-line"></span>
+        <span class="pokeball-button"></span>
+      </div>
+    </div>
+
+
+    <p class="error-state__code" *ngIf="errorTitle">{{ errorTitle }}</p>
+
+    <h2 class="error-state__title">{{ errorMessage }}</h2>
+    <p class="error-state__message" *ngIf="errorAction">{{ errorAction }}</p>
+
+  </div>
+</section>

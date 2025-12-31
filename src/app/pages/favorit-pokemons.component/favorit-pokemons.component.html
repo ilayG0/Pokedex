@@ -1,0 +1,12 @@
+@for (pokemon of this.favorites(); track pokemon.id) {
+<app-pokemon-card
+  [pokemon]="pokemon"
+  page="favorite"
+  (pokemonToRemove)="onRemoveFavorite($event)"
+/>
+} @if (favorites().length === 0) {
+<app-pokemon-error-notification
+  errorMessage="No Favorite Pokémon Yet"
+  errorAction="Start exploring and add Pokémon you love"
+/>
+} 

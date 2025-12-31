@@ -1,0 +1,269 @@
+@import '../../../styles/src-colors';
+
+:host {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.4);
+  z-index: 1000;
+  direction: rtl;
+  font-family: 'Roboto';
+}
+
+.filter-card {
+  width: 640px;
+  max-width: 90%;
+  height: 560px;
+  background: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.all-filters {
+  padding: 18px 24px 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.all-buttons {
+  padding: 0px 24px 12px;
+  margin-top: auto;
+}
+
+.filter-card__header {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 16px;
+}
+
+.filter-card__title {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Roboto';
+  font-style: bold;
+  color: #222;
+}
+
+.filter-card__row {
+  margin-bottom: 12px;
+}
+
+.filter-card__row--two-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.field label {
+  color: #555;
+  margin-bottom: 4px;
+  font-family: 'Roboto';
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.field input,
+.field select {
+  height: 36px;
+  padding: 0 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #cfcfcf;
+  background: #ffffff;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.field input::placeholder,
+.field select {
+  color: #b0b0b0;
+}
+
+.field select {
+  padding-right: 8px;
+}
+
+.filter-card__actions {
+  width: 100%;
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 10px;
+}
+
+.line {
+  width: 100%;
+  border: none;
+  border-top: 1px solid rgba(224, 224, 224, 0.45);
+  margin: 0 0 10px 0;
+  margin-top: 45px;
+}
+
+.btn {
+  min-width: 140px;
+  height: 38px;
+  border-radius: 2px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  font-family: 'Roboto';
+  font-weight: 400;
+}
+
+.btn--primary {
+  background: $color-primary-blue;
+  color: #ffffff;
+}
+
+.btn--ghost {
+  background: #ffffff;
+  color: $color-primary-blue;
+  border: 1px solid $color-primary-blue;
+}
+
+.color-picker {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.9rem;
+  margin-top: 0.6rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.color-chip-pokeball {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  outline: none;
+  transition: transform 0.15s ease, filter 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
+  }
+
+  &.selected .pokeball {
+    box-shadow: 0 0 0 3px rgba(66, 121, 239, 0.15), 0 6px 14px 
+    rgba(178, 132, 235, 0.85),
+      0 2px 4px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px) scale(1.05);
+  }
+}
+
+.pokeball {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #020202;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pokeball-top {
+  flex: 1;
+}
+
+.pokeball-bottom {
+  flex: 1;
+  background: #ffffff;
+}
+
+.pokeball::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #020202;
+  transform: translateY(-50%);
+}
+
+.pokeball-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #f9fafb;
+  border: 2px solid #020202;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pokeball-center-inner {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+}
+
+.pokeball-label {
+  font-size: 0.75rem;
+  color: #111827;
+  text-align: center;
+  font-family: 'Roboto';
+
+  &.selected{
+    font-weight: bold;
+  }
+}
+
+@media (max-width: 760px) {
+  .color-picker {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+    margin-top: 0.4rem;
+  }
+  .filter-card {
+    height: 650px;
+  }
+}
+
+.color-hint {
+  margin-top: 1.5rem;
+  font-size: 0.78rem;
+  color: $color-text;
+  text-align: right;
+  direction: rtl; display: inline-block;
+  width: auto;
+  white-space: nowrap;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(134, 132, 235, 0.06);
+  border: 1px dashed rgba(134, 132, 235, 0.35);
+}

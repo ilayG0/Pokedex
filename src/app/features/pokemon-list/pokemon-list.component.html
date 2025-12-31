@@ -1,0 +1,27 @@
+
+<div class="pokemon-grid">
+  @for (pokemon of pokemons; track pokemon.id) {
+  <app-pokemon-card [pokemon]="pokemon" page="home" />
+  }
+</div>
+
+<<<<<<< HEAD
+@if (pokemons.length === 0) {
+  <app-pokemon-error-notification errorTitle="No Pokémon found" errorMessage="Try searching with the full Pokémon name or its Pokédex number"/>
+}
+
+<div class="home__pagination" *ngIf="!searchMode()">
+  <button (click)="prevPage()" [disabled]="currentPage() === 1">Prev</button>
+
+  <span>Page {{ currentPage() }} / {{ totalPages() }}</span>
+
+  <button (click)="nextPage()" [disabled]="currentPage() === totalPages() || pokemons.length === 0">
+    Next
+  </button>
+</div>
+
+=======
+@if (pokemons?.length === 0) {
+  <app-pokemon-error-notification errorTitle="No Pokémon found" errorMessage="Please enter the Pokémon’s full name or serial number"/>
+}
+>>>>>>> 32dfd5ab10431e0fc12564017973f9084d421567
