@@ -1,0 +1,33 @@
+name: Deploy Frontend to Nginx (Self-hosted)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted  # this will use your EC2 runner
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build -c development
+
+      - name: Deploy to Nginx folder
+        run: |
+          FRONTEND_DIR=/var/www/pokedex-frontend
+          BUILD_DIR=dist/pokedex-project
+
+          sudo rm -rf $FRONTEND_DIR/*
+          sudo cp -r $BUILD_DIR/* $FRONTEND_DIR/
+          sudo systemctl reload nginx
