@@ -1,10 +1,14 @@
 import { Routes } from '@angular/router';
-import { PokemonInfoComponent } from './pages/pokemon-info/pokemon-info.component';
-import { PokemonsHome } from './pages/home-page/pokemons-home.component';
-import { FavoritPokemonsComponent } from './pages/favorit-pokemons.component/favorit-pokemons.component';
 
 export const routes: Routes = [
-{ path: 'home', component: PokemonsHome }, 
-{ path: 'pokemon-info/:id', component: PokemonInfoComponent },
-{ path: 'favorite-pokemons', component: FavoritPokemonsComponent }
+  {
+    path: 'auth',
+    loadChildren: () => import('./routes/auth.routes').then((m) => m.AUTH_ROUTES),
+  },
+ {
+    path: '',
+    loadChildren: () =>
+      import('./routes/pokedex.routes').then((m) => m.POKEDEX_ROUTES),
+  },
+  { path: '**', redirectTo: 'auth/login' },
 ];

@@ -1,0 +1,86 @@
+<div class="ring" [ngClass]="{ 'ring--active': isMyTurn && !isFinished }">
+  <div class="floor"></div>
+
+  <ng-container *ngIf="!isFindingMatch && hasOpponent; else overlayTemplate">
+    <div class="turn-banner" [class.turn-banner--my]="isMyTurn && !isFinished">
+      {{ turnLabel }}
+    </div>
+
+    <div class="fighter fighter--left" [ngClass]="playerFxClass">
+      <img class="poke" [src]="playerArtwork" [alt]="playerName" draggable="false" />
+      <div class="shadow"></div>
+      <div class="tag">
+        {{ playerName }}
+        <div class="hp-bar">
+          <div class="hp-bar__fill" [style.width.%]="playerHpPercent"></div>
+        </div>
+        <div class="damage-badge damage-badge--me" *ngIf="damageSide === 'player' && damageAmount !== null">
+          -{{ damageAmount }}
+        </div>
+      </div>
+    </div>
+
+    <div class="vs">
+      <div class="burst"></div>
+      <div class="text">VS</div>
+    </div>
+
+    <div class="fighter fighter--right" [ngClass]="opponentFxClass">
+      <img class="poke" [src]="opponentArtwork" [alt]="opponentName || 'Opponent'" draggable="false" />
+      <div class="shadow"></div>
+      <div class="tag tag--alt">
+        {{ opponentName || 'Opponent' }}
+        <div class="hp-bar">
+          <div class="hp-bar__fill hp-bar__fill--opponent" [style.width.%]="opponentHpPercent"></div>
+        </div>
+        <div class="damage-badge damage-badge--opponent" *ngIf="damageSide === 'opponent' && damageAmount !== null">
+          -{{ damageAmount }}
+        </div>
+      </div>
+    </div>
+
+    <div class="fx fx--left"></div>
+    <div class="fx fx--right"></div>
+
+    <div class="battle-ui" *ngIf="!isFinished">
+      <div class="turn-timer" [class.turn-timer--danger]="remainingSeconds <= 5">
+        {{ remainingSeconds }}s
+      </div>
+
+      <div class="moves-panel">
+        <button
+          class="move-btn"
+          *ngFor="let m of playerMoves"
+          (click)="onMoveClick(m)"
+          [disabled]="!isMyTurn || isFinished"
+        >
+          {{ (m?.name || m?.move?.name || '') | titlecase }}
+        </button>
+      </div>
+    </div>
+
+    <div class="win-overlay" *ngIf="isFinished">
+      <div class="win-overlay__confetti" *ngIf="isWinner"></div>
+      <div class="win-overlay__card">
+        <div class="win-overlay__title">
+          {{ isWinner ? 'Victory!' : 'Defeat' }}
+        </div>
+        <div class="win-overlay__subtitle">
+          {{ isWinner ? 'You won this battle.' : 'Better luck next time.' }}
+        </div>
+        <button class="win-overlay__btn" (click)="onBackToStart()">
+          Back to start
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #overlayTemplate>
+    <div class="match-overlay">
+      <div class="match-overlay__loader"></div>
+      <div class="match-overlay__text">
+        {{ isFindingMatch ? 'Finding a match…' : 'Waiting for opponent…' }}
+      </div>
+    </div>
+  </ng-template>
+</div>

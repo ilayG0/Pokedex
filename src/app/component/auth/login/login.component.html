@@ -1,0 +1,56 @@
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form" novalidate>
+  <div class="field">
+    <label for="login-email">Email</label>
+    <input
+      class="field__input"
+      id="login-email"
+      type="email"
+      formControlName="email"
+      placeholder="ash.ketchum@pokedex.com"
+      autocomplete="email"
+      [class.field__input--invalid]="email.touched && email.invalid"
+    />
+    <div class="field__errors" *ngIf="email.touched && email.invalid">
+      <span *ngIf="email.errors?.['required']">Email is required.</span>
+      <span *ngIf="email.errors?.['email']"> Please enter a valid email. </span>
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="login-password">Password</label>
+    <div class="field__password-wrapper">
+      <input
+        class="field__input"
+        id="login-password"
+        [type]="showPassword ? 'text' : 'password'"
+        formControlName="password"
+        placeholder="Your password"
+        autocomplete="current-password"
+        [class.field__input--invalid]="password.touched && password.invalid"
+      />
+      <button type="button" class="field__password-toggle" (click)="showPassword = !showPassword">
+        {{ showPassword ? 'Hide' : 'Show' }}
+      </button>
+    </div>
+    <div class="field__errors" *ngIf="password.touched && password.invalid">
+      <span *ngIf="password.errors?.['required']"> Password is required. </span>
+    </div>
+  </div>
+
+  <button
+    type="submit"
+    class="auth-btn auth-btn--primary"
+    [disabled]="loginForm.invalid || isSubmitting"
+  >
+    {{ isSubmitting ? 'Logging in…' : 'Login' }}
+  </button>
+
+  <p class="auth-switch">
+    Don’t have an account?
+    <a routerLink="../signup" class="auth-link">Create one</a>
+  </p>
+
+  <p *ngIf="submitError" class="field__errors">
+    {{ submitError }}
+  </p>
+</form>

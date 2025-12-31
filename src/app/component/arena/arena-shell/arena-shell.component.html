@@ -1,0 +1,21 @@
+<div class="arena">
+  <div class="bg">
+    <div class="lights"></div>
+    <div class="crowd"></div>
+  </div>
+
+  <header class="top">
+    <div class="brand">
+      <div class="badge">ARENA</div>
+    </div>
+
+    <div class="status" [class.status--busy]="isFindingMatch">
+      <span class="dot"></span>
+      <span class="text">{{ statusText }}</span>
+    </div>
+  </header>
+
+  <section class="stage">
+    <ng-content></ng-content>
+  </section>
+</div>

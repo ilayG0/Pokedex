@@ -1,8 +1,8 @@
-@if (pokemon && pokemon.id) {
+@if (pokemon && pokemon.pokedexId) {
 <div [class]="page === 'info' ? 'pokemon-card-info' : 'card'">
   <div class="pokemon-card__header">
     <span class="pokemon-card__id">
-      {{ pokemon.id | pokemonId }}
+      {{ pokemon.pokedexId | pokemonId }}
     </span>
 
     @if (page === 'favorite') {
@@ -39,13 +39,13 @@
 
   <div [class]="page === 'info' ? 'row devider' : ''">
     <div [class]="page === 'info' ? 'col-md-4' : ''">
-      <a (click)="goToPokemon(pokemon.id)">
+      <a (click)="goToPokemon(pokemon.pokedexId)">
         <img
           class="card-home-image"
           *ngIf="page === 'home' || page === 'favorite'"
           [src]="
             'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' +
-            pokemon.id +
+            pokemon.pokedexId +
             '.png'
           "
           alt="{{ pokemon.name }}"
@@ -63,8 +63,8 @@
       </a>
 
       <div class="pokemon-card__types" *ngIf="page === 'info'">
-        <span *ngFor="let t of pokemon.types" class="type-chip" [ngClass]="'type-' + t.type.name">
-          {{ t.type.name | capitalizeFirst }}
+        <span *ngFor="let t of pokemon.types" class="type-chip" [ngClass]="'type-' + t.name">
+          {{ t.name | capitalizeFirst }}
         </span>
       </div>
     </div>

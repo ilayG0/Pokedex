@@ -1,0 +1,20 @@
+<div class="picker">
+  <div class="head">
+    <div class="title">Choose your Pokémon</div>
+    <div class="sub">Only from your favorites</div>
+  </div>
+
+  <div class="grid" *ngIf="favorites()?.length; else empty">
+    <button class="card" *ngFor="let p of favorites()" (click)="onPick(p)">
+      <img class="img" [src]="artworkUrlFn(p.pokedexId)" [alt]="titleCaseFn(pokemonNameFn(p))" draggable="false" />
+      <div class="name">{{ titleCaseFn(pokemonNameFn(p)) }}</div>
+    </button>
+  </div>
+
+  <ng-template #empty>
+    <div class="empty">
+      <div class="emptyTitle">No favorites yet</div>
+      <div class="emptySub">Add Pokémon to favorites first, then come back to battle.</div>
+    </div>
+  </ng-template>
+</div>

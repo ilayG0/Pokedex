@@ -35,7 +35,7 @@ nav a {
   display: flex;
   align-items: center;
   height: 100%;
-  padding: 24px;
+  padding: 15px;
   gap: 10px;
   font-family: 'Roboto';
   font-weight: 400;
@@ -247,4 +247,9 @@ nav a.active {
   font-size: 10px;
   font-weight: 700;
   color: #111;
+}
+
+#logout-btn{
+  color: $color-error;
+  font-weight: 500;
 }
