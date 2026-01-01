@@ -21,13 +21,7 @@
   </div>
   @if (!isMobile()) {
   <nav>
-    <a
-      class="nav-home"
-      [routerLink]="['/home']"
-      routerLinkActive="active"
-    >
-      Home
-    </a>
+    <a class="nav-home" [routerLink]="['/home']" routerLinkActive="active"> Home </a>
 
     <a
       class="nav-favorites"
@@ -43,7 +37,17 @@
       </span>
       }
     </a>
-    <a id="logout-btn" (click)="onLogout()">Logout</a>
+<a
+  class="arena-link"
+  routerLink="/areana"
+  routerLinkActive="arena-link--active"
+  [routerLinkActiveOptions]="{ exact: true }"
+>
+  Arena
+</a>
+    <a id="logout-btn" (click)="onLogout()" title="Logout">
+      <fa-icon [icon]="logoutIcon"></fa-icon>
+    </a>
   </nav>
   } @if (isMobile()) {
   <div class="mobile-menu" [class.mobile-menu--open]="isMenuOpen()">
