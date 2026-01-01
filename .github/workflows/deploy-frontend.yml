@@ -1,33 +1,55 @@
-name: Deploy Frontend to Nginx (Self-hosted)
+name: Frontend CI/CD (GitHub-hosted)
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted  
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build frontend
-        run: npm run build -c development
+      - name: Build Angular app
+        run: npm run build -- --configuration=production
 
-      - name: Deploy to Nginx folder
+      - name: Setup SSH
         run: |
-          FRONTEND_DIR=/var/www/pokedex-frontend
-          BUILD_DIR=dist/pokedex-project
+          mkdir -p ~/.ssh
+          echo "$EC2_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          printf "Host *\n  StrictHostKeyChecking no\n" > ~/.ssh/config
+        env:
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
 
-          sudo rm -rf $FRONTEND_DIR/*
-          sudo cp -r $BUILD_DIR/* $FRONTEND_DIR/
-          sudo systemctl reload nginx
+      - name: Deploy build to EC2
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rsync
+          rsync -avz --delete \
+            dist/pokedex-project/ \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/pokedex-frontend/
+
+      - name: Health check
+        run: |
+          for i in {1..10}; do
+            echo "Health check attempt $i..."
+            if curl -f http://${{ secrets.EC2_HOST }}/index.html > /dev/null 2>&1; then
+              echo "Frontend is up ✅"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "Frontend health check failed ❌"
+          exit 1
