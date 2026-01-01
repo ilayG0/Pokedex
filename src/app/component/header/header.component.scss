@@ -70,7 +70,7 @@ nav a.active {
     display: block;
 
     img {
-      height: 32px; 
+      height: 32px;
       width: auto;
       display: block;
     }
@@ -183,7 +183,6 @@ nav a.active {
     background-color: #ffffff;
     color: $color-primary-green;
     font-weight: 600;
-
   }
 
   nav {
@@ -249,7 +248,44 @@ nav a.active {
   color: #111;
 }
 
-#logout-btn{
+#logout-btn {
   color: $color-error;
+  font-size: 20px;
+}
+
+.arena-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: 'Roboto';
+  padding: 0.6rem 1.6rem;
+
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+
+  color: #fefefe;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.arena-link::after {
+  content: '⚔';
+  font-size: 1.2rem;
+  padding-bottom: 5px;
+}
+
+.arena-link:hover {
+  transform: translateY(-1px);
+  text-shadow: 0 0 8px rgba(213, 156, 0, 0.7);
+}
+
+.arena-link--active {
+  text-shadow: 0 0 10px rgb(197, 0, 0);
+  background-color: $color-primary-green;
+  color: $color-primary-blue;
   font-weight: 500;
 }
