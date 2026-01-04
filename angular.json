@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "pokedex-project": {
+    "pokedex-frontend": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -61,10 +61,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "pokedex-project:build:production"
+              "buildTarget": "pokedex-frontend:build:production"
             },
             "development": {
-              "buildTarget": "pokedex-project:build:development"
+              "buildTarget": "pokedex-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"
