@@ -38,7 +38,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y rsync
           rsync -avz --delete \
-            dist/pokedex-project/browser/ \
+            dist/pokedex-frontend/browser/ \
             ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/pokedex-frontend/
 
       - name: Health check
@@ -46,10 +46,10 @@ jobs:
           for i in {1..10}; do
             echo "Health check attempt $i..."
             if curl -f http://${{ secrets.EC2_HOST }}/index.html > /dev/null 2>&1; then
-              echo "Frontend is up ✅"
+              echo "Frontend is up "
               exit 0
             fi
             sleep 3
           done
-          echo "Frontend health check failed ❌"
+          echo "Frontend health check failed "
           exit 1
